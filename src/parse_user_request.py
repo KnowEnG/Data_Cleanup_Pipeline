@@ -146,22 +146,21 @@ def check_ensemble_gene_name(data_frame, user_config):
     output_df_mapped = data_frame[mapped_filter]
 
     # writes each data frame to output file separately
-    output_df_unmapped_one.to_csv(user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_one",
-                                  header=None, index=None, sep='\t')
-    output_df_unmapped_many.to_csv(user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_many",
-                                   header=None, index=None, sep='\t')
-    output_df_unmapped_one.to_csv(user_config['user_spreadsheet_mapped_gene_output_dir'] + "/tmp_mapped",
-                                  header=None, index=None, sep='\t')
-
     if not output_df_unmapped_one.empty:
+        output_df_unmapped_one.to_csv(user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_one",
+                                      header=None, index=None, sep='\t')
         return False, "Found gene names that cannot be mapped to ensemble name."
 
     if not output_df_unmapped_many.empty:
+        output_df_unmapped_many.to_csv(user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_many",
+                                       header=None, index=None, sep='\t')
         return False, "Found gene names that mapped to many ensemble name."
 
     if output_df_mapped.empty:
         return False, "No valid ensemble name can be found."
     else:
+        output_df_mapped.to_csv(user_config['user_spreadsheet_mapped_gene_output_dir'] + "/tmp_mapped",
+                                header=None, index=None, sep='\t')
         return True, "This is a valid user spreadsheet. Proceed to do next step analysis."
 
     return False, "An unexpected error occured."
