@@ -11,7 +11,6 @@ import redis_utilities as ru
 import yaml
 import pickle
 
-
 log = logging.getLogger()
 out_handler = logging.StreamHandler(sys.stdout)
 out_handler.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
@@ -31,8 +30,8 @@ def return_formatter(boolean_code, message):
 
     """
     return {"status": boolean_code, "message": message}
-    
-    
+
+
 def load_data_file(spreadsheet_path):
     """
     Loads data file as a data frame object by a given file path
@@ -147,19 +146,10 @@ def check_ensemble_gene_name(data_frame, user_config):
     output_df_mapped = data_frame[mapped_filter]
 
     # writes each data frame to output file separately
-    """
-
-    write_to_tsv(output_df_unmapped_one,
-                 user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_one")
-    write_to_tsv(output_df_unmapped_many,
-                 user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_many")
-    write_to_tsv(output_df_mapped,
-                 user_config['user_spreadsheet_mapped_gene_output_dir'] + '/tmp_mapped')
-    """
     output_df_unmapped_one.to_csv(user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_one",
-        header = None, index = None, sep = '\t')
-    output_df_unmapped_many.to_csv(user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_many",
                                   header=None, index=None, sep='\t')
+    output_df_unmapped_many.to_csv(user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_many",
+                                   header=None, index=None, sep='\t')
     output_df_unmapped_one.to_csv(user_config['user_spreadsheet_mapped_gene_output_dir'] + "/tmp_mapped",
                                   header=None, index=None, sep='\t')
 
