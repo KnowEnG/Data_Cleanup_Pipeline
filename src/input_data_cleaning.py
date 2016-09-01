@@ -1,36 +1,10 @@
-#!/usr/bin/env python3
 """
 This module serves as a connecting function between front end with back end
 """
-import logging
-import time
 import sys
-import os
 import pandas
-import redis_utilities as ru
+import src.redis_utilities as redutil
 import yaml
-import pickle
-
-log = logging.getLogger()
-out_handler = logging.StreamHandler(sys.stdout)
-out_handler.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
-out_handler.setLevel(logging.INFO)
-log.addHandler(out_handler)
-log.setLevel(logging.INFO)
-
-
-def return_formatter(boolean_code, message):
-    """
-    Creates a return value format as a dictionary
-    Args:
-        boolean_code: a boolean return code
-        message: a message indicates useful information about current condition
-
-    Returns:
-
-    """
-    return {"status": boolean_code, "message": message}
-
 
 def load_data_file(spreadsheet_path):
     """
@@ -41,7 +15,7 @@ def load_data_file(spreadsheet_path):
     Returns: user spreadsheet as a data frame
 
     """
-    log.info("Start checking user spread sheet")
+    print("Start checking user spread sheet")
     try:
         user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', header=None)
         return user_spreadsheet_df
@@ -122,11 +96,11 @@ def check_ensemble_gene_name(data_frame, user_config):
     Returns:
          (match_flag, error_message)
     """
-    redis_db = ru.get_database(user_config['redis_credential'])
+    redis_db = redutil.get_database(user_config['redis_credential'])
     num_columns = len(data_frame.columns)
 
     for idx, row in data_frame.iterrows():
-        convert_gene = ru.conv_gene(redis_db, row[0], '', '9606')
+        convert_gene = redutil.conv_gene(redis_db, row[0], '', '9606')
         data_frame.set_value(idx, num_columns, convert_gene)
 
     # filters the unmappped-none rows
@@ -183,27 +157,29 @@ def sanity_check_data_file(user_spreadsheet_df, user_config):
     # Case 1: checks the duplication on entire row and removes it if it exists
     user_spreadsheet_df_row_dedup, match_flag, error_msg = check_duplicate_rows(user_spreadsheet_df)
     if match_flag is False:
-        return return_formatter(match_flag, error_msg)
+        return match_flag, error_msg
 
     # Case 2: checks the duplication on gene name and rejects it if it exists
     user_spreadsheet_df_genename_dedup, match_flag, error_msg = check_duplicate_gene_name(user_spreadsheet_df_row_dedup)
     if match_flag is False:
-        return return_formatter(match_flag, error_msg)
+        return match_flag, error_msg
 
     # Case 3: checks if only 0 and 1 appears in user spreadsheet
     match_flag, error_msg = check_value_set(user_spreadsheet_df_genename_dedup, default_user_spreadsheet_value)
     if match_flag is False:
-        return return_formatter(match_flag, error_msg)
+        return match_flag, error_msg
 
     # Case 4: checks the validity of gene name
     match_flag, error_msg = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, user_config)
     if match_flag is not None:
-        return return_formatter(match_flag, error_msg)
+        return match_flag, error_msg
+
+    return True, "This is a valid user spreadsheet! It will be passed to next step..."
 
 
 def parse_config(config_path):
     """
-
+    Parsing configuration file as yaml format
     Args:
         config_path: run file path
 
@@ -214,30 +190,7 @@ def parse_config(config_path):
         try:
             config = yaml.load(stream)
         except yaml.YAMLError as exc:
-            log.error(exc)
+            print(exc)
     return config
 
 
-def main():
-    log.info("Start fetching data")
-    start_time = time.time()
-
-    user_session_path = os.getcwd() + '/user_configuration'
-    config_file_name = 'run_file.yml'
-
-    config_file_path = user_session_path + '/' + config_file_name
-    user_config = parse_config(config_file_path)
-    log.info(user_config)
-
-    spreadsheet_path = user_session_path + '/' + user_config['user_spreadsheet_name']
-    spreadsheet_df = load_data_file(spreadsheet_path)
-    is_bad_file = sanity_check_data_file(spreadsheet_df, user_config)
-    if is_bad_file["status"] is False:
-        sys.exit("This is a bad user spreadsheet. Please check syntax before upload.")
-
-    log.info("--- Program ran for %s seconds ---" % (time.time() - start_time))
-    log.info("Program succeeded!")
-
-
-if __name__ == "__main__":
-    main()
