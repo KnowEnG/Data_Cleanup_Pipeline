@@ -12,6 +12,7 @@ import yaml
 def load_data_file(spreadsheet_path):
     """
     Loads data file as a data frame object by a given file path
+
     Args:
         spreadsheet_path: user spreadsheet input file, which is uploaded from frontend
 
@@ -56,7 +57,7 @@ def check_duplicate_gene_name(data_frame):
 
     Returns:
           (data_frame_genename_dedup, match_flag, error_message)
-          
+
     """
     data_frame_genename_dedup = data_frame.drop_duplicates(
         0, keep='first').reset_index(drop=True)
@@ -149,6 +150,7 @@ def check_ensemble_gene_name(data_frame, user_config):
 def sanity_check_data_file(user_spreadsheet_df, user_config):
     """
     Checks the validity of user input spreadsheet data file
+
     Args:
         user_spreadsheet_df: user spreadsheet input file data frame, which is uploaded from frontend
         user_config: run_file parameter dictionary
@@ -180,12 +182,13 @@ def sanity_check_data_file(user_spreadsheet_df, user_config):
     if match_flag is not None:
         return match_flag, error_msg
 
-    return True, "This is a valid user spreadsheet! It will be passed to next step..."
+    return True, "User spreadsheet has passed the validation successfully! It will be passed to next step..."
 
 
 def parse_config(config_path):
     """
-    Parsing configuration file as yaml format
+    Parsing a configuration file in YAML format
+
     Args:
         config_path: run file path
 
@@ -195,8 +198,8 @@ def parse_config(config_path):
     with open(config_path, 'r') as stream:
         try:
             config = yaml.load(stream)
-        except yaml.YAMLError as exc:
-            print(exc)
+        except yaml.YAMLError as err:
+            sys.exit(str(err))
     return config
 
 
