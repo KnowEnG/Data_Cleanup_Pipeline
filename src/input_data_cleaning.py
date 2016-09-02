@@ -1,5 +1,8 @@
 """
-This module serves as a connecting function between front end with back end
+    This module serves as a connecting function between front end with back end.
+    It validates/cleans the user spreadsheet data and returns a boolean value to
+    indicate if the user spreadsheet is valid or not. If the user spreadsheet is
+     valid or not.
 """
 import sys
 import pandas
@@ -53,6 +56,7 @@ def check_duplicate_gene_name(data_frame):
 
     Returns:
           (data_frame_genename_dedup, match_flag, error_message)
+          
     """
     data_frame_genename_dedup = data_frame.drop_duplicates(
         0, keep='first').reset_index(drop=True)
@@ -76,6 +80,7 @@ def check_value_set(data_frame, golden_value_set):
 
     Returns:
          (match_flag, error_message)
+
     """
     gene_value_set = set(data_frame.ix
                          [:, data_frame.columns != 0].values.ravel())
@@ -95,6 +100,7 @@ def check_ensemble_gene_name(data_frame, user_config):
 
     Returns:
          (match_flag, error_message)
+
     """
     redis_db = redutil.get_database(user_config['redis_credential'])
     num_columns = len(data_frame.columns)

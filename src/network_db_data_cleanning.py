@@ -8,10 +8,8 @@ import logging
 import pandas
 import mysql.connector as sql
 from pandas import DataFrame
-from knpackage import toolbox
 
 log = logging.getLogger()
-
 
 def read_database(etype, taxon, global_log):
     """
@@ -97,13 +95,9 @@ def create_symmetric_matrix(data_frame, lookup_table):
 
     temp_array = []
     for row in data_frame.itertuples():
-   #     replace_col_0 = lookup_table.get(row[1])
-    #    replace_col_1 = lookup_table.get(row[2])
         cur_strings_to_sort = [row[1], row[2]]
         cur_strings_to_sort.sort()
         dict_tmp = []
-   #     dict_tmp.append(replace_col_0)
-   #     dict_tmp.append(replace_col_1)
         dict_tmp.append(row[1])
         dict_tmp.append(row[2])
         dict_tmp.append(row[3])
