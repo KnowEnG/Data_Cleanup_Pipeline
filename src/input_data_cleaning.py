@@ -6,7 +6,7 @@
 """
 import sys
 import pandas
-import src.redis_utilities as redutil
+import redis_utilities as redutil
 import yaml
 
 def load_data_file(spreadsheet_path):
@@ -19,7 +19,7 @@ def load_data_file(spreadsheet_path):
     Returns: user spreadsheet as a data frame
 
     """
-    print("Start checking user spread sheet")
+    print("Start checking user spread sheet...")
     try:
         user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', header=None)
         return user_spreadsheet_df
@@ -38,6 +38,7 @@ def check_duplicate_rows(data_frame):
           (data_frame_dedup, match_flag, error_message)
 
     """
+    print("Checking duplicate rows...")
     data_frame_dedup = data_frame.drop_duplicates()
     row_count_diff = len(data_frame.index) - len(data_frame_dedup.index)
     if row_count_diff > 0:
@@ -59,6 +60,8 @@ def check_duplicate_gene_name(data_frame):
           (data_frame_genename_dedup, match_flag, error_message)
 
     """
+    print("Checking duplicate gene names...")
+
     data_frame_genename_dedup = data_frame.drop_duplicates(
         0, keep='first').reset_index(drop=True)
     row_count_diff = len(data_frame.index) - len(data_frame_genename_dedup.index)
@@ -83,6 +86,8 @@ def check_value_set(data_frame, golden_value_set):
          (match_flag, error_message)
 
     """
+    print("Checking value set...")
+
     gene_value_set = set(data_frame.ix
                          [:, data_frame.columns != 0].values.ravel())
     if golden_value_set != gene_value_set:
@@ -103,6 +108,8 @@ def check_ensemble_gene_name(data_frame, user_config):
          (match_flag, error_message)
 
     """
+    print("Checking ensemble gene name ...")
+
     redis_db = redutil.get_database(user_config['redis_credential'])
     num_columns = len(data_frame.columns)
 
@@ -128,21 +135,21 @@ def check_ensemble_gene_name(data_frame, user_config):
 
     # writes each data frame to output file separately
     if not output_df_unmapped_one.empty:
-        output_df_unmapped_one.to_csv(user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_one",
+        output_df_unmapped_one.to_csv(user_config['results_directory'] + "/tmp_unmapped_one",
                                       header=None, index=None, sep='\t')
         return False, "Found gene names that cannot be mapped to ensemble name."
 
     if not output_df_unmapped_many.empty:
-        output_df_unmapped_many.to_csv(user_config['user_spreadsheet_unmapped_gene_output_dir'] + "/tmp_unmapped_many",
+        output_df_unmapped_many.to_csv(user_config['results_directory'] + "/tmp_unmapped_many",
                                        header=None, index=None, sep='\t')
         return False, "Found gene names that mapped to many ensemble name."
 
     if output_df_mapped.empty:
         return False, "No valid ensemble name can be found."
     else:
-        output_df_mapped.to_csv(user_config['user_spreadsheet_mapped_gene_output_dir'] + "/tmp_mapped",
+        output_df_mapped.to_csv(user_config['results_directory'] + "/tmp_mapped",
                                 header=None, index=None, sep='\t')
-        return True, "This is a valid user spreadsheet. Proceed to do next step analysis."
+        return True, "This is a valid user spreadsheet. Proceed to next step analysis."
 
     return False, "An unexpected error occured."
 
@@ -185,17 +192,18 @@ def sanity_check_data_file(user_spreadsheet_df, user_config):
     return True, "User spreadsheet has passed the validation successfully! It will be passed to next step..."
 
 
-def parse_config(config_path):
+
+def parse_config(run_file_path):
     """
     Parsing a configuration file in YAML format
 
     Args:
-        config_path: run file path
+        run_file_path: run file path
 
     Returns: a dictionary contains the run file parameters
 
     """
-    with open(config_path, 'r') as stream:
+    with open(run_file_path, 'r') as stream:
         try:
             config = yaml.load(stream)
         except yaml.YAMLError as err:

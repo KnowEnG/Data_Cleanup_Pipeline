@@ -3,21 +3,23 @@
 import time
 import sys
 import os
-import src.input_data_cleaning as dataclng
+import input_data_cleaning as dataclng
 
 def main():
     start_time = time.time()
 
-    user_session_path = os.getcwd() + '/user_configuration'
-    config_file_name = 'run_file.yml'
+    user_session_path = os.path.dirname(os.getcwd())
+    config_file_name = 'run_parameters.yml'
 
-    config_file_path = user_session_path + '/' + config_file_name
+    config_file_path = user_session_path + '/data/run_files/' + config_file_name
     user_config = dataclng.parse_config(config_file_path)
     print(user_config)
 
-    spreadsheet_path = user_session_path + '/' + user_config['user_spreadsheet_name']
+    spreadsheet_path = user_config['spreadsheet_name_full_path']
     spreadsheet_df = dataclng.load_data_file(spreadsheet_path)
-    is_bad_file, err_msg = dataclng.sanity_check_data_file(spreadsheet_df, user_config)
+    is_bad_file, msg = dataclng.sanity_check_data_file(spreadsheet_df, user_config)
+    print(msg)
+
     if is_bad_file is False:
         sys.exit("This is a bad user spreadsheet. Please check syntax before upload.")
 
