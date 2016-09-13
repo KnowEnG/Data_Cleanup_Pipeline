@@ -1,5 +1,5 @@
 #	dataframe == matrix with row and column names in .tsv format.
-spreadsheet_name_full_path: ../data/spreadsheets/abc_user_spreadsheet.tsv
+spreadsheet_name_full_path: ../data/spreadsheets/example_user_spreadsheet.tsv
 
 #	Where the computational output will be written.
 results_directory: ./run_dir/results
