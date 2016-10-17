@@ -1,8 +1,7 @@
 """
-    This module serves as a connecting function between front end with back end.
+    This module serves as a connecting function between front end and back end.
     It validates/cleans the user spreadsheet data and returns a boolean value to
-    indicate if the user spreadsheet is valid or not. If the user spreadsheet is
-     valid or not.
+    indicate if the user spreadsheet is valid or not. 
 """
 import pandas
 import redis_utilities as redutil
