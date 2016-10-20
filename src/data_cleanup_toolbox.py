@@ -6,6 +6,7 @@
 import pandas
 import redis_utilities as redutil
 import yaml
+import os
 
 
 def parse_config(run_file_path):
@@ -15,7 +16,8 @@ def parse_config(run_file_path):
     Args:
         run_file_path: run file path
 
-    Returns: a dictionary contains the run file parameters
+    Returns:
+         config: dictionary contains the run file parameters
 
     """
     with open(run_file_path, 'r') as stream:
@@ -33,12 +35,13 @@ def load_data_file(spreadsheet_path):
     Args:
         spreadsheet_path: user spreadsheet input file, which is uploaded from frontend
 
-    Returns: user spreadsheet as a data frame
+    Returns:
+        user_spreadsheet_df: user spreadsheet as a data frame
 
     """
     print("Start checking user spread sheet...")
     try:
-        user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', header=None)
+        user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
         return user_spreadsheet_df
     except OSError as err:
         raise OSError(str(err))
@@ -46,13 +49,15 @@ def load_data_file(spreadsheet_path):
 
 def check_duplicate_rows(data_frame):
     """
-    Checks the duplication on entire row and removes it if it exists
+    Checks duplication on entire row and removes it if exists
 
     Args:
         data_frame: input data frame to be checked
 
     Returns:
-          (data_frame_dedup, match_flag, error_message)
+        data_frame_dedup: a data frame in original formatf
+        match_flag: a flag indicates if the check passes
+        error_msg: error message
 
     """
     print("Checking duplicate rows...")
@@ -67,31 +72,69 @@ def check_duplicate_rows(data_frame):
     return data_frame_dedup, False, "An unexpected error occured."
 
 
-def check_duplicate_gene_name(data_frame):
+def check_duplicate_columns(data_frame):
     """
-    Checks the duplication on gene name and rejects it if it exists
+    Checks duplication on entire column and removes it if exists
 
     Args:
         data_frame: input data frame
 
     Returns:
-          (data_frame_genename_dedup, match_flag, error_message)
+        data_frame_dedup_row.T: a data frame in original format
+        match_flag: a flag indicates if the check passes
+        error_msg: error message
+    """
+    print("Checking duplicate columns...")
 
+    # transposes original data frame so that original column becomes row
+    data_frame_transpose = data_frame.T
+    data_frame_dedup_row, match_flag, error_msg = check_duplicate_rows(data_frame_transpose)
+    # transposes back the transposed data frame to be the original format
+    return data_frame_dedup_row.T, match_flag, error_msg
+
+
+def check_duplicate_column_name(data_frame):
+    """
+    Checks duplicate column names and rejects it if it exists
+
+    Args: data_frame:
+    Returns:
+        user_spreadsheet_df_genename_dedup.T: a data frame in original format
+        match_flag: a flag indicates if the check passes
+        error_msg: error message
+    """
+    print("Checking duplicate column names...")
+
+    data_frame_transpose = data_frame.T
+    user_spreadsheet_df_genename_dedup, match_flag, error_msg = check_duplicate_gene_name(data_frame_transpose)
+    return user_spreadsheet_df_genename_dedup.T, match_flag, error_msg
+
+
+def check_duplicate_gene_name(data_frame):
+    """
+    Checks duplication on gene name and rejects it if it exists
+
+    Args:
+        data_frame: input data frame
+
+    Returns:
+        data_frame_genename_dedup: a data frame in original format
+        match_flag: a flag indicates if the check passes
+        error_msg: error message
     """
     print("Checking duplicate gene names...")
 
-    data_frame_genename_dedup = data_frame.drop_duplicates(
-        0, keep='first').reset_index(drop=True)
+    data_frame_genename_dedup = data_frame[~data_frame.index.duplicated()]
 
     row_count_diff = len(data_frame.index) - len(data_frame_genename_dedup.index)
 
     if row_count_diff > 0:
-        return data_frame_genename_dedup, False, "Found duplicate gene names " \
-                                                 "and dropped these duplicates. " \
-                                                 "Proceed to next check."
+        return data_frame_genename_dedup, True, "Found duplicate gene names " \
+                                                "and dropped these duplicates. "
+
     if row_count_diff == 0:
         return data_frame_genename_dedup, True, "No duplication detected in this data set."
-    return data_frame_genename_dedup, False, "An unexpected error occured."
+    return data_frame_genename_dedup, False, "An unexpected error occurred."
 
 
 def check_value_set(data_frame, golden_value_set):
@@ -103,7 +146,8 @@ def check_value_set(data_frame, golden_value_set):
         golden_value_set: golden standard value set to be compared with
 
     Returns:
-         (match_flag, error_message)
+        match_flag: a flag indicates if the check passes
+        error_msg: error message
 
     """
     print("Checking value set...")
@@ -113,6 +157,8 @@ def check_value_set(data_frame, golden_value_set):
     if golden_value_set != gene_value_set:
         return False, "This user spreadsheet contains invalid value. " \
                       "Please revise your spreadsheet and reupload."
+
+    data_frame.applymap(lambda x: isinstance(x, (int, float)))
     return True, "Value contains in user spreadsheet matches with golden standard value set."
 
 
@@ -131,39 +177,31 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     print("Checking ensemble gene name ...")
 
     redis_db = redutil.get_database(run_parameters['redis_credential'])
-    num_columns = len(data_frame.columns)
 
+    ensemble_gene_name = []
+    gene_to_ensemble_map = {}
     for idx, row in data_frame.iterrows():
-        convert_gene = redutil.conv_gene(redis_db, row[0], '', '9606')
-        data_frame.set_value(idx, num_columns, convert_gene)
+        convert_gene = redutil.conv_gene(redis_db, idx, '', run_parameters['taxonid'])
+        ensemble_gene_name.append(convert_gene)
+        print("converted_gene = {}".format(convert_gene))
+        gene_to_ensemble_map[idx] = convert_gene
 
-    # filters the unmappped-none rows
-    output_df_unmapped_one = data_frame[
-        data_frame[num_columns] == 'unmapped-none'
-        ]
-
-    # filters the unmapped-many rows
-    output_df_unmapped_many = data_frame[
-        data_frame[num_columns] == 'unmapped-many'
-        ]
+    data_frame.index = ensemble_gene_name
+    print(data_frame)
+    print(gene_to_ensemble_map)
 
     # filter out the unmapped rows
-    mapped_filter = ~data_frame[num_columns].str.contains(r'^unmapped.*$')
+    mapped_filter = ~data_frame.index.str.contains(r'^unmapped.*$')
 
     # extracts all the mapped rows in dataframe
     output_df_mapped = data_frame[mapped_filter]
 
+    output_file_basename = \
+    os.path.splitext(os.path.basename(os.path.normpath(run_parameters['spreadsheet_name_full_path'])))[0]
+
     # writes each data frame to output file separately
-    output_df_unmapped_one.to_csv(run_parameters['results_directory'] + "/tmp_unmapped_one",
-                                  header=None, index=None, sep='\t')
-    output_df_unmapped_many.to_csv(run_parameters['results_directory'] + "/tmp_unmapped_many",
-                                   header=None, index=None, sep='\t')
-    output_df_mapped.to_csv(run_parameters['results_directory'] + "/tmp_mapped",
-                            header=None, index=None, sep='\t')
-
-
-    if not output_df_unmapped_one.empty or not output_df_unmapped_many.empty:
-        return False, "Found gene names that cannot be mapped to ensemble name."
+    output_df_mapped.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv",
+                            sep='\t')
 
     if output_df_mapped.empty:
         return False, "No valid ensemble name can be found."
@@ -188,13 +226,13 @@ def sanity_check_data_file(user_spreadsheet_df, run_parameters):
     # defines the default values that can exist in user spreadsheet
     default_user_spreadsheet_value = {0, 1}
 
-    # Case 1: checks the duplication on entire row and removes it if it exists
-    user_spreadsheet_df_row_dedup, match_flag, error_msg = check_duplicate_rows(user_spreadsheet_df)
+    # Case 1: checks the duplication on column name and removes it if exists
+    user_spreadsheet_df_col_dedup, match_flag, error_msg = check_duplicate_column_name(user_spreadsheet_df)
     if match_flag is False:
         return match_flag, error_msg
 
-    # Case 2: checks the duplication on gene name and rejects it if it exists
-    user_spreadsheet_df_genename_dedup, match_flag, error_msg = check_duplicate_gene_name(user_spreadsheet_df_row_dedup)
+    # Case 2: checks the duplication on gene name and removes it if exists
+    user_spreadsheet_df_genename_dedup, match_flag, error_msg = check_duplicate_gene_name(user_spreadsheet_df_col_dedup)
     if match_flag is False:
         return match_flag, error_msg
 
@@ -209,4 +247,3 @@ def sanity_check_data_file(user_spreadsheet_df, run_parameters):
         return match_flag, error_msg
 
     return True, "User spreadsheet has passed the validation successfully! It will be passed to next step..."
-

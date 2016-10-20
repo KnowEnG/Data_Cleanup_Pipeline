@@ -15,3 +15,5 @@ redis_credential:
   host: knownbs.dyndns.org
   port: 6380
   password: KnowEnG
+
+taxonid : '9606'

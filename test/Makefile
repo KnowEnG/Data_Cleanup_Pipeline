@@ -8,7 +8,7 @@ DATA_DIR = ../data/spreadsheets
 RUN_DIR = ./run_dir
 RUN_FILES_DIR = ../data/run_files
 RESULTS_DIR = $(RUN_DIR)/results
-SCRIPT = ../src/main.py
+SCRIPT = ../src/data_cleanup.py
 
 .PHONY: env_setup create_run_dir copy_run_files clean_dir_recursively final_clean 
 
@@ -28,8 +28,6 @@ create_run_dir:
 # Copy run_files
 copy_run_files:
 	cp $(RUN_FILES_DIR)/*.yml $(RUN_DIR)
-	touch $(RESULTS_DIR)/tmp_unmapped_one
-	touch $(RESULTS_DIR)/tmp_unmapped_many
 
 # Remove run directory
 clean_dir_recursively:

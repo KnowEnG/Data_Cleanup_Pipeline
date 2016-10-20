@@ -8,8 +8,8 @@ There are four clustering methods that one can choose from:
 
 | **Options**                                      | **Method**                           | **Parameters** |
 | ------------------------------------------------ | -------------------------------------| -------------- |
-| Check values                                       | check_value_set                    | user_spreadsheet_dataframe            |
-| Check duplicates                             | check_duplicate_gene_name              | user_spreadsheet_dataframe         |
-| Map gene name to ensembl name           | check_ensemble_gene_name                   | user_spreadsheet_dataframe        |
-| Create final mapped spreadsheet and mapping table | check_ensemble_gene_name | user_spreadsheet_dataframe, config     |
+| Check values                                       | check_value_set                    | user_spreadsheet_dataframe |
+| Check duplicates                             | check_duplicate_gene_name              | user_spreadsheet_dataframe   |
+| Map gene name to ensembl name           | check_ensemble_gene_name                   | user_spreadsheet_dataframe    |
+| Create final mapped spreadsheet and mapping table | check_ensemble_gene_name    | user_spreadsheet_dataframe, config |
 
