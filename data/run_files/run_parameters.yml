@@ -1,7 +1,9 @@
-#	dataframe == matrix with row and column names in .tsv format.
-spreadsheet_name_full_path: ../data/spreadsheets/example_user_spreadsheet.tsv
+# input data location
+spreadsheet_name_full_path: ../data/spreadsheets/ProGENI_rwr20_STExp_GDSC_500.rname.gxc
+#example_user_spreadsheet.tsv
+#ProGENI_rwr20_STExp_GDSC_500.rname.gxc
 
-#	Where the computational output will be written.
+# where the computational output will be written.
 results_directory: ./run_dir/results
 
 # knoweng_net database credentials
@@ -16,4 +18,11 @@ redis_credential:
   port: 6380
   password: KnowEnG
 
-taxonid : '9606'
+taxonid: '9606'
+source_hint: ''
+
+# sc, gsc, gp
+pipeline_type: gsc
+
+# sample or phenotype
+input_data_type: sample
