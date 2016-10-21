@@ -2,7 +2,7 @@ import unittest
 import os
 import yaml
 import shutil
-import input_data_cleaning as data_cln
+import data_cleanup_toolbox as data_cln
 
 
 class TestParse_config(unittest.TestCase):

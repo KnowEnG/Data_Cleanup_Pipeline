@@ -13,7 +13,6 @@ def get_database(args):
     return redis.StrictRedis(host=args['host'], port=args['port'],
                              password=args['password'])
 
-
 def conv_gene(rdb, foreign_key, hint, taxid):
     """Uses the redis database to convert a gene to enesmbl stable id
 
@@ -65,3 +64,11 @@ def conv_gene(rdb, foreign_key, hint, taxid):
         if len(hint_ens_ids) == 1:
             return hint_ens_ids[0].decode()
     return 'unmapped-many'
+
+def convert_list(gene_list, rdb, hint, taxid):
+    mapping_result = []
+    for gene in gene_list:
+        ret = conv_gene(rdb, gene, hint, taxid)
+        mapping_result.append(ret)
+
+    return mapping_result

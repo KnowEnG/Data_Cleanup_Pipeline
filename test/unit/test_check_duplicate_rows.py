@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 import numpy.testing as npytest
-import input_data_cleaning as data_cln
+import data_cleanup_toolbox as data_cln
 
 class TestCheck_duplicate_rows(unittest.TestCase):
     def setUp(self):

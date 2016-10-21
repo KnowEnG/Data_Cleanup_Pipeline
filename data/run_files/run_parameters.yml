@@ -1,5 +1,5 @@
 # input data location
-spreadsheet_name_full_path: ../data/spreadsheets/ProGENI_rwr20_STExp_GDSC_500.rname.gxc
+spreadsheet_name_full_path: ../data/spreadsheets/example_user_spreadsheet.tsv
 #example_user_spreadsheet.tsv
 #ProGENI_rwr20_STExp_GDSC_500.rname.gxc
 

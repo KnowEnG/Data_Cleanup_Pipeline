@@ -1,12 +1,15 @@
 import unittest
 import pandas as pd
-import input_data_cleaning as data_cln
+import data_cleanup_toolbox as data_cln
 
 class TestCheck_value_set(unittest.TestCase):
     def setUp(self):
-        self.input_df = pd.DataFrame([["ENSG00001027003", 1, 0],
-                                          ["ENSG00001027003", 0, 0],
-                                          ["ENSG00008000303", 1, 1]])
+        self.input_df = pd.DataFrame([[1, 0],
+                                          [0, 0],
+                                          [1, 1]],
+                                     index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
+                                     columns=['a', 'b'])
+
         self.value_set_a = set([0,1])
         self.value_set_b = set([0])
 

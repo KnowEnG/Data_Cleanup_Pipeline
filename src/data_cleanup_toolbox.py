@@ -7,6 +7,8 @@ import pandas
 import redis_utilities as redutil
 import yaml
 import os
+import numpy
+
 
 
 def parse_config(run_file_path):
@@ -39,7 +41,6 @@ def load_data_file(spreadsheet_path):
         user_spreadsheet_df: user spreadsheet as a data frame
 
     """
-    print("Start checking user spread sheet...")
     try:
         user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
         return user_spreadsheet_df
@@ -60,7 +61,6 @@ def check_duplicate_rows(data_frame):
         error_msg: error message
 
     """
-    print("Checking duplicate rows...")
     data_frame_dedup = data_frame.drop_duplicates()
 
     row_count_diff = len(data_frame.index) - len(data_frame_dedup.index)
@@ -84,8 +84,6 @@ def check_duplicate_columns(data_frame):
         match_flag: a flag indicates if the check passes
         error_msg: error message
     """
-    print("Checking duplicate columns...")
-
     # transposes original data frame so that original column becomes row
     data_frame_transpose = data_frame.T
     data_frame_dedup_row, match_flag, error_msg = check_duplicate_rows(data_frame_transpose)
@@ -103,8 +101,6 @@ def check_duplicate_column_name(data_frame):
         match_flag: a flag indicates if the check passes
         error_msg: error message
     """
-    print("Checking duplicate column names...")
-
     data_frame_transpose = data_frame.T
     user_spreadsheet_df_genename_dedup, match_flag, error_msg = check_duplicate_gene_name(data_frame_transpose)
     return user_spreadsheet_df_genename_dedup.T, match_flag, error_msg
@@ -122,8 +118,6 @@ def check_duplicate_gene_name(data_frame):
         match_flag: a flag indicates if the check passes
         error_msg: error message
     """
-    print("Checking duplicate gene names...")
-
     data_frame_genename_dedup = data_frame[~data_frame.index.duplicated()]
 
     row_count_diff = len(data_frame.index) - len(data_frame_genename_dedup.index)
@@ -137,7 +131,7 @@ def check_duplicate_gene_name(data_frame):
     return data_frame_genename_dedup, False, "An unexpected error occurred."
 
 
-def check_value_set(data_frame, golden_value_set):
+def check_value_set(data_frame, pipeline_type, input_data_type, golden_value_set):
     """
     Checks if the values in user spreadsheet matches with golden standard value set
 
@@ -150,16 +144,38 @@ def check_value_set(data_frame, golden_value_set):
         error_msg: error message
 
     """
-    print("Checking value set...")
 
-    gene_value_set = set(data_frame.ix
-                         [:, data_frame.columns != 0].values.ravel())
-    if golden_value_set != gene_value_set:
-        return False, "This user spreadsheet contains invalid value. " \
-                      "Please revise your spreadsheet and reupload."
+    if data_frame.isnull().values.any():
+        return False, "This user spreadsheet contains invalid NaN value."
 
-    data_frame.applymap(lambda x: isinstance(x, (int, float)))
+    '''
+    if (pipeline_type == 'sc' or 'gsc' and input_data_type == 'sample'):
+        gene_value_set = set(data_frame.ix
+                             [:, data_frame.columns != 0].values.ravel())
+        if golden_value_set != gene_value_set:
+            return False, "This user spreadsheet contains invalid value. " \
+                          "Please revise your spreadsheet and reupload."
+    if (pipeline_type == 'sc' and input_data_type == 'phenotype'):
+        return True, "This user phenotype data passed validation. Proceed to next check."
+    '''
+    print(data_frame)
+    # check real number negative to positive infinite
+    if (pipeline_type == 'gp' ):
+        if(input_data_type == 'sample'):
+            data_frame_filtered = data_frame[data_frame >= 0]
+            print(data_frame_filtered)
+        else:
+            data_frame = data_frame.applymap(lambda x: isinstance(x, (int, float)))
+            print(data_frame)
+            data_frame_bad = data_frame[data_frame == False]
+            print(data_frame_bad)
+
+
     return True, "Value contains in user spreadsheet matches with golden standard value set."
+
+
+def check_intersection(user_spreadsheet_df, drug_response_df):
+    return
 
 
 def check_ensemble_gene_name(data_frame, run_parameters):
@@ -174,21 +190,12 @@ def check_ensemble_gene_name(data_frame, run_parameters):
          (match_flag, error_message)
 
     """
-    print("Checking ensemble gene name ...")
-
     redis_db = redutil.get_database(run_parameters['redis_credential'])
 
-    ensemble_gene_name = []
-    gene_to_ensemble_map = {}
-    for idx, row in data_frame.iterrows():
-        convert_gene = redutil.conv_gene(redis_db, idx, '', run_parameters['taxonid'])
-        ensemble_gene_name.append(convert_gene)
-        print("converted_gene = {}".format(convert_gene))
-        gene_to_ensemble_map[idx] = convert_gene
+    data_frame['original'] = data_frame.index
 
-    data_frame.index = ensemble_gene_name
-    print(data_frame)
-    print(gene_to_ensemble_map)
+    data_frame.index = data_frame.index.map(
+        lambda x: redutil.conv_gene(redis_db, x, run_parameters['source_hint'], run_parameters['taxonid']))
 
     # filter out the unmapped rows
     mapped_filter = ~data_frame.index.str.contains(r'^unmapped.*$')
@@ -196,12 +203,19 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     # extracts all the mapped rows in dataframe
     output_df_mapped = data_frame[mapped_filter]
 
+    mapping = data_frame['original']
+    mapping_dedup_df = mapping[~mapping.index.duplicated()]
+
+    output_df_mapped = output_df_mapped.drop('original', axis=1)
+
     output_file_basename = \
-    os.path.splitext(os.path.basename(os.path.normpath(run_parameters['spreadsheet_name_full_path'])))[0]
+        os.path.splitext(os.path.basename(os.path.normpath(run_parameters['spreadsheet_name_full_path'])))[0]
 
     # writes each data frame to output file separately
     output_df_mapped.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv",
-                            sep='\t')
+                               sep='\t', header=True, index=True)
+    mapping_dedup_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv",
+                               sep='\t', index=True)
 
     if output_df_mapped.empty:
         return False, "No valid ensemble name can be found."
@@ -209,6 +223,15 @@ def check_ensemble_gene_name(data_frame, run_parameters):
         return True, "This is a valid user spreadsheet. Proceed to next step analysis."
 
     return False, "An unexpected error occured."
+
+
+def generate_output(user_spreadsheet_df, mapping_df, run_parameters):
+    output_file_basename = \
+        os.path.splitext(os.path.basename(os.path.normpath(run_parameters['spreadsheet_name_full_path'])))[0]
+
+    # writes each data frame to output file separately
+    user_spreadsheet_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv",
+                               sep='\t')
 
 
 def sanity_check_data_file(user_spreadsheet_df, run_parameters):
@@ -225,7 +248,7 @@ def sanity_check_data_file(user_spreadsheet_df, run_parameters):
     """
     # defines the default values that can exist in user spreadsheet
     default_user_spreadsheet_value = {0, 1}
-
+    '''
     # Case 1: checks the duplication on column name and removes it if exists
     user_spreadsheet_df_col_dedup, match_flag, error_msg = check_duplicate_column_name(user_spreadsheet_df)
     if match_flag is False:
@@ -235,15 +258,15 @@ def sanity_check_data_file(user_spreadsheet_df, run_parameters):
     user_spreadsheet_df_genename_dedup, match_flag, error_msg = check_duplicate_gene_name(user_spreadsheet_df_col_dedup)
     if match_flag is False:
         return match_flag, error_msg
-
+    '''
     # Case 3: checks if only 0 and 1 appears in user spreadsheet
-    match_flag, error_msg = check_value_set(user_spreadsheet_df_genename_dedup, default_user_spreadsheet_value)
+    match_flag, error_msg = check_value_set(user_spreadsheet_df, 'gp', 'phenotype', default_user_spreadsheet_value)
     if match_flag is False:
         return match_flag, error_msg
-
+    '''
     # Case 4: checks the validity of gene name
-    match_flag, error_msg = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, run_parameters)
+    match_flag, error_msg = check_ensemble_gene_name(user_spreadsheet_df, run_parameters)
     if match_flag is not None:
         return match_flag, error_msg
-
+    '''
     return True, "User spreadsheet has passed the validation successfully! It will be passed to next step..."

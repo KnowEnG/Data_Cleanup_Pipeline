@@ -3,19 +3,24 @@ import os
 import pandas as pd
 import numpy.testing as npytest
 import shutil
-import input_data_cleaning as data_cln
+import data_cleanup_toolbox as data_cln
+
 
 class TestLoad_data_file(unittest.TestCase):
     def setUp(self):
         self.run_dir = "./run_file"
         self.user_spreadsheet = "user_spreadsheet.tsv"
         self.spreadsheet_path = self.run_dir + "/" + self.user_spreadsheet
-        self.f_context = "ENSG00000000003\t1\t0\t1\n" + \
+        self.f_context = "\ta\tb\tc\n" + \
+                         "ENSG00000000003\t1\t0\t1\n" + \
                          "ENSG00001000205\t0\t0\t1\n" + \
                          "ENSG00000700034\t1\t1\t1\n"
-        self.golden_output = pd.DataFrame([["ENSG00000000003",1,0,1],
-                                           ["ENSG00001000205",0,0,1],
-                                           ["ENSG00000700034",1,1,1]])
+        self.golden_output = pd.DataFrame([
+            [1, 0, 1],
+            [0, 0, 1],
+            [1, 1, 1]],
+            index=['ENSG00000000003', "ENSG00001000205", 'ENSG00000700034'],
+            columns=['a', 'b', 'c'])
 
     def tearDown(self):
         del self.user_spreadsheet
@@ -38,6 +43,7 @@ class TestLoad_data_file(unittest.TestCase):
 
     def test_load_data_file_with_execption(self):
         self.assertRaises(OSError, data_cln.load_data_file, "./file_not_exist")
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -2,7 +2,7 @@ import unittest
 import os
 import pandas as pd
 import numpy.testing as npytest
-import input_data_cleaning as data_cln
+import data_cleanup_toolbox as data_cln
 
 class TestSanity_check_data_file(unittest.TestCase):
     def setUp(self):
