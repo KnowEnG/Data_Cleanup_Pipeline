@@ -3,7 +3,7 @@
 
 This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet this pipeline maps gene-label row names to Ensemble-label row names and checks data formats. It will go through the following steps
 
-There are four clustering methods that one can choose from:
+There are four data cleaning methods that one can choose from:
 
 
 | **Options**                                      | **Method**                           | **Parameters** |
