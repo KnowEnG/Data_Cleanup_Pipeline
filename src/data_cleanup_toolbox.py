@@ -179,8 +179,6 @@ def check_user_spreadsheet_value(data_frame, phenotype_df, pipeline_type, data_t
         if data_frame_filtered.empty or False in phenotype_value_check.values or not common_cols:
             return None, "Cannot find valid value in either user spreadsheet or phenotype data."
 
-        print("test={}".format(os.path.basename(os.path.normpath(run_parameters['phenotype_full_path'])).lstrip()))
-
         # store cleaned phenotype data to a file
         output_file_basename = \
             os.path.splitext(os.path.basename(os.path.normpath(run_parameters['phenotype_full_path'])).lstrip())[0]
@@ -278,3 +276,4 @@ def sanity_check_data_file(user_spreadsheet_df, phenotype_df, run_parameters):
         return match_flag, error_msg
 
     return True, "User spreadsheet has passed the validation successfully! It will be passed to next step..."
+
