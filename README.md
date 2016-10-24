@@ -8,8 +8,9 @@ There are four data cleaning methods that one can choose from:
 
 | **Options**                                      | **Method**                           | **Parameters** |
 | ------------------------------------------------ | -------------------------------------| -------------- |
-| Check values                                       | check_value_set                    | user_spreadsheet_dataframe |
-| Check duplicates                             | check_duplicate_gene_name              | user_spreadsheet_dataframe   |
+| Check values                                       | check_user_spreadsheet_value        | user_spreadsheet_dataframe |
+| Check duplicate column name                           | check_duplicate_column_name              | user_spreadsheet_dataframe   |
+| Check duplicate gene name                           | check_duplicate_gene_name              | user_spreadsheet_dataframe   |
 | Map gene name to ensembl name           | check_ensemble_gene_name                   | user_spreadsheet_dataframe    |
-| Create final mapped spreadsheet and mapping table | check_ensemble_gene_name    | user_spreadsheet_dataframe, config |
+| Create final mapped spreadsheet and mapping table | check_ensemble_gene_name    | user_spreadsheet_dataframe, run_parameters |
 

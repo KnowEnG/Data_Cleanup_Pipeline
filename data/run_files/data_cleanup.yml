@@ -1,7 +1,6 @@
 # input data location
 spreadsheet_name_full_path: ../data/spreadsheets/example_user_spreadsheet.tsv
-#example_user_spreadsheet.tsv
-#ProGENI_rwr20_STExp_GDSC_500.rname.gxc
+
 phenotype_full_path: ../data/spreadsheets/phenotype.tsv
 
 # where the computational output will be written.
@@ -23,9 +22,7 @@ taxonid: '9606'
 source_hint: ''
 
 # sc, gsc, gp
-pipeline_type: gsc
+pipeline_type: gene_priorization_pipeline
 
 # sample or phenotype
-input_data_type: sample
-
-phenotype_output_dir: ./run_dir/results
+input_data_type: 

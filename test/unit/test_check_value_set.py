@@ -1,6 +1,7 @@
 import unittest
 import pandas as pd
 import data_cleanup_toolbox as data_cln
+import os
 
 
 class TestCheck_user_spreadsheet_value(unittest.TestCase):
@@ -43,6 +44,7 @@ class TestCheck_user_spreadsheet_value(unittest.TestCase):
 
         self.pipeline_sc = "sample_clustering_pipeline"
         self.data_type = "user_spreadsheet"
+        self.phenotype_output = "./phenotype_ETL.tsv"
 
     def tearDown(self):
         del self.input_df
@@ -51,36 +53,42 @@ class TestCheck_user_spreadsheet_value(unittest.TestCase):
         del self.run_parameters
         del self.pipeline_sc
         del self.data_type
+        del self.phenotype_output
 
     def test_check_user_spreadsheet_value_pass(self):
         ret_df, ret_msg = data_cln.check_user_spreadsheet_value(self.input_df, self.input_phenotype_df,
-                                                                self.pipeline_sc, self.data_type, self.run_parameters)
+                                                                "sample_clustering_pipeline", "user_spreadsheet", self.run_parameters)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
+
 
     def test_check_user_spreadsheet_value_Nan_value(self):
         ret_df, ret_msg = data_cln.check_user_spreadsheet_value(self.input_nan_df, self.input_phenotype_df,
-                                                                self.pipeline_sc, self.data_type, self.run_parameters)
+                                                                "sample_clustering_pipeline", "user_spreadsheet", self.run_parameters)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 
+
     def test_check_user_spreadsheet_value_case_a(self):
         ret_df, ret_msg = data_cln.check_user_spreadsheet_value(self.input_df, self.input_phenotype_df,
-                                                                self.pipeline_sc, self.data_type, self.run_parameters)
+                                                                "sample_clustering_pipeline", "user_spreadsheet", self.run_parameters)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
+
 
     def test_check_user_spreadsheet_value_case_b(self):
         ret_df, ret_msg = data_cln.check_user_spreadsheet_value(self.input_df, self.input_phenotype_df,
                                                                 "gene_priorization_pipeline", "", self.run_parameters)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
+        os.remove(self.phenotype_output)
 
     def test_check_user_spreadsheet_value_case_c(self):
         ret_df, ret_msg = data_cln.check_user_spreadsheet_value(self.input_df, self.input_phenotype_df_bad,
                                                                 "gene_priorization_pipeline", "", self.run_parameters)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -174,9 +174,20 @@ def check_user_spreadsheet_value(data_frame, phenotype_df, pipeline_type, data_t
         common_cols = list(set(phenotype_columns) & set(data_frame_columns))
         # select common column to process
         data_frame_trimed = data_frame_filtered[common_cols]
+        phenotype_trimed = phenotype_df[common_cols]
 
         if data_frame_filtered.empty or False in phenotype_value_check.values or not common_cols:
             return None, "Cannot find valid value in either user spreadsheet or phenotype data."
+
+        print("test={}".format(os.path.basename(os.path.normpath(run_parameters['phenotype_full_path'])).lstrip()))
+
+        # store cleaned phenotype data to a file
+        output_file_basename = \
+            os.path.splitext(os.path.basename(os.path.normpath(run_parameters['phenotype_full_path'])).lstrip())[0]
+
+        phenotype_trimed.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv",
+                                sep='\t', header=True, index=True)
+
         return data_frame_trimed, "Passed value check validation."
 
     return None, "An unexpected condition occurred."
@@ -246,7 +257,8 @@ def sanity_check_data_file(user_spreadsheet_df, phenotype_df, run_parameters):
 
     # Case 1: checks if only 0 and 1 appears in user spreadsheet
     user_spreadsheet_val_chked, error_msg = check_user_spreadsheet_value(user_spreadsheet_df, phenotype_df,
-                                                                         'gene_priorization_pipeline', '',
+                                                                         run_parameters['pipeline_type'],
+                                                                         run_parameters['input_data_type'],
                                                                          run_parameters)
     if user_spreadsheet_val_chked is None:
         return False, error_msg
