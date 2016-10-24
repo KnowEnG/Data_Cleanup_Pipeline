@@ -5,6 +5,7 @@ import sys
 import data_cleanup_toolbox as dataclng
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
 
+
 def data_cleanup():
     start_time = time.time()
 

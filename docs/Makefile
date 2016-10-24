@@ -7,11 +7,6 @@ SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = build
 
-# User-friendly check for sphinx-build
-ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
-	$(error The '$(SPHINXBUILD)' command was not found. Make sure you have Sphinx installed, then set the SPHINXBUILD environment variable to point to the full path of the '$(SPHINXBUILD)' executable. Alternatively you can add the directory with the executable to your PATH. If you don\'t have Sphinx installed, grab it from http://sphinx-doc.org/)
-endif
-
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
@@ -96,9 +91,9 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/samples_clustering_pipeline.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/data_cleanup_pipeline.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/samples_clustering_pipeline.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/data_cleanup_pipeline.qhc"
 
 .PHONY: applehelp
 applehelp:
@@ -115,8 +110,8 @@ devhelp:
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/samples_clustering_pipeline"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/samples_clustering_pipeline"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/data_cleanup_pipeline"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/data_cleanup_pipeline"
 	@echo "# devhelp"
 
 .PHONY: epub
@@ -228,4 +223,3 @@ dummy:
 	$(SPHINXBUILD) -b dummy $(ALLSPHINXOPTS) $(BUILDDIR)/dummy
 	@echo
 	@echo "Build finished. Dummy builder generates no files."
-
