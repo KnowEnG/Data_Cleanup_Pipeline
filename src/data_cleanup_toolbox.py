@@ -131,7 +131,7 @@ def check_duplicate_gene_name(data_frame):
     return None, "An unexpected error occurred."
 
 
-def check_dataframe_value(data_frame, pipeline_type, input_data_type, golden_value_set):
+def check_user_spreadsheet_value(data_frame, phenotype_df, pipeline_type, data_type, run_parameters):
     """
     Checks if the values in user spreadsheet matches with golden standard value set
 
@@ -144,38 +144,42 @@ def check_dataframe_value(data_frame, pipeline_type, input_data_type, golden_val
         error_msg: error message
 
     """
+    # defines the default values that can exist in user spreadsheet
+    golden_value_set = {0, 1}
 
-    if (pipeline_type == 'sc' and input_data_type == 'phenotype'):
-        return data_frame, "This user phenotype data passed validation. Proceed to next check."
+    if data_type == "user_spreadsheet":
+        if data_frame.isnull().values.any():
+            return None, "This user spreadsheet contains invalid NaN value."
 
-    if data_frame.isnull().values.any():
-        return None, "This user spreadsheet contains invalid NaN value."
-
-    if (pipeline_type == 'sc' or 'gsc' and input_data_type == 'sample'):
-        gene_value_set = set(data_frame.ix
-                             [:, data_frame.columns != 0].values.ravel())
-        if golden_value_set != gene_value_set:
-            return None, "This user spreadsheet contains invalid value. " \
-                         "Please revise your spreadsheet and reupload."
-        else:
-            return data_frame, "Value contains in user spreadsheet matches with golden standard value set."
+        if (pipeline_type == 'sample_clustering_pipeline' or 'geneset_characerization_pipeline'):
+            gene_value_set = set(data_frame.ix
+                                 [:, data_frame.columns != 0].values.ravel())
+            if golden_value_set != gene_value_set:
+                return None, "This user spreadsheet contains invalid value. " \
+                             "Please revise your spreadsheet and reupload."
+            else:
+                return data_frame, "Value contains in user spreadsheet matches with golden standard value set."
 
     # check real number negative to positive infinite
-    if (pipeline_type == 'gp'):
-        if (input_data_type == 'sample'):
-            data_frame_filtered = data_frame[data_frame >= 0]
-            if data_frame_filtered.empty:
-                return None, "Cannot find valid value in user spreadsheet."
-            else:
-                return data_frame_filtered, True, "Passed value check validtion."
-        if (input_data_type == 'phenotype'):
-            data_frame_check = data_frame.applymap(lambda x: isinstance(x, (int, float)))
-            if (False in data_frame_check.values):
-                return None, "Found bad value in user spreadsheet."
-            else:
-                return data_frame, "Value in user spreadsheet is valid."
+    if pipeline_type == 'gene_priorization_pipeline':
+        data_frame_filtered = data_frame[data_frame >= 0]
+        # drops columns with NA value in phenotype dataframe
+        phenotype_df = phenotype_df.dropna(axis=1)
+        # check phenotype value to be real value
+        phenotype_value_check = phenotype_df.applymap(lambda x: isinstance(x, (int, float)))
+        # get intersection between phenotype and user spreadsheet
+        phenotype_columns = list(phenotype_df.columns.values)
+        data_frame_columns = list(data_frame_filtered.columns.values)
+        # unordered name
+        common_cols = list(set(phenotype_columns) & set(data_frame_columns))
+        # select common column to process
+        data_frame_trimed = data_frame_filtered[common_cols]
 
-    return None, "Value validation goes into a very serious condition. Please double check your input and reupload again."
+        if data_frame_filtered.empty or False in phenotype_value_check.values or not common_cols:
+            return None, "Cannot find valid value in either user spreadsheet or phenotype data."
+        return data_frame_trimed, "Passed value check validation."
+
+    return None, "An unexpected condition occurred."
 
 
 def check_ensemble_gene_name(data_frame, run_parameters):
@@ -227,7 +231,7 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     return False, "An unexpected error occured."
 
 
-def sanity_check_data_file(user_spreadsheet_df, run_parameters):
+def sanity_check_data_file(user_spreadsheet_df, phenotype_df, run_parameters):
     """
     Checks the validity of user input spreadsheet data file
 
@@ -239,12 +243,11 @@ def sanity_check_data_file(user_spreadsheet_df, run_parameters):
         True or False with an error message
 
     """
-    # defines the default values that can exist in user spreadsheet
-    default_user_spreadsheet_value = {0, 1}
 
     # Case 1: checks if only 0 and 1 appears in user spreadsheet
-    user_spreadsheet_val_chked, error_msg = check_dataframe_value(user_spreadsheet_df, 'gp', 'phenotype',
-                                                                  default_user_spreadsheet_value)
+    user_spreadsheet_val_chked, error_msg = check_user_spreadsheet_value(user_spreadsheet_df, phenotype_df,
+                                                                         'gene_priorization_pipeline', '',
+                                                                         run_parameters)
     if user_spreadsheet_val_chked is None:
         return False, error_msg
 
