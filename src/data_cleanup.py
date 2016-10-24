@@ -17,11 +17,10 @@ def main():
     spreadsheet_path = user_config['spreadsheet_name_full_path']
     spreadsheet_df = dataclng.load_data_file(spreadsheet_path)
     is_bad_file, msg = dataclng.sanity_check_data_file(spreadsheet_df, user_config)
-    print(msg)
-    '''
+
     if is_bad_file is False:
         sys.exit("This is a bad user spreadsheet. Please check syntax before upload.")
-    '''
+
     print("--- Program ran for %s seconds ---" % (time.time() - start_time))
     print("Program succeeded!")
 

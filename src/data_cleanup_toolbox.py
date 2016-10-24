@@ -100,8 +100,10 @@ def check_duplicate_column_name(data_frame):
         error_msg: error message
     """
     data_frame_transpose = data_frame.T
-    user_spreadsheet_df_genename_dedup, match_flag, error_msg = check_duplicate_gene_name(data_frame_transpose)
-    return user_spreadsheet_df_genename_dedup.T, match_flag, error_msg
+    user_spreadsheet_df_genename_dedup, error_msg = check_duplicate_gene_name(data_frame_transpose)
+    if user_spreadsheet_df_genename_dedup is None:
+        return False, error_msg
+    return user_spreadsheet_df_genename_dedup.T, error_msg
 
 
 def check_duplicate_gene_name(data_frame):
