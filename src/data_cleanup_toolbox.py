@@ -64,10 +64,10 @@ def check_duplicate_rows(data_frame):
     row_count_diff = len(data_frame.index) - len(data_frame_dedup.index)
     if row_count_diff > 0:
         return data_frame_dedup, "Found duplicate rows and " \
-                                       "dropped these duplicates. Proceed to next check."
+                                 "dropped these duplicates. Proceed to next check."
     if row_count_diff == 0:
         return data_frame_dedup, "No duplication detected in this data set."
-    return None,"An unexpected error occured."
+    return None, "An unexpected error occured."
 
 
 def check_duplicate_columns(data_frame):
@@ -124,10 +124,10 @@ def check_duplicate_gene_name(data_frame):
 
     if row_count_diff > 0:
         return data_frame_genename_dedup, "Found duplicate gene names " \
-                                                "and dropped these duplicates. "
+                                          "and dropped these duplicates. "
 
     if row_count_diff == 0:
-        return data_frame_genename_dedup,  "No duplication detected in this data set."
+        return data_frame_genename_dedup, "No duplication detected in this data set."
     return None, "An unexpected error occurred."
 
 
@@ -156,7 +156,7 @@ def check_dataframe_value(data_frame, pipeline_type, input_data_type, golden_val
                              [:, data_frame.columns != 0].values.ravel())
         if golden_value_set != gene_value_set:
             return None, "This user spreadsheet contains invalid value. " \
-                                "Please revise your spreadsheet and reupload."
+                         "Please revise your spreadsheet and reupload."
         else:
             return data_frame, "Value contains in user spreadsheet matches with golden standard value set."
 
@@ -243,7 +243,8 @@ def sanity_check_data_file(user_spreadsheet_df, run_parameters):
     default_user_spreadsheet_value = {0, 1}
 
     # Case 1: checks if only 0 and 1 appears in user spreadsheet
-    user_spreadsheet_val_chked, error_msg = check_dataframe_value(user_spreadsheet_df, 'gp', 'phenotype', default_user_spreadsheet_value)
+    user_spreadsheet_val_chked, error_msg = check_dataframe_value(user_spreadsheet_df, 'gp', 'phenotype',
+                                                                  default_user_spreadsheet_value)
     if user_spreadsheet_val_chked is None:
         return False, error_msg
 

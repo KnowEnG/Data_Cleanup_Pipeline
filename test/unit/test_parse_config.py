@@ -34,8 +34,8 @@ class TestParse_config(unittest.TestCase):
         f.close()
 
     def test_parse_config(self):
-        self.createFile(self.run_dir, "run_parameters.yml", self.f_context)
-        cur_config = data_cln.parse_config(self.run_dir + "/" + "run_parameters.yml")
+        self.createFile(self.run_dir, "data_cleanup.yml", self.f_context)
+        cur_config = data_cln.parse_config(self.run_dir + "/" + "data_cleanup.yml")
         self.assertDictEqual(cur_config, self.golden_output)
 
 

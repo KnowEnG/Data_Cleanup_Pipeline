@@ -16,7 +16,7 @@ SCRIPT = ../src/data_cleanup.py
 env_setup: create_run_dir copy_run_files
 
 run_data_cleaning:
-	python3 $(SCRIPT)
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file data_cleanup.yml
 
 # Clean the pipeline after running the pipelines you desire
 final_clean: clean_dir_recursively
@@ -27,7 +27,7 @@ create_run_dir:
 
 # Copy run_files
 copy_run_files:
-	cp $(RUN_FILES_DIR)/*.yml $(RUN_DIR)
+	cp $(RUN_FILES_DIR)/data_cleanup.yml $(RUN_DIR)
 
 # Remove run directory
 clean_dir_recursively:

@@ -26,9 +26,16 @@ class TestSanity_check_data_file(unittest.TestCase):
             "taxonid": '9606'
         }
 
+        self.output_ensemble = "./example_ETL.tsv"
+        self.output_mapped = "./example_MAP.tsv"
+
     def tearDown(self):
         del self.input_df_good
         del self.run_parameters
+        os.remove(self.output_mapped)
+        os.remove(self.output_ensemble)
+        del self.output_mapped
+        del self.output_ensemble
 
     def test_sanity_check_data_file(self):
         ret_val, ret_msg = data_cln.sanity_check_data_file(self.input_df_good, self.run_parameters)
