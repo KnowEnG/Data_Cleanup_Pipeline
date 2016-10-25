@@ -19,5 +19,5 @@ knoweng_net_credential:                                    # knoweng_net databas
 
 redis_credential:                                          # knoweng Redis database credentials
   host: knownbs.dyndns.org
-  port: 6380
   password: KnowEnG
+  port: 6380
