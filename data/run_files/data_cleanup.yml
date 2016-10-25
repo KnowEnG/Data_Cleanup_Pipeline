@@ -4,22 +4,20 @@ phenotype_full_path:        ../data/spreadsheets/phenotype.tsv
 
 results_directory:          ./run_dir/results
 
-taxonid:                    '9606'
+taxonid:                    '9606'                         # taxon id of a given gene name
 
-source_hint:                ''
+source_hint:                ''                             # hint of looking up ensembl name in Redis database
 
-pipeline_type:              gene_priorization_pipeline
+pipeline_type:              gene_priorization_pipeline     # pipeline name
 
-input_data_type:            ''                                                   # user_spreadsheet or phenotype 
+input_data_type:            ''                             # user_spreadsheet or phenotype 
 
-# knoweng_net database credentials
-knoweng_net_credential:
+knoweng_net_credential:                                    # knoweng_net database credentials
   host: knownbs.dyndns.org
   user: KNviewer
   port: 3307
 
-# knoweng Redis database credentials
-redis_credential:
+redis_credential:                                          # knoweng Redis database credentials
   host: knownbs.dyndns.org
   port: 6380
   password: KnowEnG
