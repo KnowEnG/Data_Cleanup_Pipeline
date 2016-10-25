@@ -1,10 +1,17 @@
-# input data location
 spreadsheet_name_full_path: ../data/spreadsheets/example_user_spreadsheet.tsv
 
-phenotype_full_path: ../data/spreadsheets/phenotype.tsv
+phenotype_full_path:        ../data/spreadsheets/phenotype.tsv
 
-# where the computational output will be written.
-results_directory: ./run_dir/results
+results_directory:          ./run_dir/results
+
+taxonid:                    '9606'
+
+source_hint:                ''
+
+pipeline_type:              gene_priorization_pipeline
+
+# user_spreadsheet or phenotype
+input_data_type: 
 
 # knoweng_net database credentials
 knoweng_net_credential:
@@ -17,12 +24,3 @@ redis_credential:
   host: knownbs.dyndns.org
   port: 6380
   password: KnowEnG
-
-taxonid: '9606'
-source_hint: ''
-
-# sc, gsc, gp
-pipeline_type: gene_priorization_pipeline
-
-# sample or phenotype
-input_data_type: 
