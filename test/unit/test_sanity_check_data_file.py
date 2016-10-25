@@ -22,7 +22,7 @@ class TestSanity_check_data_file(unittest.TestCase):
 
         self.run_parameters = {
             "spreadsheet_name_full_path": "../data/spreadsheets/example.tsv",
-            "phenotype_full_path": ".. / data / spreadsheets / phenotype.tsv",
+            "phenotype_full_path": ".. /data/spreadsheets/phenotype.tsv",
             "results_directory": "./",
             "redis_credential": {
                 "host": "knownbs.dyndns.org",
@@ -30,7 +30,9 @@ class TestSanity_check_data_file(unittest.TestCase):
                 "password": "KnowEnG"
             },
             "source_hint": "",
-            "taxonid": '9606'
+            "taxonid": '9606',
+            "pipeline_type": "gene_priorization_pipeline",
+            "input_data_type": ""
         }
 
         self.output_ensemble = "./example_ETL.tsv"

@@ -55,7 +55,6 @@ def check_duplicate_rows(data_frame):
 
     Returns:
         data_frame_dedup: a data frame in original formatf
-        match_flag: a flag indicates if the check passes
         error_msg: error message
 
     """
@@ -79,14 +78,13 @@ def check_duplicate_columns(data_frame):
 
     Returns:
         data_frame_dedup_row.T: a data frame in original format
-        match_flag: a flag indicates if the check passes
         error_msg: error message
     """
     # transposes original data frame so that original column becomes row
     data_frame_transpose = data_frame.T
-    data_frame_dedup_row, match_flag, error_msg = check_duplicate_rows(data_frame_transpose)
+    data_frame_dedup_row, error_msg = check_duplicate_rows(data_frame_transpose)
     # transposes back the transposed data frame to be the original format
-    return data_frame_dedup_row.T, match_flag, error_msg
+    return data_frame_dedup_row.T, error_msg
 
 
 def check_duplicate_column_name(data_frame):
@@ -96,7 +94,6 @@ def check_duplicate_column_name(data_frame):
     Args: data_frame:
     Returns:
         user_spreadsheet_df_genename_dedup.T: a data frame in original format
-        match_flag: a flag indicates if the check passes
         error_msg: error message
     """
     data_frame_transpose = data_frame.T
@@ -115,7 +112,6 @@ def check_duplicate_gene_name(data_frame):
 
     Returns:
         data_frame_genename_dedup: a data frame in original format
-        match_flag: a flag indicates if the check passes
         error_msg: error message
     """
     data_frame_genename_dedup = data_frame[~data_frame.index.duplicated()]
@@ -131,7 +127,7 @@ def check_duplicate_gene_name(data_frame):
     return None, "An unexpected error occurred."
 
 
-def check_user_spreadsheet_value(data_frame, phenotype_df, pipeline_type, data_type, run_parameters):
+def check_input_value(data_frame, phenotype_df, run_parameters):
     """
     Checks if the values in user spreadsheet matches with golden standard value set
 
@@ -140,12 +136,15 @@ def check_user_spreadsheet_value(data_frame, phenotype_df, pipeline_type, data_t
         golden_value_set: golden standard value set to be compared with
 
     Returns:
-        match_flag: a flag indicates if the check passes
+        data_frame: processed data_frame
         error_msg: error message
 
     """
     # defines the default values that can exist in user spreadsheet
     golden_value_set = {0, 1}
+
+    data_type = run_parameters['input_data_type']
+    pipeline_type = run_parameters['pipeline_type']
 
     if data_type == "user_spreadsheet":
         if data_frame.isnull().values.any():
@@ -254,9 +253,7 @@ def sanity_check_data_file(user_spreadsheet_df, phenotype_df, run_parameters):
     """
 
     # Case 1: checks if only 0 and 1 appears in user spreadsheet
-    user_spreadsheet_val_chked, error_msg = check_user_spreadsheet_value(user_spreadsheet_df, phenotype_df,
-                                                                         run_parameters['pipeline_type'],
-                                                                         run_parameters['input_data_type'],
+    user_spreadsheet_val_chked, error_msg = check_input_value(user_spreadsheet_df, phenotype_df,
                                                                          run_parameters)
     if user_spreadsheet_val_chked is None:
         return False, error_msg
@@ -276,4 +273,3 @@ def sanity_check_data_file(user_spreadsheet_df, phenotype_df, run_parameters):
         return match_flag, error_msg
 
     return True, "User spreadsheet has passed the validation successfully! It will be passed to next step..."
-
