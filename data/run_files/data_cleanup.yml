@@ -12,11 +12,6 @@ pipeline_type:              gene_priorization_pipeline     # pipeline name
 
 input_data_type:            ''                             # user_spreadsheet or phenotype 
 
-knoweng_net_credential:                                    # knoweng_net database credentials
-  host: knownbs.dyndns.org
-  user: KNviewer
-  port: 3307
-
 redis_credential:                                          # knoweng Redis database credentials
   host: knownbs.dyndns.org
   password: KnowEnG
