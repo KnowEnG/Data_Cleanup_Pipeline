@@ -7,6 +7,8 @@ import pandas
 import redis_utilities as redutil
 import yaml
 import os
+import threading
+import sys
 
 
 def parse_config(run_file_path):
@@ -190,6 +192,15 @@ def check_input_value(data_frame, phenotype_df, run_parameters):
     return None, "An unexpected condition occurred."
 
 
+# gene_to_ensemble_map = {}
+
+def read_from_redis_db(idx, run_parameters, gene_to_ensemble_map):
+    redis_db = redutil.get_database(run_parameters['redis_credential'])
+    convert_gene = redutil.conv_gene(redis_db, idx, '', run_parameters['taxonid'])
+    gene_to_ensemble_map[idx] = convert_gene
+    return gene_to_ensemble_map
+
+
 def check_ensemble_gene_name(data_frame, run_parameters):
     """
     Checks if the gene name follows ensemble format
@@ -202,23 +213,42 @@ def check_ensemble_gene_name(data_frame, run_parameters):
          (match_flag, error_message)
 
     """
-    redis_db = redutil.get_database(run_parameters['redis_credential'])
 
-    data_frame['original'] = data_frame.index
+    row_count = len(data_frame.index)
+    # number of threads to be spawned each time
+    parallism = 10
+    threads = []
+    # a counter tracks the index for each row
+    count = 0
+    gene_to_ensemble_map = {}
+    try:
+        for idx, row in data_frame.iterrows():
+            count = count + 1
+            t = threading.Thread(target=read_from_redis_db, args=(idx, run_parameters, gene_to_ensemble_map))
+            threads.append(t)
+            if (len(threads) % parallism) == 0 or count == row_count:
+                for i in threads:
+                    i.start()
+                for i in threads:
+                    i.join()
+                # clear threads list for next round iteration
+                threads[:] = []
+    except:
+        raise (sys.exc_info())
 
-    data_frame.index = data_frame.index.map(
-        lambda x: redutil.conv_gene(redis_db, x, run_parameters['source_hint'], run_parameters['taxonid']))
-
-    # filter out the unmapped rows
-    mapped_filter = ~data_frame.index.str.contains(r'^unmapped.*$')
+    # reset index value to be ensemble name getting back from Redis database
+    data_frame.index = list(gene_to_ensemble_map.values())
 
     # extracts all the mapped rows in dataframe
-    output_df_mapped = data_frame[mapped_filter]
+    output_df_mapped = data_frame[~data_frame.index.str.contains(r'^unmapped.*$')]
 
-    mapping = data_frame['original']
-    mapping_dedup_df = mapping[~mapping.index.duplicated()]
-
-    output_df_mapped = output_df_mapped.drop('original', axis=1)
+    # dedup on gene name mapping dictionary
+    mapping = pandas.DataFrame.from_dict(gene_to_ensemble_map, orient='index')
+    mapping_filtered = mapping[~mapping[0].str.contains(r'^unmapped.*$')]
+    mapping_dedup_df = mapping_filtered.drop_duplicates(subset=[0], keep='first')
+    mapping_dedup_df['original'] = mapping_dedup_df.index
+    mapping_dedup_df.index = mapping_dedup_df[0]
+    mapping_dedup_df = mapping_dedup_df.drop(0, axis=1)
 
     output_file_basename = \
         os.path.splitext(os.path.basename(os.path.normpath(run_parameters['spreadsheet_name_full_path'])))[0]
@@ -229,7 +259,7 @@ def check_ensemble_gene_name(data_frame, run_parameters):
                             sep='\t', header=True, index=True)
     # does not include header in output mapping file
     mapping_dedup_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv",
-                            sep='\t', index=True)
+                            sep='\t', header=False, index=True)
 
     if output_df_mapped.empty:
         return False, "No valid ensemble name can be found."
@@ -254,7 +284,7 @@ def sanity_check_data_file(user_spreadsheet_df, phenotype_df, run_parameters):
 
     # Case 1: checks if only 0 and 1 appears in user spreadsheet
     user_spreadsheet_val_chked, error_msg = check_input_value(user_spreadsheet_df, phenotype_df,
-                                                                         run_parameters)
+                                                              run_parameters)
     if user_spreadsheet_val_chked is None:
         return False, error_msg
 
@@ -267,6 +297,7 @@ def sanity_check_data_file(user_spreadsheet_df, phenotype_df, run_parameters):
     user_spreadsheet_df_genename_dedup, error_msg = check_duplicate_gene_name(user_spreadsheet_df_col_dedup)
     if user_spreadsheet_df_genename_dedup is None:
         return False, error_msg
+
     # Case 4: checks the validity of gene name
     match_flag, error_msg = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, run_parameters)
     if match_flag is not None:

@@ -35,8 +35,8 @@ class TestCheck_ensemble_gene_name(unittest.TestCase):
             "source_hint": "",
             "taxonid": '9606'
         }
-        self.output_mapped = "./example_ETL.tsv"
-
+        self.output_processed = "./example_ETL.tsv"
+        self.output_mapping = "./example_MAP.tsv"
 
         self.golden_output_good = pd.DataFrame([[1, 0],
                                                 [0, 0],
@@ -44,30 +44,31 @@ class TestCheck_ensemble_gene_name(unittest.TestCase):
                                                index=['ENSG00000000003', "ENSG00000000457", 'ENSG00000000005'],
                                                columns=['a', 'b'])
 
-
     def tearDown(self):
         del self.input_df_good
         del self.input_df_bad
+        del self.input_df_empty_mapped
         del self.run_parameters
         del self.golden_output_good
-        os.remove(self.output_mapped)
-        del self.output_mapped
-
+        os.remove(self.output_processed)
+        os.remove(self.output_mapping)
+        del self.output_processed
+        del self.output_mapping
 
     def test_check_ensemble_gene_name_good(self):
         ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_good, self.run_parameters)
         self.assertEqual(True, ret_val)
 
-        file_content_df = pd.read_csv(self.output_mapped, sep='\t',header=0, index_col=0, mangle_dupe_cols=False)
+        file_content_df = pd.read_csv(self.output_processed, sep='\t', header=0, index_col=0, mangle_dupe_cols=False)
         npytest.assert_array_equal(self.golden_output_good, file_content_df)
-
-    def test_check_ensemble_gene_name_bad(self):
-        ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_bad, self.run_parameters)
-        self.assertEqual(True, ret_val)
 
     def test_check_ensemble_gene_name_empty_mapped(self):
         ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_empty_mapped, self.run_parameters)
         self.assertEqual(False, ret_val)
+
+    def test_check_ensemble_gene_name_bad(self):
+        ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_bad, self.run_parameters)
+        self.assertEqual(True, ret_val)
 
 
 if __name__ == '__main__':
