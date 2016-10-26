@@ -192,9 +192,19 @@ def check_input_value(data_frame, phenotype_df, run_parameters):
     return None, "An unexpected condition occurred."
 
 
-# gene_to_ensemble_map = {}
-
 def read_from_redis_db(idx, run_parameters, gene_to_ensemble_map):
+    """
+    Reads ensemble name from Redis database.
+
+    Args:
+        idx: gene name when iterates through a data frame
+        run_parameters:
+        gene_to_ensemble_map: global dictionary to add ensembl_name: original_name
+
+    Returns:
+        gene_to_ensemble_map: an updated dictionary
+
+    """
     redis_db = redutil.get_database(run_parameters['redis_credential'])
     convert_gene = redutil.conv_gene(redis_db, idx, '', run_parameters['taxonid'])
     gene_to_ensemble_map[idx] = convert_gene
@@ -203,7 +213,7 @@ def read_from_redis_db(idx, run_parameters, gene_to_ensemble_map):
 
 def check_ensemble_gene_name(data_frame, run_parameters):
     """
-    Checks if the gene name follows ensemble format
+    Checks if the gene name follows ensemble format.
 
     Args:
         data_frame: input data frame
