@@ -25,11 +25,10 @@ pipeline_type:              gene_priorization_pipeline  # valid pipeline names:
                                                         # gene_prioritization
 input_data_type:            ''                          # valid values: user_spreadsheet or phenotype
 
-
 # --------------------------------------------------------------------
 # - Redis database credentials                                       -
 # --------------------------------------------------------------------
 redis_credential:                                       # knoweng Redis database credentials
-  host: knownbs.dyndns.org
-  password: KnowEnG
-  port: 6380
+                            host: knownbs.dyndns.org
+                            password: KnowEnG
+                            port: 6380
