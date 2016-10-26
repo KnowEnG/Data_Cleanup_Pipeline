@@ -244,7 +244,8 @@ def check_ensemble_gene_name(data_frame, run_parameters):
                 # clear threads list for next round iteration
                 threads[:] = []
     except:
-        raise (sys.exc_info())
+        print("Unexpected error: {}".format(sys.exc_info()))
+        raise
 
     # reset index value to be ensemble name getting back from Redis database
     data_frame.index = list(gene_to_ensemble_map.values())
