@@ -1,4 +1,4 @@
-spreadsheet_name_full_path: ../data/spreadsheets/example_user_spreadsheet.tsv
+spreadsheet_name_full_path: ../data/spreadsheets/ProGENI_rwr20_STExp_GDSC_500.tsv
 phenotype_full_path:        ../data/spreadsheets/phenotype.tsv
 results_directory:          ./run_dir/results
 
