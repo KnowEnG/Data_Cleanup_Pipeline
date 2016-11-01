@@ -168,17 +168,24 @@ def check_input_value(data_frame, phenotype_df, run_parameters):
         phenotype_df = phenotype_df.dropna(axis=1)
         # check phenotype value to be real value
         phenotype_value_check = phenotype_df.applymap(lambda x: isinstance(x, (int, float)))
+
+        if False in phenotype_value_check.values:
+            return None, "Found not numeric value in phenotype data."
         # get intersection between phenotype and user spreadsheet
         phenotype_columns = list(phenotype_df.columns.values)
         data_frame_columns = list(data_frame_filtered.columns.values)
         # unordered name
         common_cols = list(set(phenotype_columns) & set(data_frame_columns))
+
+        if not common_cols:
+            return None, "Cannot find intersection between user spreadsheet column and phenotype data."
+
         # select common column to process
         data_frame_trimed = data_frame_filtered[common_cols]
         phenotype_trimed = phenotype_df[common_cols]
 
-        if data_frame_filtered.empty or False in phenotype_value_check.values or not common_cols:
-            return None, "Cannot find valid value in either user spreadsheet or phenotype data."
+        if data_frame_filtered.empty:
+            return None, "Cannot find valid value in user spreadsheet."
 
         # store cleaned phenotype data to a file
         output_file_basename = \
