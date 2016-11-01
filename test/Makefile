@@ -1,17 +1,16 @@
 # ----------------------------------------------------------------
 # Variables setup Section                                        -
 # ----------------------------------------------------------------
-SCRIPT = 		../src/data_cleanup.py
-RUN_DIR = 		./run_dir
-DATA_DIR = 		../data/spreadsheets
-RESULTS_DIR = 		$(RUN_DIR)/results
-RUN_FILES_DIR = 	../data/run_files
+SCRIPT =        ../src/data_cleanup.py
+RUN_DIR =       ./run_dir
+DATA_DIR =      ../data/spreadsheets
+RESULTS_DIR =   $(RUN_DIR)/results
+RUN_FILES_DIR = ../data/run_files
 
-RMR = 			rm -rf
-GZIP = 			gzip
-GZIP_D = 		gzip -df
-MKDIR_P =		mkdir -p
-
+RMR =           rm -rf
+GZIP =          gzip
+GZIP_D =        gzip -df
+MKDIR_P =       mkdir -p
 
 .PHONY: env_setup create_run_dir copy_run_files clean_dir_recursively final_clean 
 

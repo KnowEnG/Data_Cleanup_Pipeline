@@ -20,6 +20,7 @@ def data_cleanup():
     is_bad_file, msg = dataclng.sanity_check_data_file(spreadsheet_df, phenotype_df, user_config)
 
     if is_bad_file is False:
+        print(msg)
         sys.exit("This is a bad user spreadsheet. Please check syntax before upload.")
 
     print("--- Program ran for %s seconds ---" % (time.time() - start_time))
