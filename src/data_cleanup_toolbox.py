@@ -259,10 +259,12 @@ def check_ensemble_gene_name(data_frame, run_parameters):
 
     # extracts all the mapped rows in dataframe
     output_df_mapped = data_frame[~data_frame.index.str.contains(r'^unmapped.*$')]
+    output_df_unmapped = data_frame[data_frame.index.str.contains(r'^unmapped.*$')]
 
     # dedup on gene name mapping dictionary
     mapping = pandas.DataFrame.from_dict(gene_to_ensemble_map, orient='index')
     mapping_filtered = mapping[~mapping[0].str.contains(r'^unmapped.*$')]
+
     mapping_dedup_df = mapping_filtered.drop_duplicates(subset=[0], keep='first')
     mapping_dedup_df['original'] = mapping_dedup_df.index
     mapping_dedup_df.index = mapping_dedup_df[0]
@@ -275,6 +277,11 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     # includes header and index in output file (index is gene name, header is column name)
     output_df_mapped.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv",
                             sep='\t', header=True, index=True)
+
+    # writes
+    output_df_unmapped.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_UNMAPPED.tsv",
+                            sep='\t', header=True, index=True)
+
     # does not include header in output mapping file
     mapping_dedup_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv",
                             sep='\t', header=False, index=True)

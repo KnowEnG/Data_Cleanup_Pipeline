@@ -37,6 +37,7 @@ class TestCheck_ensemble_gene_name(unittest.TestCase):
         }
         self.output_processed = "./example_ETL.tsv"
         self.output_mapping = "./example_MAP.tsv"
+        self.output_unmapped = "./example_UNMAPPED.tsv"
 
         self.golden_output_good = pd.DataFrame([[1, 0],
                                                 [0, 0],
@@ -52,8 +53,10 @@ class TestCheck_ensemble_gene_name(unittest.TestCase):
         del self.golden_output_good
         os.remove(self.output_processed)
         os.remove(self.output_mapping)
+        os.remove(self.output_unmapped)
         del self.output_processed
         del self.output_mapping
+        del self.output_unmapped
 
     def test_check_ensemble_gene_name_good(self):
         ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_good, self.run_parameters)
