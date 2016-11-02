@@ -264,7 +264,7 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     # dedup on gene name mapping dictionary
     mapping = pandas.DataFrame.from_dict(gene_to_ensemble_map, orient='index')
     mapping_filtered = mapping[~mapping[0].str.contains(r'^unmapped.*$')]
-    unmapped_filtered = mapping[mapping[0].str.contains(r'^unmapped.*$')]
+    unmapped_filtered = mapping[mapping[0].str.contains(r'^unmapped.*$')].sort([0], ascending=False)
 
     mapping_dedup_df = mapping_filtered.drop_duplicates(subset=[0], keep='first')
     mapping_dedup_df['original'] = mapping_dedup_df.index
