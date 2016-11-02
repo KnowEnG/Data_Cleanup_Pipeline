@@ -307,7 +307,7 @@ def sanity_check_data_file(user_spreadsheet_df, phenotype_df, run_parameters):
 
     """
 
-    # Case 1: checks if only 0 and 1 appears in user spreadsheet
+    # Case 1: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
     user_spreadsheet_val_chked, error_msg = check_input_value(user_spreadsheet_df, phenotype_df,
                                                               run_parameters)
     if user_spreadsheet_val_chked is None:
@@ -323,7 +323,7 @@ def sanity_check_data_file(user_spreadsheet_df, phenotype_df, run_parameters):
     if user_spreadsheet_df_genename_dedup is None:
         return False, error_msg
 
-    # Case 4: checks the validity of gene name
+    # Case 4: checks the validity of gene name meaning if it can be ensemble or not
     match_flag, error_msg = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, run_parameters)
     if match_flag is not None:
         return match_flag, error_msg
