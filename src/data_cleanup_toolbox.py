@@ -156,19 +156,24 @@ def check_input_value(data_frame, phenotype_df, run_parameters):
             gene_value_set = set(data_frame.ix
                                  [:, data_frame.columns != 0].values.ravel())
             if golden_value_set != gene_value_set:
-                return None, "Only 0, 1 are allowed in user spreadsheet. This user spreadsheet contains invalid value: {}. ".format(gene_value_set) + \
-                             "Please revise your spreadsheet and reupload."
+                return None, "Only 0, 1 are allowed in user spreadsheet. This user spreadsheet contains invalid value: {}. ".format(
+                    gene_value_set) + \
+                       "Please revise your spreadsheet and reupload."
             else:
                 return data_frame, "Value contains in user spreadsheet matches with golden standard value set."
 
-    # check real number negative to positive infinite
+    # gene_priorization_pipeline has special requirement for cleanup.
+    # both data_frame and phenotype handled in this following section.
     if pipeline_type == 'gene_priorization_pipeline':
-        data_frame_filtered = data_frame[data_frame >= 0]
+        # check real number negative to positive infinite
+        data_frame_filtered = data_frame[(data_frame >= 0).all(1)]
+        if data_frame_filtered.empty:
+            return None, "Cannot find valid value (>=0) in user spreadsheet."
+
         # drops columns with NA value in phenotype dataframe
         phenotype_df = phenotype_df.dropna(axis=1)
         # check phenotype value to be real value
         phenotype_value_check = phenotype_df.applymap(lambda x: isinstance(x, (int, float)))
-
         if False in phenotype_value_check.values:
             return None, "Found not numeric value in phenotype data."
         # get intersection between phenotype and user spreadsheet
@@ -176,26 +181,19 @@ def check_input_value(data_frame, phenotype_df, run_parameters):
         data_frame_columns = list(data_frame_filtered.columns.values)
         # unordered name
         common_cols = list(set(phenotype_columns) & set(data_frame_columns))
-
         if not common_cols:
             return None, "Cannot find intersection between user spreadsheet column and phenotype data."
-
         # select common column to process
         data_frame_trimed = data_frame_filtered[common_cols]
         phenotype_trimed = phenotype_df[common_cols]
-
-        if data_frame_filtered.empty:
+        if data_frame_trimed.empty:
             return None, "Cannot find valid value in user spreadsheet."
-
         # store cleaned phenotype data to a file
         output_file_basename = \
             os.path.splitext(os.path.basename(os.path.normpath(run_parameters['phenotype_full_path'])).lstrip())[0]
-
         phenotype_trimed.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv",
                                 sep='\t', header=True, index=True)
-
         return data_frame_trimed, "Passed value check validation."
-
     return None, "An unexpected condition occurred."
 
 
@@ -259,12 +257,11 @@ def check_ensemble_gene_name(data_frame, run_parameters):
 
     # extracts all the mapped rows in dataframe
     output_df_mapped = data_frame[~data_frame.index.str.contains(r'^unmapped.*$')]
-    output_df_unmapped = data_frame[data_frame.index.str.contains(r'^unmapped.*$')]
 
     # dedup on gene name mapping dictionary
     mapping = pandas.DataFrame.from_dict(gene_to_ensemble_map, orient='index')
     mapping_filtered = mapping[~mapping[0].str.contains(r'^unmapped.*$')]
-    unmapped_filtered = mapping[mapping[0].str.contains(r'^unmapped.*$')].sort([0], ascending=False)
+    unmapped_filtered = mapping[mapping[0].str.contains(r'^unmapped.*$')].sort_values(by=[0], ascending=False)
 
     mapping_dedup_df = mapping_filtered.drop_duplicates(subset=[0], keep='first')
     mapping_dedup_df['original'] = mapping_dedup_df.index
@@ -281,7 +278,7 @@ def check_ensemble_gene_name(data_frame, run_parameters):
 
     # writes unmapped gene name along with return value from Redis data base to a file
     unmapped_filtered.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_UNMAPPED.tsv",
-                            sep='\t', header=False, index=True)
+                             sep='\t', header=False, index=True)
 
     # does not include header in output mapping file
     mapping_dedup_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv",
