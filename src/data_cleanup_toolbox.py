@@ -166,25 +166,26 @@ def check_input_value(data_frame, phenotype_df, run_parameters):
     # both data_frame and phenotype handled in this following section.
     if pipeline_type == 'gene_priorization_pipeline':
         # check real number negative to positive infinite
-        data_frame_filtered = data_frame[(data_frame >= 0).all(1)]
-        if data_frame_filtered.empty:
-            return None, "Cannot find valid value (>=0) in user spreadsheet."
+        data_frame_check = data_frame.applymap(lambda x: isinstance(x, (int, float)))
+        if False in data_frame_check:
+            return None, "Found not numeric value in user spreadsheet."
 
         # drops columns with NA value in phenotype dataframe
         phenotype_df = phenotype_df.dropna(axis=1)
         # check phenotype value to be real value
-        phenotype_value_check = phenotype_df.applymap(lambda x: isinstance(x, (int, float)))
-        if False in phenotype_value_check.values:
-            return None, "Found not numeric value in phenotype data."
+        phenotype_df = phenotype_df[(phenotype_df >=0).all(1)]
+        if phenotype_df.empty:
+            return None, "Found negative value in phenotype data. Value should be positive."
+
         # get intersection between phenotype and user spreadsheet
         phenotype_columns = list(phenotype_df.columns.values)
-        data_frame_columns = list(data_frame_filtered.columns.values)
+        data_frame_columns = list(data_frame.columns.values)
         # unordered name
         common_cols = list(set(phenotype_columns) & set(data_frame_columns))
         if not common_cols:
             return None, "Cannot find intersection between user spreadsheet column and phenotype data."
         # select common column to process
-        data_frame_trimed = data_frame_filtered[common_cols]
+        data_frame_trimed = data_frame[common_cols]
         phenotype_trimed = phenotype_df[common_cols]
         if data_frame_trimed.empty:
             return None, "Cannot find valid value in user spreadsheet."

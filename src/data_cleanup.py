@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import time
 import sys
 import data_cleanup_toolbox as dataclng
