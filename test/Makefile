@@ -25,13 +25,11 @@ create_run_dir:
 copy_run_files:
 	cp $(RUN_FILES_DIR)/*.yml $(RUN_DIR)
 
-
 # ----------------------------------------------------------------
 # Large Benchmarks RUN Section                                   -
 # ----------------------------------------------------------------
 run_data_cleaning:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file data_cleanup.yml
-
 
 # ----------------------------------------------------------------
 # Small Benchmarks RUN Section                                   -
@@ -39,6 +37,11 @@ run_data_cleaning:
 run_data_cleaning_small:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_data_cleanup.yml
 
+# ----------------------------------------------------------------
+# - UNIT TESTS RUN SECTION                                       -
+# ----------------------------------------------------------------
+unit_tests:
+	cd unit; make all_unit_tests
 
 # ----------------------------------------------------------------
 # - CLEAN UP SECTION                                             -
