@@ -99,13 +99,13 @@ def check_duplicate_column_name(data_frame):
         error_msg: error message
     """
     data_frame_transpose = data_frame.T
-    user_spreadsheet_df_genename_dedup, error_msg = check_duplicate_gene_name(data_frame_transpose)
+    user_spreadsheet_df_genename_dedup, error_msg = check_duplicate_row_name(data_frame_transpose)
     if user_spreadsheet_df_genename_dedup is None:
         return False, error_msg
     return user_spreadsheet_df_genename_dedup.T, error_msg
 
 
-def check_duplicate_gene_name(data_frame):
+def check_duplicate_row_name(data_frame):
     """
     Checks duplication on gene name and rejects it if it exists
 
@@ -117,7 +117,6 @@ def check_duplicate_gene_name(data_frame):
         error_msg: error message
     """
     data_frame_genename_dedup = data_frame[~data_frame.index.duplicated()]
-
     row_count_diff = len(data_frame.index) - len(data_frame_genename_dedup.index)
 
     if row_count_diff > 0:
@@ -173,7 +172,7 @@ def check_input_value(data_frame, phenotype_df, run_parameters):
         # drops columns with NA value in phenotype dataframe
         phenotype_df = phenotype_df.dropna(axis=1)
         # check phenotype value to be real value
-        phenotype_df = phenotype_df[(phenotype_df >=0).all(1)]
+        phenotype_df = phenotype_df[(phenotype_df >= 0).all(1)]
         if phenotype_df.empty:
             return None, "Found negative value in phenotype data. Value should be positive."
 
@@ -184,7 +183,7 @@ def check_input_value(data_frame, phenotype_df, run_parameters):
         common_cols = list(set(phenotype_columns) & set(data_frame_columns))
         if not common_cols:
             return None, "Cannot find intersection between user spreadsheet column and phenotype data."
-        # select common column to process
+        # select common column to process, this operation will reorder the column
         data_frame_trimed = data_frame[common_cols]
         phenotype_trimed = phenotype_df[common_cols]
         if data_frame_trimed.empty:
@@ -229,45 +228,26 @@ def check_ensemble_gene_name(data_frame, run_parameters):
          (match_flag, error_message)
 
     """
+    redis_db = redutil.get_database(run_parameters['redis_credential'])
 
-    row_count = len(data_frame.index)
-    # number of threads to be spawned each time
-    parallism = 10
-    threads = []
-    # a counter tracks the index for each row
-    count = 0
-    gene_to_ensemble_map = {}
-    try:
-        for idx, row in data_frame.iterrows():
-            count = count + 1
-            t = threading.Thread(target=read_from_redis_db, args=(idx, run_parameters, gene_to_ensemble_map))
-            threads.append(t)
-            if (len(threads) % parallism) == 0 or count == row_count:
-                for i in threads:
-                    i.start()
-                for i in threads:
-                    i.join()
-                # clear threads list for next round iteration
-                threads[:] = []
-    except:
-        print("Unexpected error: {}".format(sys.exc_info()))
-        raise
+    data_frame['original'] = data_frame.index
 
-    # reset index value to be ensemble name getting back from Redis database
-    data_frame.index = list(gene_to_ensemble_map.values())
+    data_frame.index = data_frame.index.map(
+        lambda x: redutil.conv_gene(redis_db, x, run_parameters['source_hint'], run_parameters['taxonid']))
 
-    # extracts all the mapped rows in dataframe
+    # extracts all mapped rows in dataframe
     output_df_mapped = data_frame[~data_frame.index.str.contains(r'^unmapped.*$')]
+    output_df_mapped = output_df_mapped.drop('original', axis=1)
 
     # dedup on gene name mapping dictionary
-    mapping = pandas.DataFrame.from_dict(gene_to_ensemble_map, orient='index')
-    mapping_filtered = mapping[~mapping[0].str.contains(r'^unmapped.*$')]
-    unmapped_filtered = mapping[mapping[0].str.contains(r'^unmapped.*$')].sort_values(by=[0], ascending=False)
+    mapping = data_frame[['original']]
 
-    mapping_dedup_df = mapping_filtered.drop_duplicates(subset=[0], keep='first')
-    mapping_dedup_df['original'] = mapping_dedup_df.index
-    mapping_dedup_df.index = mapping_dedup_df[0]
-    mapping_dedup_df = mapping_dedup_df.drop(0, axis=1)
+    mapping_filtered = mapping[~mapping.index.str.contains(r'^unmapped.*$')]
+
+    unmapped_filtered = mapping[mapping.index.str.contains(r'^unmapped.*$')].sort_index(axis=0, ascending=False)
+    unmapped_filtered['ensenble'] = unmapped_filtered.index
+
+    mapping_dedup_df = mapping_filtered[~mapping_filtered.index.duplicated()]
 
     output_file_basename = \
         os.path.splitext(os.path.basename(os.path.normpath(run_parameters['spreadsheet_name_full_path'])))[0]
@@ -279,7 +259,7 @@ def check_ensemble_gene_name(data_frame, run_parameters):
 
     # writes unmapped gene name along with return value from Redis data base to a file
     unmapped_filtered.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_UNMAPPED.tsv",
-                             sep='\t', header=False, index=True)
+                             sep='\t', header=False, index=False)
 
     # does not include header in output mapping file
     mapping_dedup_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv",
@@ -318,7 +298,7 @@ def sanity_check_data_file(user_spreadsheet_df, phenotype_df, run_parameters):
         return False, error_msg
 
     # Case 3: checks the duplication on gene name and removes it if exists
-    user_spreadsheet_df_genename_dedup, error_msg = check_duplicate_gene_name(user_spreadsheet_df_col_dedup)
+    user_spreadsheet_df_genename_dedup, error_msg = check_duplicate_row_name(user_spreadsheet_df_col_dedup)
     if user_spreadsheet_df_genename_dedup is None:
         return False, error_msg
 
