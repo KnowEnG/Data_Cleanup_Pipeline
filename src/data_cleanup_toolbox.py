@@ -245,7 +245,7 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     mapping_filtered = mapping[~mapping.index.str.contains(r'^unmapped.*$')]
 
     unmapped_filtered = mapping[mapping.index.str.contains(r'^unmapped.*$')].sort_index(axis=0, ascending=False)
-    unmapped_filtered['ensenble'] = unmapped_filtered.index
+    unmapped_filtered['ensemble'] = unmapped_filtered.index
 
     mapping_dedup_df = mapping_filtered[~mapping_filtered.index.duplicated()]
 

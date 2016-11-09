@@ -23,13 +23,22 @@ create_run_dir:
 	$(MKDIR_P) $(RESULTS_DIR) 
 
 copy_run_files:
-	cp $(RUN_FILES_DIR)/data_cleanup.yml $(RUN_DIR)
+	cp $(RUN_FILES_DIR)/*.yml $(RUN_DIR)
+
 
 # ----------------------------------------------------------------
 # Large Benchmarks RUN Section                                   -
 # ----------------------------------------------------------------
 run_data_cleaning:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file data_cleanup.yml
+
+
+# ----------------------------------------------------------------
+# Small Benchmarks RUN Section                                   -
+# ----------------------------------------------------------------
+run_data_cleaning_small:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_data_cleanup.yml
+
 
 # ----------------------------------------------------------------
 # - CLEAN UP SECTION                                             -
