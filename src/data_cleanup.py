@@ -5,8 +5,6 @@ from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
 
 
 def data_cleanup():
-    start_time = time.time()
-
     run_directory, run_file = get_run_directory_and_file(sys.argv)
     user_config = get_run_parameters(run_directory, run_file)
 
@@ -16,13 +14,6 @@ def data_cleanup():
     phenotype_path = user_config['phenotype_full_path']
     phenotype_df = dataclng.load_data_file(phenotype_path)
     is_bad_file, msg = dataclng.sanity_check_data_file(spreadsheet_df, phenotype_df, user_config)
-
-    if is_bad_file is False:
-        print(msg)
-        sys.exit("This is a bad user spreadsheet. Please check syntax before upload.")
-
-    print("--- Program ran for %s seconds ---" % (time.time() - start_time))
-    print("Program succeeded!")
 
 
 if __name__ == "__main__":
