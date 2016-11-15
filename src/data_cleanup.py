@@ -1,19 +1,36 @@
-import time
 import sys
-import data_cleanup_toolbox as dataclng
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
+
+
+def geneset_characterization_pipeline(run_parameters):
+    from data_cleanup_toolbox import run_geneset_characterization_pipeline
+    validation_flag, error_msg = run_geneset_characterization_pipeline(run_parameters)
+    return validation_flag, error_msg
+
+
+def sample_clustering_pipeline(run_parameters):
+    from data_cleanup_toolbox import run_sample_clustering_pipeline
+    validation_flag, error_msg = run_sample_clustering_pipeline(run_parameters)
+    return validation_flag, error_msg
+
+
+def gene_priorization_pipeline(run_parameters):
+    from data_cleanup_toolbox import run_gene_priorization_pipeline
+    validation_flag, error_msg = run_gene_priorization_pipeline(run_parameters)
+    return validation_flag, error_msg
+
+
+SELECT = {
+    "geneset_characterization_pipeline": geneset_characterization_pipeline,
+    "sample_clustering_pipeline": sample_clustering_pipeline,
+    "gene_priorization_pipeline": gene_priorization_pipeline
+}
 
 
 def data_cleanup():
     run_directory, run_file = get_run_directory_and_file(sys.argv)
-    user_config = get_run_parameters(run_directory, run_file)
-
-    spreadsheet_path = user_config['spreadsheet_name_full_path']
-    spreadsheet_df = dataclng.load_data_file(spreadsheet_path)
-
-    phenotype_path = user_config['phenotype_full_path']
-    phenotype_df = dataclng.load_data_file(phenotype_path)
-    is_bad_file, msg = dataclng.sanity_check_data_file(spreadsheet_df, phenotype_df, user_config)
+    run_parameters = get_run_parameters(run_directory, run_file)
+    SELECT[run_parameters['pipeline_type']](run_parameters)
 
 
 if __name__ == "__main__":

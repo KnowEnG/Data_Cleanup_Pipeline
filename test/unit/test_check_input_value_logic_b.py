@@ -29,37 +29,15 @@ class Testcheck_input_value(unittest.TestCase):
             columns=['d', 'e', 'f']
         )
 
-        self.run_parameters_sc = {
-            "spreadsheet_name_full_path": "../data/spreadsheets/example.tsv",
-            "phenotype_full_path": ".. / data / spreadsheets / phenotype.tsv",
-            "results_directory": "./",
-            "redis_credential": {
-                "host": "knownbs.dyndns.org",
-                "port": 6380,
-                "password": "KnowEnG"
-            },
-            "source_hint": "",
-            "taxonid": '9606',
-            "pipeline_type": "sample_clustering_pipeline",
-            "input_data_type": "user_spreadsheet"
-        }
-
         self.run_parameters_gp = {
             "spreadsheet_name_full_path": "../data/spreadsheets/example.tsv",
-            "phenotype_full_path": ".. / data / spreadsheets / phenotype.tsv",
+            "phenotype_full_path": "../data/spreadsheets/phenotype.tsv",
             "results_directory": "./",
-            "redis_credential": {
-                "host": "knownbs.dyndns.org",
-                "port": 6380,
-                "password": "KnowEnG"
-            },
             "source_hint": "",
             "taxonid": '9606',
-            "pipeline_type": "gene_priorization_pipeline",
-            "input_data_type": ""
+            "pipeline_type": "gene_priorization_pipeline"
         }
 
-        self.pipeline_sc = "sample_clustering_pipeline"
         self.data_type = "user_spreadsheet"
         self.phenotype_output = "./phenotype_ETL.tsv"
 
@@ -67,42 +45,25 @@ class Testcheck_input_value(unittest.TestCase):
         del self.input_df
         del self.input_phenotype_df
         del self.input_nan_df
-        del self.run_parameters_sc
         del self.run_parameters_gp
-        del self.pipeline_sc
         del self.data_type
         del self.phenotype_output
 
-    def test_check_input_value_pass(self):
-        ret_df, ret_msg = data_cln.check_input_value(self.input_df, self.input_phenotype_df,
-                                                     self.run_parameters_sc)
-        ret_flag = ret_df is not None
-        self.assertEqual(True, ret_flag)
-
-    def test_check_input_value_Nan_value(self):
-        ret_df, ret_msg = data_cln.check_input_value(self.input_nan_df, self.input_phenotype_df,
-                                                     self.run_parameters_sc)
-        ret_flag = ret_df is not None
-        self.assertEqual(False, ret_flag)
-
-    def test_check_input_value_case_a(self):
-        ret_df, ret_msg = data_cln.check_input_value(self.input_df, self.input_phenotype_df,
-                                                     self.run_parameters_sc)
-        ret_flag = ret_df is not None
-        self.assertEqual(True, ret_flag)
 
     def test_check_input_value_case_b(self):
-        ret_df, ret_msg = data_cln.check_input_value(self.input_df, self.input_phenotype_df,
+        ret_df, ret_msg = data_cln.check_input_value_logic_b(self.input_df, self.input_phenotype_df,
                                                      self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
         os.remove(self.phenotype_output)
 
+
     def test_check_input_value_case_c(self):
-        ret_df, ret_msg = data_cln.check_input_value(self.input_df, self.input_phenotype_df_bad,
+        ret_df, ret_msg = data_cln.check_input_value_logic_b(self.input_df, self.input_phenotype_df_bad,
                                                      self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
+
 
 
 if __name__ == '__main__':

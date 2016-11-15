@@ -38,7 +38,6 @@ class TestSanity_check_data_file(unittest.TestCase):
         self.output_ensemble = "./example_ETL.tsv"
         self.output_mapped = "./example_MAP.tsv"
         self.output_unmapped = "./example_UNMAPPED.tsv"
-        self.output_phenotype_cleaned = "./phenotype_ETL.tsv"
 
     def tearDown(self):
         del self.input_df_good
@@ -46,14 +45,12 @@ class TestSanity_check_data_file(unittest.TestCase):
         os.remove(self.output_mapped)
         os.remove(self.output_ensemble)
         os.remove(self.output_unmapped)
-        os.remove(self.output_phenotype_cleaned)
         del self.output_mapped
         del self.output_ensemble
         del self.output_unmapped
-        del self.output_phenotype_cleaned
 
     def test_sanity_check_data_file(self):
-        ret_val, ret_msg = data_cln.sanity_check_data_file(self.input_df_good, self.input_phenotype, self.run_parameters)
+        ret_val, ret_msg = data_cln.sanity_check_data_file(self.input_df_good, self.run_parameters)
         self.assertEqual(True, ret_val)
 
 

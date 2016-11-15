@@ -5,7 +5,6 @@ results_directory:          ./run_dir/results
 taxonid:                    '9606'                      # taxon id of a given gene name
 source_hint:                ''                          # hint of looking up ensembl name in Redis database
 pipeline_type:              gene_priorization_pipeline # pipeline name
-input_data_type:            ''                          # user_spreadsheet or phenotype
 
 redis_credential:                                       # knoweng Redis database credentials
                             host: knownbs.dyndns.org
