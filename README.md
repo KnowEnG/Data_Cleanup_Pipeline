@@ -40,6 +40,7 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
  pip3 install matplotlib==1.4.2
  pip3 install pyyaml
  pip3 install knpackage
+ pip3 install redis
 ```
 
 ###4. Change directory to Gene_Prioritization_Pipeline
