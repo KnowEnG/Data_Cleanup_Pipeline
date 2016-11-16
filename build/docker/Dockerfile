@@ -4,7 +4,7 @@ MAINTAINER Jing Ge<jingge2@illinois.edu>
 ENV SRC_LOC /home
 
 # Install the latest knpackage
-RUN pip3 install -I knpackage
+RUN pip3 install -I knpackage redis
 
 # Clone from github
 RUN git clone https://username:password@github.com/KnowEnG-Research/Data_Cleanup_Pipeline.git ${SRC_LOC} 
