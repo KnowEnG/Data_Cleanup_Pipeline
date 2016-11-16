@@ -69,6 +69,7 @@ def run_gene_priorization_pipeline(run_parameters):
     Returns:
         validation_flag: Boolean type value indicating if input data is valid or not
         message: A message indicates the status of current check
+
     """
     user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'],
                                                               run_parameters['phenotype_full_path'])
@@ -407,3 +408,5 @@ def sanity_check_data_file(user_spreadsheet_df, run_parameters):
         return match_flag, error_msg
 
     return True, "User spreadsheet has passed the validation successfully! It will be passed to next step..."
+
+
