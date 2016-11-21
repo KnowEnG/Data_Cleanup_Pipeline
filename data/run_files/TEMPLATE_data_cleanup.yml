@@ -1,0 +1,33 @@
+# --------------------------------------------------------------------
+# - spreadsheet          dataframe in .tsv format                    -
+# - phenotype            dataframe in .tsv format                    -
+# --------------------------------------------------------------------
+spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression.tsv
+phenotype_full_path:        ../data/spreadsheets/TEST_1_phenotype.tsv
+
+# --------------------------------------------------------------------
+# - directory where the result files will be written                 -
+# --------------------------------------------------------------------
+results_directory:          ./run_dir/results
+
+# --------------------------------------------------------------------
+# - taxon id as a string                                             -
+# - source_hint as a string                                          -
+# - pipeline type indicates which pipeline to clean                  -
+# - input_data_type indicates which pipelines to clean up            -
+# --------------------------------------------------------------------
+taxonid:                    '9606'                      # taxon id of a given gene name
+source_hint:                ''                          # hint of looking up ensembl name in Redis database
+pipeline_type:              gene_priorization_pipeline  # valid pipeline names:
+                                                        # gene_priorization_pipeline,
+                                                        # sample_clustering_pipeline,
+                                                        # geneset_characterization_pipeline,
+                                                        # gene_prioritization
+
+# --------------------------------------------------------------------
+# - Redis database credentials                                       -
+# --------------------------------------------------------------------
+redis_credential:                                       # knoweng Redis database credentials
+                            host: knownbs.dyndns.org
+                            password: KnowEnG
+                            port: 6380
