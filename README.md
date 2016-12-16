@@ -1,5 +1,5 @@
 # KnowEnG's Data Cleanup Pipeline
- This is the Knowledge Engine for Genomics (KnowEnG), an NIH BD2K Center of Excellence, Samples Clustering Pipeline.
+ This is the Knowledge Engine for Genomics (KnowEnG), an NIH BD2K Center of Excellence, Data Cleanup Pipeline.
 
 This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet this pipeline maps gene-label row names to Ensemble-label row names and checks data formats. It will go through the following steps
 
@@ -8,11 +8,9 @@ There are four data cleaning methods that one can choose from:
 
 | **Options**                                      | **Method**                           | **Parameters** |
 | ------------------------------------------------ | -------------------------------------| -------------- |
-| Check values                                       | check_user_spreadsheet_value        | user_spreadsheet_dataframe |
-| Check duplicate column name                           | check_duplicate_column_name              | user_spreadsheet_dataframe   |
-| Check duplicate gene name                           | check_duplicate_gene_name              | user_spreadsheet_dataframe   |
-| Map gene name to ensembl name           | check_ensemble_gene_name                   | user_spreadsheet_dataframe    |
-| Create final mapped spreadsheet and mapping table | check_ensemble_gene_name    | user_spreadsheet_dataframe, run_parameters |
+| checks for geneset_characterization_pipeline | run_geneset_characterization_pipeline | run_parameters |
+| checks for sample_clustering_pipeline | run_sample_clustering_pipeline | run_parameters |
+| checks for gene_priorization_pipeline | run_gene_priorization_pipeline | run_parameters |
 
 
 * * * 
@@ -23,7 +21,7 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
 
 * __Access__ KnowEnG-Research github repo
 
-###2. Clone the Gene_Prioritization_Pipeline Repo
+###2. Clone the Data_Cleanup_Pipeline Repo
 ```
  git clone https://github.com/KnowEnG-Research/Data_Cleanup_Pipeline.git
 ```
@@ -43,10 +41,10 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
  pip3 install redis
 ```
 
-###4. Change directory to Gene_Prioritization_Pipeline
+###4. Change directory to Data_Cleanup_Pipeline
 
 ```
-cd Gene_Prioritization_Pipeline
+cd Data_Cleanup_Pipeline 
 ```
 
 ###5. Change directory to test
