@@ -4,7 +4,6 @@ import data_cleanup_toolbox as datacln
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
 
 
-
 def pasted_gene_cleanup(run_parameters):
     redis_db = redutil.get_database(run_parameters['redis_credential'])
 
