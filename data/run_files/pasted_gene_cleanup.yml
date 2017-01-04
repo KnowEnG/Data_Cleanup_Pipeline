@@ -1,0 +1,11 @@
+pasted_gene_list_full_path: ../data/spreadsheets/TEST_pasted_gene_list.tsv
+temp_redis_vector: ../data/spreadsheets/TEST_redis_retrived_universal_data.tsv
+results_directory:          ./run_dir/results
+
+taxonid:                    '9606'                      # taxon id of a given gene name
+source_hint:                ''                          # hint of looking up ensembl name in Redis database
+
+redis_credential:                                       # knoweng Redis database credentials
+                            host: knownbs.dyndns.org
+                            password: KnowEnG
+                            port: 6380
