@@ -3,16 +3,6 @@
 
 This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet this pipeline maps gene-label row names to Ensemble-label row names and checks data formats. It will go through the following steps
 
-There are four data cleaning methods that one can choose from:
-
-
-| **Options**                                      | **Method**                           | **Parameters** |
-| ------------------------------------------------ | -------------------------------------| -------------- |
-| checks for geneset_characterization_pipeline | run_geneset_characterization_pipeline | run_parameters |
-| checks for sample_clustering_pipeline | run_sample_clustering_pipeline | run_parameters |
-| checks for gene_priorization_pipeline | run_gene_priorization_pipeline | run_parameters |
-
-
 * * * 
 ## How to run this pipeline with Our data
 * * * 
