@@ -1,8 +1,7 @@
 import sys
 import redis_utilities as redutil
 import data_cleanup_toolbox as datacln
-from knpackage.toolbox import get_run_parameters, get_run_directory_and_file, get_spreadsheet_df
-import pandas
+from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
 
 def pasted_gene_cleanup(run_parameters):
     # gets redis database instance by its credential
