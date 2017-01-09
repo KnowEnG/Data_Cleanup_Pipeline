@@ -9,7 +9,9 @@ def pasted_gene_cleanup(run_parameters):
     redis_db = redutil.get_database(run_parameters['redis_credential'])
 
     # reads pasted_gene_list as a dataframe
-    input_small_genes_df = get_spreadsheet_df(run_parameters['pasted_gene_list_full_path'])
+    input_small_genes_df = datacln.load_data_file(run_parameters['pasted_gene_list_full_path'])
+    input_small_genes_df["original_gene_name"] = input_small_genes_df.index
+
     # converts pasted_gene_list to ensemble name
     input_small_genes_df.index = input_small_genes_df.index.map(lambda x: redutil.conv_gene(redis_db, x, run_parameters['source_hint'], run_parameters['taxonid']))
 
