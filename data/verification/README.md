@@ -22,3 +22,9 @@ The Makefile in the test directory contains the targes, needed to build the **Da
 * Compare the results with verification file starts with prefix: **GDSC_Expression_ensembl**
 **Note that the order of columns and rows may change.**
 
+### 3. Run pasted gene list test
+```
+    make run_pasted_gene_list
+```
+* Compare the results with verification file starts with prefix: **TEST_pasted_gene_list**
+**Note that the order of columns and rows may change.**
