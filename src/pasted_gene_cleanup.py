@@ -36,7 +36,7 @@ def pasted_gene_cleanup(run_parameters):
 
     # outputs final results
     output_file_basename = datacln.get_file_basename(run_parameters['pasted_gene_list_full_path'])
-    input_small_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv", sep='\t', header=False, index=True)
+    input_small_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv", sep='\t', header=True, index=True)
     universal_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv", sep='\t', header=True, index=True)
 
 
