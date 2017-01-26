@@ -1,5 +1,3 @@
-import json
-import os
 import redis
 
 def get_database(args):
