@@ -50,8 +50,8 @@ class Testcheck_input_value(unittest.TestCase):
         del self.phenotype_output
 
 
-    def test_check_input_value_case_b(self):
-        ret_df, ret_msg = data_cln.check_input_value_logic_b(self.input_df, self.input_phenotype_df,
+    def test_check_input_value_for_gene_prioritazion(self):
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df, self.input_phenotype_df,
                                                      self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
@@ -59,7 +59,7 @@ class Testcheck_input_value(unittest.TestCase):
 
 
     def test_check_input_value_case_c(self):
-        ret_df, ret_msg = data_cln.check_input_value_logic_b(self.input_df, self.input_phenotype_df_bad,
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df, self.input_phenotype_df_bad,
                                                      self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
