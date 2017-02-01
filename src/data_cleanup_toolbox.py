@@ -346,6 +346,13 @@ def check_input_value_for_sample_clustering(data_frame, phenotype_df, run_parame
     if data_frame.isnull().values.any():
         return None, "This user spreadsheet contains invalid NaN value."
 
+    # checks if it contains only real number
+    data_frame_real_number = data_frame.applymap(lambda x: isinstance(x, (int, float)))
+
+    if False in data_frame_real_number:
+        return None, "Found not numeric value in user spreadsheet."
+
+    # checks if it contains only positive number
     data_frame_negative = data_frame[(data_frame < 0).any(axis=1)]
 
     if not data_frame_negative.empty:
