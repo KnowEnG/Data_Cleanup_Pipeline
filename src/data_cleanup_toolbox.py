@@ -305,6 +305,7 @@ def check_input_value_for_geneset_characterization(data_frame, phenotype_df, run
 
     Args:
         data_frame: input data frame
+        phenotype_df: input phenotype data frame
         golden_value_set: golden standard value set to be compared with
 
     Returns:
@@ -338,6 +339,7 @@ def check_input_value_for_sample_clustering(data_frame, phenotype_df, run_parame
 
     Args:
         data_frame: input data frame
+        phenotype_df: input phenotype data frame
         golden_value_set: golden standard value set to be compared with
 
     Returns:
@@ -452,3 +454,5 @@ def sanity_check_data_file(user_spreadsheet_df, run_parameters):
         return match_flag, error_msg
 
     return True, "User spreadsheet has passed the validation successfully! It will be passed to next step..."
+
+
