@@ -23,7 +23,8 @@ def run_geneset_characterization_pipeline(run_parameters):
     user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'],
                                                               run_parameters['phenotype_full_path'])
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
-    user_spreadsheet_val_chked, error_msg = check_input_value_for_geneset_characterization(user_spreadsheet_df, phenotype_df, run_parameters)
+    user_spreadsheet_val_chked, error_msg = check_input_value_for_geneset_characterization(user_spreadsheet_df,
+                                                                                           phenotype_df, run_parameters)
 
     if user_spreadsheet_val_chked is None:
         return False, error_msg
@@ -263,7 +264,7 @@ def check_input_value_for_gene_prioritazion(data_frame, phenotype_df, run_parame
     # checks real number negative to positive infinite
     data_frame_check = data_frame_dropna.applymap(lambda x: isinstance(x, (int, float)))
 
-    if False in data_frame_check:
+    if False in data_frame_check.values:
         return None, None, "Found not numeric value in user spreadsheet."
 
     # drops columns with NA value in phenotype dataframe
@@ -349,21 +350,19 @@ def check_input_value_for_sample_clustering(data_frame, phenotype_df, run_parame
     # checks if it contains only real number
     data_frame_real_number = data_frame.applymap(lambda x: isinstance(x, (int, float)))
 
-    if False in data_frame_real_number:
-        return None, "Found not numeric value in user spreadsheet."
+    if False in data_frame_real_number.values:
+        return None, "Found non-numeric value in user spreadsheet."
 
     # checks if it contains only positive number
-    data_frame_negative = data_frame[(data_frame < 0).any(axis=1)]
+    data_frame_abs = data_frame_real_number.abs()
 
-    if not data_frame_negative.empty:
-        return None, "An invalid negative value detected in input spreadsheet. Please revise your spreadsheet and reupload."
-    else:
-        output_file_basename = get_file_basename(run_parameters['phenotype_full_path'])
-        phenotype_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv",
-                            sep='\t', header=True, index=True)
-        return data_frame, "Value contains in user spreadsheet matches with golden standard value set."
-
-    return None, "An unexpected condition occurred during value check for either spreadsheet or phenotype data."
+    phenotype_df.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+        run_parameters['phenotype_full_path']) + "_ETL.tsv",
+                        sep='\t', header=True, index=True)
+    data_frame_abs.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+        run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
+                          sep='\t', header=True, index=True)
+    return data_frame_abs, "Value contains in user spreadsheet matches with golden standard value set."
 
 
 def check_ensemble_gene_name(data_frame, run_parameters):

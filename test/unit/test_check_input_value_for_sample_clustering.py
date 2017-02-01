@@ -7,21 +7,16 @@ import os
 class TestCheck_input_value_for_sample_clustering(unittest.TestCase):
     def setUp(self):
         self.input_df = pd.DataFrame([[1, 2],
-                                      [0, 10],
+                                      [0, -10],
                                       [1, 9]],
                                      index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
                                      columns=['a', 'b'])
-        self.input_df_neg = pd.DataFrame([[1, 2],
-                                          [0, -10],
-                                          [1, 9]],
-                                         index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
-                                         columns=['a', 'b'])
         self.input_df_nan = pd.DataFrame([[1, 0],
                                           [0, None],
                                           [1, 1]],
                                          index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
                                          columns=['a', 'b'])
-        self.input_df_text = pd.DataFrame([[1, 0],
+        self.input_df_text = pd.DataFrame([["text", 0],
                                           [0, "text"],
                                           [1, 1]],
                                          index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
@@ -66,19 +61,9 @@ class TestCheck_input_value_for_sample_clustering(unittest.TestCase):
         self.assertEqual(True, ret_flag)
         os.remove(self.phenotype_output)
 
-
-    def test_check_negative_value_in_spreadsheet(self):
-        ret_df, ret_msg = data_cln.check_input_value_for_sample_clustering(self.input_df_neg, self.input_phenotype_df,
-                                                                           self.run_parameters_gp)
-
-        ret_flag = ret_df is not None
-        self.assertEqual(False, ret_flag)
-
-
     def test_check_nan_input_value_in_spreadsheet(self):
-        ret_df, ret_msg = data_cln.check_input_value_for_sample_clustering(self.input_df_neg, self.input_phenotype_df,
+        ret_df, ret_msg = data_cln.check_input_value_for_sample_clustering(self.input_df_nan, self.input_phenotype_df,
                                                                            self.run_parameters_gp)
-
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 

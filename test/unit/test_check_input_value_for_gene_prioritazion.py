@@ -11,7 +11,12 @@ class Testcheck_input_value(unittest.TestCase):
                                       [1, 1]],
                                      index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
                                      columns=['a', 'b'])
-        self.input_nan_df = pd.DataFrame([[1, 0],
+        self.input_df_text = pd.DataFrame([[1, 0],
+                                      [0, "text"],
+                                      [1, 1]],
+                                     index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
+                                     columns=['a', 'b'])
+        self.input_df_nan = pd.DataFrame([[1, 0],
                                           [0, None],
                                           [1, 1]],
                                          index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
@@ -24,7 +29,7 @@ class Testcheck_input_value(unittest.TestCase):
         )
 
         self.input_phenotype_df_bad = pd.DataFrame(
-            [[1.1, 2.2, 3.3]],
+            [[1.1, -2.2, 3.3]],
             index=['drug1'],
             columns=['d', 'e', 'f']
         )
@@ -43,12 +48,12 @@ class Testcheck_input_value(unittest.TestCase):
 
     def tearDown(self):
         del self.input_df
+        del self.input_df_text
+        del self.input_df_nan
         del self.input_phenotype_df
-        del self.input_nan_df
         del self.run_parameters_gp
         del self.data_type
         del self.phenotype_output
-
 
     def test_check_input_value_for_gene_prioritazion(self):
         ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df, self.input_phenotype_df,
@@ -57,14 +62,26 @@ class Testcheck_input_value(unittest.TestCase):
         self.assertEqual(True, ret_flag)
         os.remove(self.phenotype_output)
 
-
-    def test_check_input_value_case_c(self):
-        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df, self.input_phenotype_df_bad,
+    def test_check_nan_spreadsheet_value(self):
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df_nan, self.input_phenotype_df,
                                                      self.run_parameters_gp)
+        ret_flag = ret_df is not None
+        self.assertEqual(True, ret_flag)
+
+    def test_check_text_spreadsheet_value(self):
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df_text,
+                                                                                          self.input_phenotype_df,
+                                                                                          self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 
 
+    def test_check_negative_phenotype_value(self):
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df,
+                                                                                          self.input_phenotype_df_bad,
+                                                                                          self.run_parameters_gp)
+        ret_flag = ret_df is not None
+        self.assertEqual(False, ret_flag)
 
 if __name__ == '__main__':
     unittest.main()
