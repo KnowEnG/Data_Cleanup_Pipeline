@@ -12,10 +12,10 @@ class Testcheck_input_value(unittest.TestCase):
                                      index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
                                      columns=['a', 'b'])
         self.input_df_text = pd.DataFrame([[1, 0],
-                                      [0, "text"],
-                                      [1, 1]],
-                                     index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
-                                     columns=['a', 'b'])
+                                           [0, "text"],
+                                           [1, 1]],
+                                          index=['ENSG00001027003', "ENSG00001027003", 'ENSG00008000303'],
+                                          columns=['a', 'b'])
         self.input_df_nan = pd.DataFrame([[1, 0],
                                           [0, None],
                                           [1, 1]],
@@ -56,15 +56,17 @@ class Testcheck_input_value(unittest.TestCase):
         del self.phenotype_output
 
     def test_check_input_value_for_gene_prioritazion(self):
-        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df, self.input_phenotype_df,
-                                                     self.run_parameters_gp)
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df,
+                                                                                          self.input_phenotype_df,
+                                                                                          self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
         os.remove(self.phenotype_output)
 
     def test_check_nan_spreadsheet_value(self):
-        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df_nan, self.input_phenotype_df,
-                                                     self.run_parameters_gp)
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df_nan,
+                                                                                          self.input_phenotype_df,
+                                                                                          self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 
@@ -75,13 +77,13 @@ class Testcheck_input_value(unittest.TestCase):
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 
-
     def test_check_negative_phenotype_value(self):
         ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df,
                                                                                           self.input_phenotype_df_bad,
                                                                                           self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
+
 
 if __name__ == '__main__':
     unittest.main()
