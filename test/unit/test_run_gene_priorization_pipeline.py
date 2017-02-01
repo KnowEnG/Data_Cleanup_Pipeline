@@ -12,8 +12,8 @@ class TestRun_gene_priorization_pipeline(unittest.TestCase):
             "taxonid": '9606',
             "pipeline_type": "sample_clustering_pipeline",
             "redis_credential": {
-                "host": "knownbs.dyndns.org",
-                "port": 6380,
+                "host": "knownet.knowhub.org",
+                "port": 6379,
                 "password": "KnowEnG"
             }
         }
