@@ -28,7 +28,7 @@ class Testcheck_input_value(unittest.TestCase):
             columns=['a', 'b', 'c']
         )
 
-        self.input_phenotype_df_bad = pd.DataFrame(
+        self.input_phenotype_df_negative = pd.DataFrame(
             [[1.1, -2.2, 3.3]],
             index=['drug1'],
             columns=['d', 'e', 'f']
@@ -79,7 +79,7 @@ class Testcheck_input_value(unittest.TestCase):
 
     def test_check_negative_phenotype_value(self):
         ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df,
-                                                                                          self.input_phenotype_df_bad,
+                                                                                          self.input_phenotype_df_negative,
                                                                                           self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
