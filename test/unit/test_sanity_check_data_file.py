@@ -25,7 +25,7 @@ class TestSanity_check_data_file(unittest.TestCase):
             "phenotype_full_path": ".. /data/spreadsheets/phenotype.tsv",
             "results_directory": "./",
             "redis_credential": {
-                "host": "knownet.knowhub.org",
+                "host": "knowpipes1.knowhub.org",
                 "port": 6379,
                 "password": "KnowEnG"
             },
