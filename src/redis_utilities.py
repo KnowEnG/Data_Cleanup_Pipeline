@@ -9,7 +9,7 @@ def get_database(args):
         StrictRedis: a redis connection object
     """
     return redis.StrictRedis(host=args['host'], port=args['port'],
-                             password=args['password'])
+                             password=args['password'], socket_timeout=10)
 
 
 def node_desc(rdb, stable_id):

@@ -35,10 +35,10 @@ class Testcheck_input_value_for_geneset_characterization(unittest.TestCase):
             "results_directory": "./",
             "source_hint": "",
             "taxonid": '9606',
-            "pipeline_type": "sample_clustering_pipeline"
+            "pipeline_type": "samples_clustering_pipeline"
         }
 
-        self.pipeline_sc = "sample_clustering_pipeline"
+        self.pipeline_sc = "samples_clustering_pipeline"
         self.data_type = "user_spreadsheet"
         self.phenotype_output = "./phenotype_ETL.tsv"
 

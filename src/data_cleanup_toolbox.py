@@ -7,6 +7,7 @@ import pandas
 import knpackage.redis_utilities as redisutil
 import yaml
 import os
+from enum import Enum
 
 
 def run_geneset_characterization_pipeline(run_parameters):
@@ -22,9 +23,11 @@ def run_geneset_characterization_pipeline(run_parameters):
     """
     user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'],
                                                               run_parameters['phenotype_full_path'])
+
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
     user_spreadsheet_val_chked, error_msg = check_input_value_for_geneset_characterization(user_spreadsheet_df,
-                                                                                           phenotype_df, run_parameters)
+                                                                                           phenotype_df,
+                                                                                           run_parameters)
 
     if user_spreadsheet_val_chked is None:
         return False, error_msg
@@ -35,9 +38,9 @@ def run_geneset_characterization_pipeline(run_parameters):
     return validation_flag, error_msg
 
 
-def run_sample_clustering_pipeline(run_parameters):
+def run_samples_clustering_pipeline(run_parameters):
     """
-    Runs data cleaning for sample_clustering_pipeline.
+    Runs data cleaning for samples_clustering_pipeline.
 
     Args:
         run_parameters: configuration dictionary
@@ -48,9 +51,11 @@ def run_sample_clustering_pipeline(run_parameters):
     """
     user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'],
                                                               run_parameters['phenotype_full_path'])
+
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
-    user_spreadsheet_val_chked, error_msg = check_input_value_for_sample_clustering(user_spreadsheet_df, phenotype_df,
-                                                                                    run_parameters)
+    user_spreadsheet_val_chked, error_msg = check_input_value_for_samples_clustering(user_spreadsheet_df,
+                                                                                    run_parameters,
+                                                                                    phenotype_df)
 
     if user_spreadsheet_val_chked is None:
         return False, error_msg
@@ -74,8 +79,9 @@ def run_gene_priorization_pipeline(run_parameters):
     """
     user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'],
                                                               run_parameters['phenotype_full_path'])
+
     # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
-    user_spreadsheet_val_chked, phenotype_val_checked, error_msg = check_input_value_for_gene_prioritazion(
+    user_spreadsheet_val_chked, phenotype_val_checked, error_msg = check_input_value_for_gene_prioritization(
         user_spreadsheet_df, phenotype_df, run_parameters)
 
     if user_spreadsheet_val_chked is None:
@@ -148,8 +154,11 @@ def load_data_file(spreadsheet_path):
     Returns:
         user_spreadsheet_df: user spreadsheet as a data frame
     """
+    if len(spreadsheet_path) == 0:
+        return None
+
     try:
-        user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
+        user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=True)
         return user_spreadsheet_df
     except OSError as err:
         raise OSError(str(err))
@@ -239,7 +248,7 @@ def check_duplicate_row_name(data_frame):
     return None, "An unexpected error occurred during checking duplicate row name."
 
 
-def check_input_value_for_gene_prioritazion(data_frame, phenotype_df, run_parameters):
+def check_input_value_for_gene_prioritization(data_frame, phenotype_df, run_parameters):
     """
     This input value check is specifically designed for gene_priorization_pipeline.
     1. user spreadsheet contains real number.
@@ -317,6 +326,7 @@ def check_input_value_for_geneset_characterization(data_frame, phenotype_df, run
 
     if data_frame.isnull().values.any():
         return None, "This user spreadsheet contains invalid NaN value."
+
     gene_value_set = set(data_frame.ix[:, data_frame.columns != 0].values.ravel())
 
     if golden_value_set != gene_value_set:
@@ -332,7 +342,7 @@ def check_input_value_for_geneset_characterization(data_frame, phenotype_df, run
     return None, "An unexpected condition occurred during value check for either spreadsheet or phenotype data."
 
 
-def check_input_value_for_sample_clustering(data_frame, phenotype_df, run_parameters):
+def check_input_value_for_samples_clustering(data_frame, run_parameters, phenotype_df=None):
     """
     Checks if the values in user spreadsheet matches with golden standard value set
         and rename phenotype file to have suffix _ETL.tsv
@@ -358,7 +368,8 @@ def check_input_value_for_sample_clustering(data_frame, phenotype_df, run_parame
     # checks if it contains only positive number
     data_frame_abs = data_frame_real_number.abs()
 
-    phenotype_df.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+    if phenotype_df is not None:
+        phenotype_df.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['phenotype_full_path']) + "_ETL.tsv",
                         sep='\t', header=True, index=True)
     data_frame_abs.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
@@ -454,5 +465,4 @@ def sanity_check_data_file(user_spreadsheet_df, run_parameters):
         return match_flag, error_msg
 
     return True, "User spreadsheet has passed the validation successfully! It will be passed to next step..."
-
 

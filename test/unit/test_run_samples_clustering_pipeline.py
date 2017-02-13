@@ -2,37 +2,54 @@ import unittest
 import data_cleanup_toolbox as data_cln
 import os
 
-class TestRun_gene_priorization_pipeline(unittest.TestCase):
+class TestRun_samples_clustering_pipeline(unittest.TestCase):
     def setUp(self):
         self.run_parameters = {
             "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression.tsv",
             "phenotype_full_path": "../../data/spreadsheets/TEST_1_phenotype.tsv",
             "results_directory": "./",
-            "source_hint": "",
-            "taxonid": '9606',
-            "pipeline_type": "samples_clustering_pipeline",
             "redis_credential": {
                 "host": "knowpipes1.knowhub.org",
                 "port": 6379,
                 "password": "KnowEnG"
-            }
+            },
+            "source_hint": "",
+            "taxonid": '9606',
+            "pipeline_type": "samples_clustering_pipeline"
         }
+
+        self.run_parameters_no_phenotype = {
+            "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression.tsv",
+            "phenotype_full_path": "",
+            "results_directory": "./",
+            "redis_credential": {
+                "host": "knowpipes1.knowhub.org",
+                "port": 6379,
+                "password": "KnowEnG"
+            },
+            "source_hint": "",
+            "taxonid": '9606',
+            "pipeline_type": "samples_clustering_pipeline"
+        }
+
         self.file_ETL = "TEST_1_gene_expression_ETL.tsv"
         self.file_MAP = "TEST_1_gene_expression_MAP.tsv"
         self.file_UNMAPPED = "TEST_1_gene_expression_UNMAPPED.tsv"
         self.phenotype_ETL = "TEST_1_phenotype_ETL.tsv"
-
 
     def tearDown(self):
         del self.run_parameters
         os.remove(self.file_ETL)
         os.remove(self.file_MAP)
         os.remove(self.file_UNMAPPED)
+
+    def test_run_samples_clustering_pipeline(self):
+        ret_flag, ret_msg = data_cln.run_samples_clustering_pipeline(self.run_parameters)
+        self.assertEqual(True, ret_flag)
         os.remove(self.phenotype_ETL)
 
-
-    def test_run_gene_priorization_pipeline(self):
-        ret_flag, ret_msg = data_cln.run_gene_priorization_pipeline(self.run_parameters)
+    def test_run_samples_clustering_pipeline_no_phenotype(self):
+        ret_flag, ret_msg = data_cln.run_samples_clustering_pipeline(self.run_parameters_no_phenotype)
         self.assertEqual(True, ret_flag)
 
 
