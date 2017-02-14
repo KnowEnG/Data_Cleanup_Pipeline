@@ -32,12 +32,12 @@ def run_geneset_characterization_pipeline(run_parameters):
         return False, error_msg
 
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
-    user_spreadsheet_df_cleaned, error_msg = sanity_check_data_file(user_spreadsheet_val_chked, run_parameters)
+    user_spreadsheet_df_cleaned, error_msg = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
 
     if user_spreadsheet_df_cleaned is None:
         return False, error_msg
     else:
-        if phenotype_df is not None:
+        if not phenotype_df.empty:
             phenotype_df.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
                 run_parameters['phenotype_full_path']) + "_ETL.tsv",
                                 sep='\t', header=True, index=True)
@@ -46,6 +46,7 @@ def run_geneset_characterization_pipeline(run_parameters):
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                            sep='\t', header=True, index=True)
     return True, error_msg
+
 
 def run_samples_clustering_pipeline(run_parameters):
     """
@@ -73,12 +74,12 @@ def run_samples_clustering_pipeline(run_parameters):
         return False, error_msg
 
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
-    user_spreadsheet_df_cleaned, error_msg = sanity_check_data_file(user_spreadsheet_val_chked, run_parameters)
+    user_spreadsheet_df_cleaned, error_msg = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
 
     if user_spreadsheet_df_cleaned is None:
         return False, error_msg
     else:
-        if phenotype_df is not None:
+        if phenotype_df is not None and not phenotype_df.empty:
             phenotype_df.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
                 run_parameters['phenotype_full_path']) + "_ETL.tsv",
                                 sep='\t', header=True, index=True)
@@ -111,9 +112,9 @@ def run_gene_priorization_pipeline(run_parameters):
         return False, error_msg
 
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
-    user_spreadsheet_df_cleaned, error_msg = sanity_check_data_file(user_spreadsheet_val_chked, run_parameters)
+    user_spreadsheet_df_cleaned, error_msg = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
 
-    if user_spreadsheet_df_cleaned is None:
+    if user_spreadsheet_df_cleaned is None or phenotype_val_checked is None:
         return False, error_msg
     else:
         # store cleaned phenotype data to a file
@@ -122,7 +123,7 @@ def run_gene_priorization_pipeline(run_parameters):
                                      sep='\t', header=True, index=True)
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
-                                           sep='\t', header=True, index=True)
+                                     sep='\t', header=True, index=True)
 
     return True, error_msg
 
@@ -450,7 +451,7 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     return output_df_mapped, "This is a valid user spreadsheet. Proceed to next step analysis."
 
 
-def sanity_check_data_file(user_spreadsheet_df, run_parameters):
+def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
     """
     Checks the validity of user input spreadsheet data file
 

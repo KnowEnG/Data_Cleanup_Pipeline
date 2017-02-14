@@ -40,6 +40,9 @@ run_pasted_gene_list:
 run_data_cleaning_small:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_data_cleanup.yml
 
+run_samples_clustering_pipeline:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_samples_clustering_pipeling.yml
+
 # ----------------------------------------------------------------
 # - UNIT TESTS RUN SECTION                                       -
 # ----------------------------------------------------------------
