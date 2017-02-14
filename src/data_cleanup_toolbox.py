@@ -365,7 +365,7 @@ def check_input_value_for_samples_clustering(data_frame, run_parameters, phenoty
         return None, "Found non-numeric value in user spreadsheet."
 
     # checks if it contains only positive number
-    data_frame_abs = data_frame_real_number.abs()
+    data_frame_abs = data_frame.abs()
 
     if phenotype_df is not None:
         phenotype_df.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
