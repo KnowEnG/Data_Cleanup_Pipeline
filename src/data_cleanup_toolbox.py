@@ -7,7 +7,6 @@ import pandas
 import knpackage.redis_utilities as redisutil
 import yaml
 import os
-from enum import Enum
 
 
 def run_geneset_characterization_pipeline(run_parameters):
