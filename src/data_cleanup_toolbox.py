@@ -432,11 +432,6 @@ def check_ensemble_gene_name(data_frame, run_parameters):
 
     output_file_basename = get_file_basename(run_parameters['spreadsheet_name_full_path'])
 
-    # writes each data frame to output file separately
-    # includes header and index in output file (index is gene name, header is column name)
-    output_df_mapped.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv",
-                            sep='\t', header=True, index=True)
-
     # writes unmapped gene name along with return value from Redis data base to a file
     unmapped_filtered.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_UNMAPPED.tsv",
                              sep='\t', header=False, index=False)
@@ -480,9 +475,3 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
 
     return user_spreadsheet_df_final, error_msg
 
-    '''
-    if match_flag is not None:
-        return match_flag, error_msg
-
-    return True, "User spreadsheet has passed the validation successfully! It will be passed to next step..."
-    '''
