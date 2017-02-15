@@ -55,8 +55,8 @@ class Testcheck_input_value(unittest.TestCase):
         del self.data_type
         del self.phenotype_output
 
-    def test_check_input_value_for_gene_prioritazion(self):
-        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df,
+    def test_check_input_value_for_gene_prioritization(self):
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritization(self.input_df,
                                                                                           self.input_phenotype_df,
                                                                                           self.run_parameters_gp)
         ret_flag = ret_df is not None
@@ -64,21 +64,21 @@ class Testcheck_input_value(unittest.TestCase):
         os.remove(self.phenotype_output)
 
     def test_check_nan_spreadsheet_value(self):
-        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df_nan,
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritization(self.input_df_nan,
                                                                                           self.input_phenotype_df,
                                                                                           self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 
     def test_check_text_spreadsheet_value(self):
-        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df_text,
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritization(self.input_df_text,
                                                                                           self.input_phenotype_df,
                                                                                           self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 
     def test_check_negative_phenotype_value(self):
-        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritazion(self.input_df,
+        ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritization(self.input_df,
                                                                                           self.input_phenotype_df_negative,
                                                                                           self.run_parameters_gp)
         ret_flag = ret_df is not None

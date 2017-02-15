@@ -20,7 +20,7 @@ taxonid:                    '9606'                      # taxon id of a given ge
 source_hint:                ''                          # hint of looking up ensembl name in Redis database
 pipeline_type:              gene_priorization_pipeline  # valid pipeline names:
                                                         # gene_priorization_pipeline,
-                                                        # sample_clustering_pipeline,
+                                                        # samples_clustering_pipeline,
                                                         # geneset_characterization_pipeline,
                                                         # gene_prioritization
 
@@ -30,4 +30,4 @@ pipeline_type:              gene_priorization_pipeline  # valid pipeline names:
 redis_credential:                                       # knoweng Redis database credentials
                             host: knowpipes1.knowhub.org
                             password: KnowEnG
-                            port: 6380
+                            port: 6379

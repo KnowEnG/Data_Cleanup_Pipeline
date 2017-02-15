@@ -1,7 +1,6 @@
 import unittest
 import data_cleanup_toolbox as data_cln
 
-
 class TestRun_geneset_characterization_pipeline(unittest.TestCase):
     def setUp(self):
         self.run_parameters = {
@@ -13,8 +12,10 @@ class TestRun_geneset_characterization_pipeline(unittest.TestCase):
             "pipeline_type": "geneset_characterization_pipeline"
         }
 
+
     def tearDown(self):
         del self.run_parameters
+
 
     def test_run_geneset_characterization_pipeline(self):
         ret_flag, ret_msg = data_cln.run_geneset_characterization_pipeline(self.run_parameters)

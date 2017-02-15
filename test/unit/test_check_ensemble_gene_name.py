@@ -62,7 +62,7 @@ class TestCheck_ensemble_gene_name(unittest.TestCase):
         ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_good, self.run_parameters)
         self.assertEqual(True, ret_val)
 
-        file_content_df = pd.read_csv(self.output_processed, sep='\t', header=0, index_col=0, mangle_dupe_cols=False)
+        file_content_df = pd.read_csv(self.output_processed, sep='\t', header=0, index_col=0, mangle_dupe_cols=True)
         npytest.assert_array_equal(self.golden_output_good, file_content_df)
 
     def test_check_ensemble_gene_name_empty_mapped(self):
