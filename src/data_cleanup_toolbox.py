@@ -44,7 +44,7 @@ def run_geneset_characterization_pipeline(run_parameters):
 
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
-                                           sep='\t', header=True, index=True)
+                                sep='\t', header=True, index=True)
     return True, error_msg
 
 
@@ -86,7 +86,7 @@ def run_samples_clustering_pipeline(run_parameters):
 
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
-                                           sep='\t', header=True, index=True)
+                                sep='\t', header=True, index=True)
     return True, error_msg
 
 
@@ -432,11 +432,11 @@ def check_ensemble_gene_name(data_frame, run_parameters):
 
     output_file_basename = get_file_basename(run_parameters['spreadsheet_name_full_path'])
 
-    # writes unmapped gene name along with return value from Redis data base to a file
+    # writes unmapped gene name along with return value from Redis database to a file
     unmapped_filtered.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_UNMAPPED.tsv",
                              sep='\t', header=False, index=False)
 
-    # does not include header in output mapping file
+    # writes dedupped mapping between original gene name and ensemble name to a file
     mapping_dedup_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv",
                             sep='\t', header=False, index=True)
 
@@ -474,4 +474,3 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
     user_spreadsheet_df_final, error_msg = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, run_parameters)
 
     return user_spreadsheet_df_final, error_msg
-
