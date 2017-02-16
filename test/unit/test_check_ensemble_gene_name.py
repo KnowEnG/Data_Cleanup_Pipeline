@@ -35,7 +35,7 @@ class TestCheck_ensemble_gene_name(unittest.TestCase):
             "source_hint": "",
             "taxonid": '9606'
         }
-        self.output_processed = "./example_ETL.tsv"
+
         self.output_mapping = "./example_MAP.tsv"
         self.output_unmapped = "./example_UNMAPPED.tsv"
 
@@ -51,27 +51,27 @@ class TestCheck_ensemble_gene_name(unittest.TestCase):
         del self.input_df_empty_mapped
         del self.run_parameters
         del self.golden_output_good
-        os.remove(self.output_processed)
         os.remove(self.output_mapping)
         os.remove(self.output_unmapped)
-        del self.output_processed
         del self.output_mapping
         del self.output_unmapped
 
     def test_check_ensemble_gene_name_good(self):
         ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_good, self.run_parameters)
-        self.assertEqual(True, ret_val)
-
-        file_content_df = pd.read_csv(self.output_processed, sep='\t', header=0, index_col=0, mangle_dupe_cols=True)
-        npytest.assert_array_equal(self.golden_output_good, file_content_df)
+        ret_val_boolean = True if ret_val is not None else False
+        self.assertEqual(True, ret_val_boolean)
+        npytest.assert_array_equal(self.golden_output_good, ret_val)
 
     def test_check_ensemble_gene_name_empty_mapped(self):
         ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_empty_mapped, self.run_parameters)
-        self.assertEqual(False, ret_val)
+        ret_val_boolean = True if ret_val is not None else False
+        self.assertEqual(False, ret_val_boolean)
 
     def test_check_ensemble_gene_name_bad(self):
         ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_bad, self.run_parameters)
-        self.assertEqual(True, ret_val)
+        ret_val_boolean = True if ret_val is not None else False
+
+        self.assertEqual(True, ret_val_boolean)
 
 
 if __name__ == '__main__':

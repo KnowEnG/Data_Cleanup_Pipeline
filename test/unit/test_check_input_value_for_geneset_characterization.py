@@ -40,7 +40,6 @@ class Testcheck_input_value_for_geneset_characterization(unittest.TestCase):
 
         self.pipeline_sc = "samples_clustering_pipeline"
         self.data_type = "user_spreadsheet"
-        self.phenotype_output = "./phenotype_ETL.tsv"
 
     def tearDown(self):
         del self.input_df
@@ -49,14 +48,12 @@ class Testcheck_input_value_for_geneset_characterization(unittest.TestCase):
         del self.run_parameters_sc
         del self.pipeline_sc
         del self.data_type
-        del self.phenotype_output
 
     def test_check_input_value_for_geneset_characterization_pass(self):
         ret_df, ret_msg = data_cln.check_input_value_for_geneset_characterization(self.input_df, self.input_phenotype_df,
                                                              self.run_parameters_sc)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
-        os.remove(self.phenotype_output)
 
     def test_check_nan_input_value(self):
         ret_df, ret_msg = data_cln.check_input_value_for_geneset_characterization(self.input_nan_df, self.input_phenotype_df,

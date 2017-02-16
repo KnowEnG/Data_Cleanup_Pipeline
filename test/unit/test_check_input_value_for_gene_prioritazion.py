@@ -44,7 +44,6 @@ class Testcheck_input_value(unittest.TestCase):
         }
 
         self.data_type = "user_spreadsheet"
-        self.phenotype_output = "./phenotype_ETL.tsv"
 
     def tearDown(self):
         del self.input_df
@@ -53,7 +52,6 @@ class Testcheck_input_value(unittest.TestCase):
         del self.input_phenotype_df
         del self.run_parameters_gp
         del self.data_type
-        del self.phenotype_output
 
     def test_check_input_value_for_gene_prioritization(self):
         ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritization(self.input_df,
@@ -61,7 +59,6 @@ class Testcheck_input_value(unittest.TestCase):
                                                                                           self.run_parameters_gp)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
-        os.remove(self.phenotype_output)
 
     def test_check_nan_spreadsheet_value(self):
         ret_df, ret_phenotype, ret_msg = data_cln.check_input_value_for_gene_prioritization(self.input_df_nan,
