@@ -14,7 +14,9 @@ def geneset_characterization_pipeline(run_parameters):
     """
     from data_cleanup_toolbox import run_geneset_characterization_pipeline
     validation_flag, message = run_geneset_characterization_pipeline(run_parameters)
-    return validation_flag, message
+    if not validation_flag:
+        sys.exit(message)
+    print("Successfully ran geneset_characterization_pipeline.")
 
 
 def samples_clustering_pipeline(run_parameters):
@@ -29,7 +31,9 @@ def samples_clustering_pipeline(run_parameters):
     """
     from data_cleanup_toolbox import run_samples_clustering_pipeline
     validation_flag, message = run_samples_clustering_pipeline(run_parameters)
-    return validation_flag, message
+    if not validation_flag:
+        sys.exit(message)
+    print("Successfully ran samples_clustering_pipeline.")
 
 
 def gene_priorization_pipeline(run_parameters):
@@ -44,12 +48,15 @@ def gene_priorization_pipeline(run_parameters):
     """
     from data_cleanup_toolbox import run_gene_priorization_pipeline
     validation_flag, message = run_gene_priorization_pipeline(run_parameters)
-    return validation_flag, message
+    if not validation_flag:
+        sys.exit(message)
+    print("Successfully ran gene_priorization_pipeline.")
 
 
 def post_processing_phenotype_clustering_data(run_parameters):
     from data_cleanup_toolbox import run_post_processing_phenotype_clustering_data
     output = run_post_processing_phenotype_clustering_data(run_parameters)
+
 
 SELECT = {
     "geneset_characterization_pipeline": geneset_characterization_pipeline,

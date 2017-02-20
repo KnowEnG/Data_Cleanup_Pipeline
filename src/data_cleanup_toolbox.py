@@ -7,6 +7,7 @@ import pandas
 import knpackage.redis_utilities as redisutil
 import yaml
 import os
+import sys
 
 
 def run_geneset_characterization_pipeline(run_parameters):
@@ -65,6 +66,7 @@ def run_samples_clustering_pipeline(run_parameters):
     else:
         user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'])
 
+
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
     user_spreadsheet_val_chked, error_msg = check_input_value_for_samples_clustering(user_spreadsheet_df,
                                                                                      run_parameters,
@@ -87,6 +89,7 @@ def run_samples_clustering_pipeline(run_parameters):
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                 sep='\t', header=True, index=True)
+
     return True, error_msg
 
 
@@ -194,6 +197,8 @@ def load_data_file(spreadsheet_path):
 
     try:
         user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
+        if user_spreadsheet_df.empty:
+            sys.exit("User spreadsheet is either empty or has a wrong delimiter (tab is the only allowed delimiter).")
         return user_spreadsheet_df
     except OSError as err:
         raise OSError(str(err))
@@ -474,3 +479,48 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
     user_spreadsheet_df_final, error_msg = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, run_parameters)
 
     return user_spreadsheet_df_final, error_msg
+
+
+from enum import Enum
+class ColumnType(Enum):
+    """Two categories of phenotype traits.
+    """
+    CONTINUOUS = "continuous"
+    CATEGORICAL = "categorical"
+
+
+def run_post_processing_phenotype_clustering_data(cluster_phenotype_df, threshold):
+    """This is the clean up function of phenotype data with nans removed.
+
+    Parameters:
+        cluster_phenotype_df: phenotype dataframe with the first column as sample clusters.
+        threshold: threshold to determine which phenotype to remove.
+    Returns:
+        output_dict: dictionary with keys to be categories of phenotype data and values
+        to be a list of related dataframes.
+    """
+    from collections import defaultdict
+
+    output_dict = defaultdict(list)
+
+    for column in cluster_phenotype_df:
+        if column == 'Cluster_ID':
+            continue
+        cur_df = cluster_phenotype_df[['Cluster_ID', column]].dropna(axis=0)
+
+        if not cur_df.empty:
+            if cur_df[column].dtype == object:
+                cur_df_lowercase = cur_df.apply(lambda x: x.astype(str).str.lower())
+            else:
+                cur_df_lowercase = cur_df
+            num_uniq_value = len(cur_df_lowercase[column].unique())
+            if num_uniq_value == 1:
+                continue
+            if cur_df_lowercase[column].dtype == object and num_uniq_value > threshold:
+                continue
+            if num_uniq_value > threshold:
+                classification = ColumnType.CONTINUOUS
+            else:
+                classification = ColumnType.CATEGORICAL
+            output_dict[classification].append(cur_df_lowercase)
+    return output_dict
