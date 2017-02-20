@@ -7,6 +7,7 @@ import pandas
 import knpackage.redis_utilities as redisutil
 import yaml
 import os
+import sys
 
 
 def run_geneset_characterization_pipeline(run_parameters):
@@ -65,6 +66,7 @@ def run_samples_clustering_pipeline(run_parameters):
     else:
         user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'])
 
+
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
     user_spreadsheet_val_chked, error_msg = check_input_value_for_samples_clustering(user_spreadsheet_df,
                                                                                      run_parameters,
@@ -87,6 +89,7 @@ def run_samples_clustering_pipeline(run_parameters):
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                 sep='\t', header=True, index=True)
+
     return True, error_msg
 
 
@@ -195,7 +198,7 @@ def load_data_file(spreadsheet_path):
     try:
         user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
         if user_spreadsheet_df.empty:
-            exit()
+            sys.exit("User spreadsheet is either empty or has a wrong delimiter (tab is the only allowed delimiter).")
         return user_spreadsheet_df
     except OSError as err:
         raise OSError(str(err))
