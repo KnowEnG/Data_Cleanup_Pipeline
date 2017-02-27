@@ -9,7 +9,7 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
             "phenotype_full_path": "../../data/spreadsheets/TEST_1_phenotype.tsv",
             "results_directory": "./",
             "redis_credential": {
-                "host": "knowpipes1.knowhub.org",
+                "host": "knowredis.knowhub.org",
                 "port": 6379,
                 "password": "KnowEnG"
             },
@@ -23,7 +23,7 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
             "phenotype_full_path": "",
             "results_directory": "./",
             "redis_credential": {
-                "host": "knowpipes1.knowhub.org",
+                "host": "knowredis.knowhub.org",
                 "port": 6379,
                 "password": "KnowEnG"
             },

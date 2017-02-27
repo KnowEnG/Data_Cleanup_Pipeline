@@ -28,7 +28,7 @@ class TestCheck_ensemble_gene_name(unittest.TestCase):
             "spreadsheet_name_full_path": "../data/spreadsheets/example.tsv",
             "results_directory": "./",
             "redis_credential": {
-                "host": "knowpipes1.knowhub.org",
+                "host": "knowredis.knowhub.org",
                 "port": 6379,
                 "password": "KnowEnG"
             },
