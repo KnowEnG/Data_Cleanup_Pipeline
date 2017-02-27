@@ -5,7 +5,6 @@ class TestRun_geneset_characterization_pipeline(unittest.TestCase):
     def setUp(self):
         self.run_parameters = {
             "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression.tsv",
-            "phenotype_full_path": "../../data/spreadsheets/TEST_1_phenotype.tsv",
             "results_directory": "./",
             "source_hint": "",
             "taxonid": '9606',
