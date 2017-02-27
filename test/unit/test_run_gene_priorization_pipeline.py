@@ -12,7 +12,7 @@ class TestRun_gene_priorization_pipeline(unittest.TestCase):
             "taxonid": '9606',
             "pipeline_type": "samples_clustering_pipeline",
             "redis_credential": {
-                "host": "knowpipes1.knowhub.org",
+                "host": "knowredis.knowhub.org",
                 "port": 6379,
                 "password": "KnowEnG"
             }

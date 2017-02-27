@@ -7,6 +7,6 @@ source_hint:                ''                          # hint of looking up ens
 pipeline_type:              gene_priorization_pipeline  # pipeline name
 
 redis_credential:                                       # knoweng Redis database credentials
-                            host: knowpipes1.knowhub.org
+                            host: knowredis.knowhub.org
                             password: KnowEnG
                             port: 6379
