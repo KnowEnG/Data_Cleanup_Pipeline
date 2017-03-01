@@ -11,6 +11,7 @@ class TestRun_gene_priorization_pipeline(unittest.TestCase):
             "source_hint": "",
             "taxonid": '9606',
             "pipeline_type": "samples_clustering_pipeline",
+            "correlation_method": 'pearson',
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
                 "port": 6379,

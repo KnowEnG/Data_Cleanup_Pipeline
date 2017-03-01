@@ -101,7 +101,7 @@ def run_gene_priorization_pipeline(run_parameters):
 
     # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
     user_spreadsheet_val_chked, phenotype_val_checked, error_msg = check_input_value_for_gene_prioritization(
-        user_spreadsheet_df, phenotype_df)
+        user_spreadsheet_df, phenotype_df, run_parameters['correlation_method'])
 
     if user_spreadsheet_val_chked is None:
         return False, error_msg
@@ -280,31 +280,13 @@ def check_duplicate_row_name(data_frame):
     return None, "An unexpected error occurred during checking duplicate row name."
 
 
-def preprocessing_for_gene_prioritization(data_frame, phenotype_df):
-    return
-
-
-def check_input_value_for_gene_prioritization(data_frame, phenotype_df):
-    """
-    This input value check is specifically designed for gene_priorization_pipeline.
-    1. user spreadsheet contains real number.
-    2. phenotype data contains only positive number, including 0.
-
-    Args:
-        data_frame: user spreadsheet as data frame
-        phenotype_df: phenotype data as data frame
-        run_parameters: configuration as data dictionary
-
-    Returns:
-        data_frame_trimed: Either None or trimed data frame will be returned for calling function
-        phenotype_trimed: Either None or trimed data frame will be returned for calling function
-        message: A message indicates the status of current check
-    """
+def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlation_method):
+    
     # drops column which contains NA in data_frame
     data_frame_dropna = data_frame.dropna(axis=1)
 
     if data_frame_dropna.empty:
-        return None, None, "Data frame is empty after remove NA."
+        return None, None, "User spreadsheet is empty after remove NA."
 
     # checks real number negative to positive infinite
     data_frame_check = data_frame_dropna.applymap(lambda x: isinstance(x, (int, float)))
@@ -312,72 +294,63 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df):
     if False in data_frame_check.values:
         return None, None, "Found not numeric value in user spreadsheet."
 
-    # drops columns with NA value in phenotype dataframe
-    phenotype_df = phenotype_df.dropna(axis=1)
+    # defines the default values that can exist in phenotype data
+    gold_value_set = {0, 1}
 
-    # check phenotype value to be real value bigger than 0
-    phenotype_df = phenotype_df[(phenotype_df >= 0).all(1)]
+    if correlation_method == 't_test':
+        phenotype_value_set = set(phenotype_df.ix[:, phenotype_df.columns != 0].values.ravel())
+        if gold_value_set != phenotype_value_set:
+            return None, None, "Only 0, 1 are allowed in phenotype data. This phenotype data contains invalid value: {}. ".format(
+                phenotype_value_set) + "Please revise your phenotype and reupload."
 
-    if phenotype_df.empty:
-        return None, None, "Found negative value in phenotype data. Value should be positive."
+    if correlation_method == 'pearson':
+        phenotype_df_check = phenotype_df.applymap(lambda x: isinstance(x, (int, float)))
+        if False in phenotype_df_check:
+            return None, None, "Found not numeric value in phenotype data."
 
-    phenotype_columns = list(phenotype_df.columns.values)
-    data_frame_columns = list(data_frame.columns.values)
-    # unordered name
-    common_cols = list(set(phenotype_columns) & set(data_frame_columns))
+    return data_frame_dropna, phenotype_df, "Value contains in user spreadsheet and phenotype data matches with gold standard value set."
 
-    if not common_cols:
-        return None, None, "Cannot find intersection between user spreadsheet column and phenotype data."
-
-    # select common column to process, this operation will reorder the column
-    data_frame_trimed = data_frame[common_cols]
-    phenotype_trimed = phenotype_df[common_cols]
-
-    if data_frame_trimed.empty:
-        return None, None, "Cannot find valid value in user spreadsheet."
-
-    return data_frame_trimed, phenotype_trimed, "Passed value check validation."
 
 
 def check_input_value_for_geneset_characterization(data_frame):
     """
-    Checks if the values in user spreadsheet matches with golden standard value set
+    Checks if the values in user spreadsheet matches with gold standard value set
         and rename phenotype file to have suffix _ETL.tsv
 
     Args:
         data_frame: input data frame
         phenotype_df: input phenotype data frame
-        golden_value_set: golden standard value set to be compared with
+        gold_value_set: gold standard value set to be compared with
 
     Returns:
         data_frame: processed data_frame
         message: A message indicates the status of current check
     """
     # defines the default values that can exist in user spreadsheet
-    golden_value_set = {0, 1}
+    gold_value_set = {0, 1}
 
     if data_frame.isnull().values.any():
         return None, "This user spreadsheet contains invalid NaN value."
 
     gene_value_set = set(data_frame.ix[:, data_frame.columns != 0].values.ravel())
 
-    if golden_value_set != gene_value_set:
+    if gold_value_set != gene_value_set:
         return None, "Only 0, 1 are allowed in user spreadsheet. This user spreadsheet contains invalid value: {}. ".format(
             gene_value_set) + \
                "Please revise your spreadsheet and reupload."
 
-    return data_frame, "Value contains in user spreadsheet matches with golden standard value set."
+    return data_frame, "Value contains in user spreadsheet matches with gold standard value set."
 
 
 def check_input_value_for_samples_clustering(data_frame, run_parameters, phenotype_df=None):
     """
-    Checks if the values in user spreadsheet matches with golden standard value set
+    Checks if the values in user spreadsheet matches with gold standard value set
         and rename phenotype file to have suffix _ETL.tsv
 
     Args:
         data_frame: input data frame
         phenotype_df: input phenotype data frame
-        golden_value_set: golden standard value set to be compared with
+        gold_value_set: gold standard value set to be compared with
 
     Returns:
         data_frame: processed data_frame
@@ -395,7 +368,7 @@ def check_input_value_for_samples_clustering(data_frame, run_parameters, phenoty
     # checks if it contains only positive number
     data_frame_abs = data_frame.abs()
 
-    return data_frame_abs, "Value contains in user spreadsheet matches with golden standard value set."
+    return data_frame_abs, "Value contains in user spreadsheet matches with gold standard value set."
 
 
 def check_ensemble_gene_name(data_frame, run_parameters):
