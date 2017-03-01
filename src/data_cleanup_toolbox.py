@@ -24,8 +24,7 @@ def run_geneset_characterization_pipeline(run_parameters):
     user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'])
 
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
-    user_spreadsheet_val_chked, error_msg = check_input_value_for_geneset_characterization(user_spreadsheet_df,
-                                                                                           run_parameters)
+    user_spreadsheet_val_chked, error_msg = check_input_value_for_geneset_characterization(user_spreadsheet_df)
 
     if user_spreadsheet_val_chked is None:
         return False, error_msg
@@ -102,7 +101,7 @@ def run_gene_priorization_pipeline(run_parameters):
 
     # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
     user_spreadsheet_val_chked, phenotype_val_checked, error_msg = check_input_value_for_gene_prioritization(
-        user_spreadsheet_df, phenotype_df, run_parameters)
+        user_spreadsheet_df, phenotype_df)
 
     if user_spreadsheet_val_chked is None:
         return False, error_msg
@@ -281,7 +280,11 @@ def check_duplicate_row_name(data_frame):
     return None, "An unexpected error occurred during checking duplicate row name."
 
 
-def check_input_value_for_gene_prioritization(data_frame, phenotype_df, run_parameters):
+def preprocessing_for_gene_prioritization(data_frame, phenotype_df):
+    return
+
+
+def check_input_value_for_gene_prioritization(data_frame, phenotype_df):
     """
     This input value check is specifically designed for gene_priorization_pipeline.
     1. user spreadsheet contains real number.
@@ -336,7 +339,7 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, run_para
     return data_frame_trimed, phenotype_trimed, "Passed value check validation."
 
 
-def check_input_value_for_geneset_characterization(data_frame, run_parameters):
+def check_input_value_for_geneset_characterization(data_frame):
     """
     Checks if the values in user spreadsheet matches with golden standard value set
         and rename phenotype file to have suffix _ETL.tsv
