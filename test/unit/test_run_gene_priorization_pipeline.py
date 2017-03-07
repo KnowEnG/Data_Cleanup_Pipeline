@@ -5,22 +5,22 @@ import os
 class TestRun_gene_priorization_pipeline(unittest.TestCase):
     def setUp(self):
         self.run_parameters = {
-            "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression.tsv",
+            "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression_real_value.tsv",
             "phenotype_full_path": "../../data/spreadsheets/TEST_1_phenotype.tsv",
             "results_directory": "./",
             "source_hint": "",
             "taxonid": '9606',
             "pipeline_type": "samples_clustering_pipeline",
-            "correlation_method": 'pearson',
+            "correlation_measure": 'pearson',
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
                 "port": 6379,
                 "password": "KnowEnG"
             }
         }
-        self.file_ETL = "TEST_1_gene_expression_ETL.tsv"
-        self.file_MAP = "TEST_1_gene_expression_MAP.tsv"
-        self.file_UNMAPPED = "TEST_1_gene_expression_UNMAPPED.tsv"
+        self.file_ETL = "TEST_1_gene_expression_real_value_ETL.tsv"
+        self.file_MAP = "TEST_1_gene_expression_real_value_MAP.tsv"
+        self.file_UNMAPPED = "TEST_1_gene_expression_real_value_UNMAPPED.tsv"
         self.phenotype_ETL = "TEST_1_phenotype_ETL.tsv"
 
 

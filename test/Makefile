@@ -41,7 +41,16 @@ run_data_cleaning_small:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_data_cleanup.yml
 
 run_samples_clustering_pipeline:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_samples_clustering_pipeling.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_samples_clustering_pipeline.yml
+
+run_gene_prioritization_pipeline_pearson:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_gene_prioritization_pipeline_pearson.yml
+
+run_gene_prioritization_pipeline_t_test:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_gene_prioritization_pipeline_t_test.yml
+
+run_geneset_characterization_pipeline:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_geneset_characterization_pipeline.yml
 
 # ----------------------------------------------------------------
 # - UNIT TESTS RUN SECTION                                       -
