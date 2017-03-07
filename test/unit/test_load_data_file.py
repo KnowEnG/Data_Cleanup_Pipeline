@@ -32,17 +32,17 @@ class TestLoad_data_file(unittest.TestCase):
         os.makedirs(dir_name, mode=0o755, exist_ok=True)
         with open(os.path.join(dir_name, file_name), "w") as f:
             f.write(file_content)
-
         f.close()
 
     def test_load_data_file(self):
         self.createFile(self.run_dir, self.user_spreadsheet, self.f_context)
-        ret_df = data_cln.load_data_file(self.spreadsheet_path)
+        ret_df, ret_msg = data_cln.load_data_file(self.spreadsheet_path)
         npytest.assert_array_equal(self.golden_output, ret_df)
         shutil.rmtree(self.run_dir)
 
     def test_load_data_file_with_execption(self):
-        self.assertRaises(OSError, data_cln.load_data_file, "./file_not_exist")
+        ret_df, ret_msg = data_cln.load_data_file("./file_not_exist")
+        self.assertEqual(None, ret_df)
 
 
 if __name__ == '__main__':

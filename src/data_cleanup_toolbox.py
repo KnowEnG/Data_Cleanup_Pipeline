@@ -5,9 +5,7 @@
 """
 import pandas
 import knpackage.redis_utilities as redisutil
-import yaml
 import os
-import sys
 
 
 def run_geneset_characterization_pipeline(run_parameters):
@@ -21,24 +19,27 @@ def run_geneset_characterization_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not
         message: A message indicates the status of current check
     """
-    user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'])
+    user_spreadsheet_df, ret_msg = load_data_file(run_parameters['spreadsheet_name_full_path'])
+    
+    if user_spreadsheet_df is None:
+        return False, ret_msg
 
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
-    user_spreadsheet_val_chked, error_msg = check_input_value_for_geneset_characterization(user_spreadsheet_df)
+    user_spreadsheet_val_chked, ret_msg = check_input_value_for_geneset_characterization(user_spreadsheet_df)
 
     if user_spreadsheet_val_chked is None:
-        return False, error_msg
+        return False, ret_msg
 
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
-    user_spreadsheet_df_cleaned, error_msg = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
+    user_spreadsheet_df_cleaned, ret_msg = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
 
     if user_spreadsheet_df_cleaned is None:
-        return False, error_msg
+        return False, ret_msg
     else:
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                 sep='\t', header=True, index=True)
-    return True, error_msg
+    return True, ret_msg
 
 
 def run_samples_clustering_pipeline(run_parameters):
@@ -52,37 +53,28 @@ def run_samples_clustering_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not
         message: A message indicates the status of current check
     """
-    if 'phenotype_full_path' in run_parameters and run_parameters['phenotype_full_path']:
-        user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'],
-                                                                  run_parameters['phenotype_full_path'])
-    else:
-        user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'])
+    user_spreadsheet_df, ret_msg = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
+    if user_spreadsheet_df is None:
+        return False, ret_msg
 
-    # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
-    user_spreadsheet_val_chked, error_msg = check_input_value_for_samples_clustering(user_spreadsheet_df,
-                                                                                     run_parameters,
-                                                                                     phenotype_df)
+    # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
+    user_spreadsheet_val_chked, ret_msg = check_input_value_for_samples_clustering(user_spreadsheet_df)
 
     if user_spreadsheet_val_chked is None:
-        return False, error_msg
+        return False, ret_msg
 
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
-    user_spreadsheet_df_cleaned, error_msg = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
+    user_spreadsheet_df_cleaned, ret_msg = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
 
     if user_spreadsheet_df_cleaned is None:
-        return False, error_msg
+        return False, ret_msg
     else:
-        if phenotype_df is not None and not phenotype_df.empty:
-            phenotype_df.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
-                run_parameters['phenotype_full_path']) + "_ETL.tsv",
-                                sep='\t', header=True, index=True)
-
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                 sep='\t', header=True, index=True)
 
-    return True, error_msg
+    return True, ret_msg
 
 
 def run_gene_priorization_pipeline(run_parameters):
@@ -96,21 +88,26 @@ def run_gene_priorization_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not
         message: A message indicates the status of current check
     """
-    user_spreadsheet_df, phenotype_df = read_input_data_as_df(run_parameters['spreadsheet_name_full_path'],
-                                                              run_parameters['phenotype_full_path'])
+    user_spreadsheet_df, ret_msg = load_data_file(run_parameters['spreadsheet_name_full_path'])
+    if user_spreadsheet_df is None:
+        return False, ret_msg
+
+    phenotype_df, ret_msg = load_data_file(run_parameters['phenotype_full_path'])
+    if phenotype_df is None:
+        return False, ret_msg
 
     # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
-    user_spreadsheet_val_chked, phenotype_val_checked, error_msg = check_input_value_for_gene_prioritization(
-        user_spreadsheet_df, phenotype_df, run_parameters['correlation_method'])
+    user_spreadsheet_val_chked, phenotype_val_checked, ret_msg = check_input_value_for_gene_prioritization(
+        user_spreadsheet_df, phenotype_df, run_parameters['correlation_measure'])
 
     if user_spreadsheet_val_chked is None:
-        return False, error_msg
+        return False, ret_msg
 
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
-    user_spreadsheet_df_cleaned, error_msg = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
+    user_spreadsheet_df_cleaned, ret_msg = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
 
     if user_spreadsheet_df_cleaned is None or phenotype_val_checked is None:
-        return False, error_msg
+        return False, ret_msg
     else:
         # store cleaned phenotype data to a file
         phenotype_val_checked.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
@@ -120,25 +117,7 @@ def run_gene_priorization_pipeline(run_parameters):
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                      sep='\t', header=True, index=True)
 
-    return True, error_msg
-
-
-def read_input_data_as_df(spreadsheet_path, phenotype_path=None):
-    """
-    Reads two input data: user spreadsheet and phenotype data(optional)
-
-    Args:
-        spreadsheet_path: full path of user spreadsheet
-        phenotype_path: full path of phenotype data
-
-    Returns:
-        user_spreadsheet_df: user spreadsheet as data frame
-        phenotype_df: phenotype data as data frame
-    """
-    user_spreadsheet_df = load_data_file(spreadsheet_path)
-    phenotype_df = None if phenotype_path is None else load_data_file(phenotype_path)
-
-    return user_spreadsheet_df, phenotype_df
+    return True, ret_msg
 
 
 def get_file_basename(file_path):
@@ -156,24 +135,6 @@ def get_file_basename(file_path):
     return output_file_basename
 
 
-def parse_config(run_file_path):
-    """
-    Parses a configuration file in YAML format
-
-    Args:
-        run_file_path: run file path
-
-    Returns:
-         config: dictionary contains the run file parameters
-    """
-    with open(run_file_path, 'r') as stream:
-        try:
-            config = yaml.load(stream)
-        except yaml.YAMLError as err:
-            raise yaml.YAMLError(str(err))
-    return config
-
-
 def load_data_file(spreadsheet_path):
     """
     Loads data file as a data frame object by a given file path
@@ -185,15 +146,15 @@ def load_data_file(spreadsheet_path):
         user_spreadsheet_df: user spreadsheet as a data frame
     """
     if spreadsheet_path == None:
-        return None
+        return None, "Input file path is empty. Please provide a valid input path."
 
     try:
         user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
         if user_spreadsheet_df.empty:
-            sys.exit("User spreadsheet is either empty or has a wrong delimiter (tab is the only allowed delimiter).")
-        return user_spreadsheet_df
+            return None, "Input data is empty. Please provide a valid input data."
+        return user_spreadsheet_df, "Successfully loaded input data."
     except OSError as err:
-        raise OSError(str(err))
+        return None, str(err)
 
 
 def check_duplicate_rows(data_frame):
@@ -228,14 +189,14 @@ def check_duplicate_columns(data_frame):
 
     Returns:
         data_frame_dedup_row.T: a data frame in original format
-        error_msg: error message
+        ret_msg: error message
     """
     # transposes original data frame so that original column becomes row
     data_frame_transpose = data_frame.T
-    data_frame_dedup_row, error_msg = check_duplicate_rows(data_frame_transpose)
+    data_frame_dedup_row, ret_msg = check_duplicate_rows(data_frame_transpose)
 
     # transposes back the transposed data frame to be the original format
-    return data_frame_dedup_row.T, error_msg
+    return data_frame_dedup_row.T, ret_msg
 
 
 def check_duplicate_column_name(data_frame):
@@ -245,15 +206,15 @@ def check_duplicate_column_name(data_frame):
     Args: data_frame:
     Returns:
         user_spreadsheet_df_genename_dedup.T: a data frame in original format
-        error_msg: error message
+        ret_msg: error message
     """
     data_frame_transpose = data_frame.T
-    user_spreadsheet_df_genename_dedup, error_msg = check_duplicate_row_name(data_frame_transpose)
+    user_spreadsheet_df_genename_dedup, ret_msg = check_duplicate_row_name(data_frame_transpose)
 
     if user_spreadsheet_df_genename_dedup is None:
-        return False, error_msg
+        return False, ret_msg
 
-    return user_spreadsheet_df_genename_dedup.T, error_msg
+    return user_spreadsheet_df_genename_dedup.T, ret_msg
 
 
 def check_duplicate_row_name(data_frame):
@@ -265,7 +226,7 @@ def check_duplicate_row_name(data_frame):
 
     Returns:
         data_frame_genename_dedup: a data frame in original format
-        error_msg: error message
+        ret_msg: error message
     """
     data_frame_genename_dedup = data_frame[~data_frame.index.duplicated()]
     row_count_diff = len(data_frame.index) - len(data_frame_genename_dedup.index)
@@ -280,7 +241,7 @@ def check_duplicate_row_name(data_frame):
     return None, "An unexpected error occurred during checking duplicate row name."
 
 
-def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlation_method):
+def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlation_measure):
     
     # drops column which contains NA in data_frame
     data_frame_dropna = data_frame.dropna(axis=1)
@@ -297,18 +258,18 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
     # defines the default values that can exist in phenotype data
     gold_value_set = {0, 1}
 
-    if correlation_method == 't_test':
+    if correlation_measure == 't_test':
         phenotype_value_set = set(phenotype_df.ix[:, phenotype_df.columns != 0].values.ravel())
         if gold_value_set != phenotype_value_set:
             return None, None, "Only 0, 1 are allowed in phenotype data. This phenotype data contains invalid value: {}. ".format(
                 phenotype_value_set) + "Please revise your phenotype and reupload."
 
-    if correlation_method == 'pearson':
+    if correlation_measure == 'pearson':
         phenotype_df_check = phenotype_df.applymap(lambda x: isinstance(x, (int, float)))
         if False in phenotype_df_check:
             return None, None, "Found not numeric value in phenotype data."
 
-    return data_frame_dropna, phenotype_df, "Value contains in user spreadsheet and phenotype data matches with gold standard value set."
+    return data_frame_dropna, phenotype_df, "Value contains in both user spreadsheet and phenotype data matches with gold standard value set."
 
 
 
@@ -342,7 +303,7 @@ def check_input_value_for_geneset_characterization(data_frame):
     return data_frame, "Value contains in user spreadsheet matches with gold standard value set."
 
 
-def check_input_value_for_samples_clustering(data_frame, run_parameters, phenotype_df=None):
+def check_input_value_for_samples_clustering(data_frame):
     """
     Checks if the values in user spreadsheet matches with gold standard value set
         and rename phenotype file to have suffix _ETL.tsv
@@ -433,21 +394,21 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
         message: A message indicates the status of current check
     """
     # Case 1: checks the duplication on column name and removes it if exists
-    user_spreadsheet_df_col_dedup, error_msg = check_duplicate_column_name(user_spreadsheet_df)
+    user_spreadsheet_df_col_dedup, ret_msg = check_duplicate_column_name(user_spreadsheet_df)
 
     if user_spreadsheet_df_col_dedup is None:
-        return None, error_msg
+        return None, ret_msg
 
     # Case 2: checks the duplication on gene name and removes it if exists
-    user_spreadsheet_df_genename_dedup, error_msg = check_duplicate_row_name(user_spreadsheet_df_col_dedup)
+    user_spreadsheet_df_genename_dedup, ret_msg = check_duplicate_row_name(user_spreadsheet_df_col_dedup)
 
     if user_spreadsheet_df_genename_dedup is None:
-        return None, error_msg
+        return None, ret_msg
 
     # Case 3: checks the validity of gene name meaning if it can be ensemble or not
-    user_spreadsheet_df_final, error_msg = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, run_parameters)
+    user_spreadsheet_df_final, ret_msg = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, run_parameters)
 
-    return user_spreadsheet_df_final, error_msg
+    return user_spreadsheet_df_final, ret_msg
 
 
 from enum import Enum
@@ -493,3 +454,11 @@ def run_post_processing_phenotype_clustering_data(cluster_phenotype_df, threshol
                 classification = ColumnType.CATEGORICAL
             output_dict[classification].append(cur_df_lowercase)
     return output_dict
+
+
+def generate_logging(flag, message, path):
+    import yaml
+    file_content = {flag : message}
+    output_stream = open(path + "/log.yml", "w")
+    yaml.dump(file_content, output_stream, default_flow_style=False)
+    output_stream.close()

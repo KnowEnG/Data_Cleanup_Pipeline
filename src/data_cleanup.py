@@ -12,11 +12,11 @@ def geneset_characterization_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not
         message: A message indicates the status of current check
     """
-    from data_cleanup_toolbox import run_geneset_characterization_pipeline
+    from data_cleanup_toolbox import run_geneset_characterization_pipeline, generate_logging
     validation_flag, message = run_geneset_characterization_pipeline(run_parameters)
-    if not validation_flag:
-        sys.exit(message)
-    print("Successfully ran geneset_characterization_pipeline.")
+    if validation_flag:
+        message = "Successfully ran geneset_characterization_pipeline."
+    generate_logging(validation_flag, message, run_parameters["results_directory"])
 
 
 def samples_clustering_pipeline(run_parameters):
@@ -29,11 +29,11 @@ def samples_clustering_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not
         message: A message indicates the status of current check
     """
-    from data_cleanup_toolbox import run_samples_clustering_pipeline
+    from data_cleanup_toolbox import run_samples_clustering_pipeline, generate_logging
     validation_flag, message = run_samples_clustering_pipeline(run_parameters)
-    if not validation_flag:
-        sys.exit(message)
-    print("Successfully ran samples_clustering_pipeline.")
+    if validation_flag:
+        message = "Successfully ran samples_clustering_pipeline."
+    generate_logging(validation_flag, message, run_parameters["results_directory"])
 
 
 def gene_priorization_pipeline(run_parameters):
@@ -46,11 +46,11 @@ def gene_priorization_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not
         message: A message indicates the status of current check
     """
-    from data_cleanup_toolbox import run_gene_priorization_pipeline
+    from data_cleanup_toolbox import run_gene_priorization_pipeline, generate_logging
     validation_flag, message = run_gene_priorization_pipeline(run_parameters)
-    if not validation_flag:
-        sys.exit(message)
-    print("Successfully ran gene_priorization_pipeline.")
+    if validation_flag:
+        message = "Successfully ran gene_priorization_pipeline."
+    generate_logging(validation_flag, message, run_parameters["results_directory"])
 
 
 def post_processing_phenotype_clustering_data(run_parameters):

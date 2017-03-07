@@ -5,7 +5,7 @@ import os
 class TestRun_samples_clustering_pipeline(unittest.TestCase):
     def setUp(self):
         self.run_parameters = {
-            "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression.tsv",
+            "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression_real_value.tsv",
             "phenotype_full_path": "../../data/spreadsheets/TEST_1_phenotype.tsv",
             "results_directory": "./",
             "redis_credential": {
@@ -19,7 +19,7 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
         }
 
         self.run_parameters_no_phenotype = {
-            "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression.tsv",
+            "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression_real_value.tsv",
             "phenotype_full_path": "",
             "results_directory": "./",
             "redis_credential": {
@@ -32,10 +32,9 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
             "pipeline_type": "samples_clustering_pipeline"
         }
 
-        self.file_ETL = "TEST_1_gene_expression_ETL.tsv"
-        self.file_MAP = "TEST_1_gene_expression_MAP.tsv"
-        self.file_UNMAPPED = "TEST_1_gene_expression_UNMAPPED.tsv"
-        self.phenotype_ETL = "TEST_1_phenotype_ETL.tsv"
+        self.file_ETL = "TEST_1_gene_expression_real_value_ETL.tsv"
+        self.file_MAP = "TEST_1_gene_expression_real_value_MAP.tsv"
+        self.file_UNMAPPED = "TEST_1_gene_expression_real_value_UNMAPPED.tsv"
 
     def tearDown(self):
         del self.run_parameters
@@ -46,7 +45,6 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
     def test_run_samples_clustering_pipeline(self):
         ret_flag, ret_msg = data_cln.run_samples_clustering_pipeline(self.run_parameters)
         self.assertEqual(True, ret_flag)
-        os.remove(self.phenotype_ETL)
 
     def test_run_samples_clustering_pipeline_no_phenotype(self):
         ret_flag, ret_msg = data_cln.run_samples_clustering_pipeline(self.run_parameters_no_phenotype)
