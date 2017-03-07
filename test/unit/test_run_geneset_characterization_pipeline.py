@@ -8,6 +8,11 @@ class TestRun_geneset_characterization_pipeline(unittest.TestCase):
             "results_directory": "./",
             "source_hint": "",
             "taxonid": '9606',
+            "redis_credential": {
+                "host": "knowredis.knowhub.org",
+                "port": 6379,
+                "password": "KnowEnG"
+            },
             "pipeline_type": "geneset_characterization_pipeline"
         }
 
@@ -18,7 +23,7 @@ class TestRun_geneset_characterization_pipeline(unittest.TestCase):
 
     def test_run_geneset_characterization_pipeline(self):
         ret_flag, ret_msg = data_cln.run_geneset_characterization_pipeline(self.run_parameters)
-        self.assertEqual(False, ret_flag)
+        self.assertEqual(True, ret_flag)
 
 
 if __name__ == '__main__':
