@@ -6,7 +6,7 @@ correlation_measure:        pearson
 
 taxonid:                    '9606'                      # taxon id of a given gene name
 source_hint:                ''                          # hint of looking up ensembl name in Redis database
-pipeline_type:              gene_priorization_pipeline # pipeline name
+pipeline_type:              gene_prioritization_pipeline # pipeline name
 
 redis_credential:                                       # knoweng Redis database credentials
                             host: knowredis.knowhub.org

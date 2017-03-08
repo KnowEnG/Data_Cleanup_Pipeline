@@ -7,6 +7,7 @@ import pandas
 import knpackage.redis_utilities as redisutil
 import os
 
+log_warnings = []
 
 def run_geneset_characterization_pipeline(run_parameters):
     """
@@ -39,7 +40,9 @@ def run_geneset_characterization_pipeline(run_parameters):
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                 sep='\t', header=True, index=True)
-    return True, ret_msg
+        log_warnings.append("WARNING: Cleaned user_spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                                   user_spreadsheet_df_cleaned.shape[1]))
+    return True, log_warnings
 
 
 def run_samples_clustering_pipeline(run_parameters):
@@ -73,13 +76,16 @@ def run_samples_clustering_pipeline(run_parameters):
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                 sep='\t', header=True, index=True)
+        log_warnings.append(
+            "WARNING: Cleaned user_spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                               user_spreadsheet_df_cleaned.shape[1]))
 
-    return True, ret_msg
+    return True, log_warnings
 
 
-def run_gene_priorization_pipeline(run_parameters):
+def run_gene_prioritization_pipeline(run_parameters):
     """
-    Runs data cleaning for gene_priorization_pipeline.
+    Runs data cleaning for gene_prioritization_pipeline.
 
     Args:
         run_parameters: configuration dictionary
@@ -116,8 +122,30 @@ def run_gene_priorization_pipeline(run_parameters):
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                      sep='\t', header=True, index=True)
+        log_warnings.append(
+            "WARNING: Cleaned user_spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                               user_spreadsheet_df_cleaned.shape[1]))
+    return True, log_warnings
 
-    return True, ret_msg
+
+def remove_na_index(dataframe):
+    """
+    Remove rows contains NA as index.
+    Args:
+        dataframe: input dataframe to be cleaned
+
+    Returns:
+        dataframe_rm_na_idx: a cleaned dataframe
+    """
+    org_row_cnt = dataframe.shape[0]
+    dataframe_rm_na_idx = dataframe[pandas.notnull(dataframe.index)]
+    new_row_cnt = dataframe_rm_na_idx.shape[0]
+    diff = org_row_cnt - new_row_cnt
+    if diff > 0:
+        log_warnings.append("WARNING: Removed {} rows which contain NA in index.".format(diff))
+    if dataframe_rm_na_idx.empty:
+        return None, "After removed {} rows that contains NA in index, the dataframe becames empty.".format(diff)
+    return dataframe_rm_na_idx, "Successfully removed {} rows which contains NA in index.".format(diff)
 
 
 def get_file_basename(file_path):
@@ -208,12 +236,13 @@ def check_duplicate_column_name(data_frame):
         user_spreadsheet_df_genename_dedup.T: a data frame in original format
         ret_msg: error message
     """
+    org_column_cnt = data_frame.shape[1]
     data_frame_transpose = data_frame.T
     user_spreadsheet_df_genename_dedup, ret_msg = check_duplicate_row_name(data_frame_transpose)
 
     if user_spreadsheet_df_genename_dedup is None:
         return False, ret_msg
-
+    log_warnings.append("WARNING: Removed {} duplicate columns from user spreadsheet.".format(org_column_cnt - user_spreadsheet_df_genename_dedup.shape[0]))
     return user_spreadsheet_df_genename_dedup.T, ret_msg
 
 
@@ -240,6 +269,14 @@ def check_duplicate_row_name(data_frame):
 
     return None, "An unexpected error occurred during checking duplicate row name."
 
+
+def check_na_index_header(df_series):
+
+    check_null_series = pandas.isnull(df_series)
+    if True in check_null_series:
+        return False, "Found NA in input series."
+
+    return
 
 def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlation_measure):
     
@@ -326,6 +363,10 @@ def check_input_value_for_samples_clustering(data_frame):
     if False in data_frame_real_number.values:
         return None, "Found non-numeric value in user spreadsheet."
 
+    # checks number of negative values
+    data_frame_negative_cnt = data_frame.lt(0).sum().sum()
+    log_warnings.append("WARNING: Converted {} negative number to their positive value.".format(data_frame_negative_cnt))
+
     # checks if it contains only positive number
     data_frame_abs = data_frame.abs()
 
@@ -393,19 +434,24 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
         flag: Boolean value indicates the status of current check
         message: A message indicates the status of current check
     """
-    # Case 1: checks the duplication on column name and removes it if exists
-    user_spreadsheet_df_col_dedup, ret_msg = check_duplicate_column_name(user_spreadsheet_df)
+    # Case 1: remove NA rows in index
+    user_spreadsheet_df_idx_na_rmd, ret_msg = remove_na_index(user_spreadsheet_df)
+    if user_spreadsheet_df_idx_na_rmd is None:
+        return None, ret_msg
+    
+    # Case 2: checks the duplication on column name and removes it if exists
+    user_spreadsheet_df_col_dedup, ret_msg = check_duplicate_column_name(user_spreadsheet_df_idx_na_rmd)
 
     if user_spreadsheet_df_col_dedup is None:
         return None, ret_msg
 
-    # Case 2: checks the duplication on gene name and removes it if exists
+    # Case 3: checks the duplication on gene name and removes it if exists
     user_spreadsheet_df_genename_dedup, ret_msg = check_duplicate_row_name(user_spreadsheet_df_col_dedup)
 
     if user_spreadsheet_df_genename_dedup is None:
         return None, ret_msg
 
-    # Case 3: checks the validity of gene name meaning if it can be ensemble or not
+    # Case 4: checks the validity of gene name meaning if it can be ensemble or not
     user_spreadsheet_df_final, ret_msg = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, run_parameters)
 
     return user_spreadsheet_df_final, ret_msg
@@ -458,7 +504,11 @@ def run_post_processing_phenotype_clustering_data(cluster_phenotype_df, threshol
 
 def generate_logging(flag, message, path):
     import yaml
-    file_content = {flag : message}
-    output_stream = open(path + "/log.yml", "w")
+    if flag:
+        status = "SUCCESS"
+    else:
+        status = "FAIL"
+    file_content = {status : message}
+    output_stream = open(path, "w")
     yaml.dump(file_content, output_stream, default_flow_style=False)
     output_stream.close()

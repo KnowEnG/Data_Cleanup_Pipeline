@@ -2,7 +2,7 @@ import unittest
 import data_cleanup_toolbox as data_cln
 import os
 
-class TestRun_gene_priorization_pipeline(unittest.TestCase):
+class TestRun_gene_prioritization_pipeline(unittest.TestCase):
     def setUp(self):
         self.run_parameters = {
             "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression_real_value.tsv",
@@ -32,8 +32,8 @@ class TestRun_gene_priorization_pipeline(unittest.TestCase):
         os.remove(self.phenotype_ETL)
 
 
-    def test_run_gene_priorization_pipeline(self):
-        ret_flag, ret_msg = data_cln.run_gene_priorization_pipeline(self.run_parameters)
+    def test_run_gene_prioritization_pipeline(self):
+        ret_flag, ret_msg = data_cln.run_gene_prioritization_pipeline(self.run_parameters)
         self.assertEqual(True, ret_flag)
 
 
