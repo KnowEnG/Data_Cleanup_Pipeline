@@ -77,7 +77,7 @@ def run_samples_clustering_pipeline(run_parameters):
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                 sep='\t', header=True, index=True)
         log_warnings.append(
-            "WARNING: Cleaned user_spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
+            "INFO: Cleaned user_spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
                                                                                user_spreadsheet_df_cleaned.shape[1]))
 
     return True, log_warnings
@@ -242,7 +242,11 @@ def check_duplicate_column_name(data_frame):
 
     if user_spreadsheet_df_genename_dedup is None:
         return False, ret_msg
-    log_warnings.append("WARNING: Removed {} duplicate columns from user spreadsheet.".format(org_column_cnt - user_spreadsheet_df_genename_dedup.shape[0]))
+
+    new_column_cnt = user_spreadsheet_df_genename_dedup.shape[0]
+    diff = org_column_cnt - new_column_cnt
+    if(diff > 0):
+        log_warnings.append("WARNING: Removed {} duplicate columns from user spreadsheet.".format(diff))
     return user_spreadsheet_df_genename_dedup.T, ret_msg
 
 
@@ -284,13 +288,13 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
     data_frame_dropna = data_frame.dropna(axis=1)
 
     if data_frame_dropna.empty:
-        return None, None, "User spreadsheet is empty after remove NA."
+        return None, None, "User spreadsheet is empty after removing NA."
 
     # checks real number negative to positive infinite
     data_frame_check = data_frame_dropna.applymap(lambda x: isinstance(x, (int, float)))
 
     if False in data_frame_check.values:
-        return None, None, "Found not numeric value in user spreadsheet."
+        return None, None, "Found non-numeric value in user spreadsheet."
 
     # defines the default values that can exist in phenotype data
     gold_value_set = {0, 1}
@@ -304,7 +308,7 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
     if correlation_measure == 'pearson':
         phenotype_df_check = phenotype_df.applymap(lambda x: isinstance(x, (int, float)))
         if False in phenotype_df_check:
-            return None, None, "Found not numeric value in phenotype data."
+            return None, None, "Found non-numeric value in phenotype data."
 
     return data_frame_dropna, phenotype_df, "Value contains in both user spreadsheet and phenotype data matches with gold standard value set."
 
