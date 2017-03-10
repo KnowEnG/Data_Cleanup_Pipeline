@@ -177,7 +177,7 @@ def load_data_file(spreadsheet_path):
         return None, "Input file path is empty. Please provide a valid input path."
 
     try:
-        user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
+        user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False, dtype={'INDEX':str})
         if user_spreadsheet_df.empty:
             return None, "Input data is empty. Please provide a valid input data."
         return user_spreadsheet_df, "Successfully loaded input data."
@@ -391,6 +391,8 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     """
     redis_db = redisutil.get_database(run_parameters['redis_credential'])
 
+    # disable this flag to avoid SettingWithCopyWarning
+    data_frame.is_copy = False
     data_frame['original'] = data_frame.index
 
     data_frame.index = data_frame.index.map(
