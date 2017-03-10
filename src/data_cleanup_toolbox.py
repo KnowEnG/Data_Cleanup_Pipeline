@@ -177,7 +177,7 @@ def load_data_file(spreadsheet_path):
         return None, "Input file path is empty. Please provide a valid input path."
 
     try:
-        user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False, dtype={'INDEX':str})
+        user_spreadsheet_df = pandas.read_csv(spreadsheet_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
         if user_spreadsheet_df.empty:
             return None, "Input data is empty. Please provide a valid input data."
         return user_spreadsheet_df, "Successfully loaded input data."
