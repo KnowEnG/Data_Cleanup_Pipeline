@@ -6,6 +6,6 @@ taxonid:                    '9606'                      # taxon id of a given ge
 source_hint:                ''                          # hint of looking up ensembl name in Redis database
 
 redis_credential:                                       # knoweng Redis database credentials
-                            host: knownet.knowhub.org 
+                            host: knowredis.knowhub.org
                             password: KnowEnG
-                            port: 6380
+                            port: 6379

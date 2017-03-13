@@ -25,8 +25,8 @@ class TestSanity_check_data_file(unittest.TestCase):
             "phenotype_full_path": ".. /data/spreadsheets/phenotype.tsv",
             "results_directory": "./",
             "redis_credential": {
-                "host": "knownbs.dyndns.org",
-                "port": 6380,
+                "host": "knowredis.knowhub.org",
+                "port": 6379,
                 "password": "KnowEnG"
             },
             "source_hint": "",
@@ -35,7 +35,6 @@ class TestSanity_check_data_file(unittest.TestCase):
             "input_data_type": ""
         }
 
-        self.output_ensemble = "./example_ETL.tsv"
         self.output_mapped = "./example_MAP.tsv"
         self.output_unmapped = "./example_UNMAPPED.tsv"
 
@@ -43,15 +42,14 @@ class TestSanity_check_data_file(unittest.TestCase):
         del self.input_df_good
         del self.run_parameters
         os.remove(self.output_mapped)
-        os.remove(self.output_ensemble)
         os.remove(self.output_unmapped)
         del self.output_mapped
-        del self.output_ensemble
         del self.output_unmapped
 
     def test_sanity_check_data_file(self):
-        ret_val, ret_msg = data_cln.sanity_check_data_file(self.input_df_good, self.run_parameters)
-        self.assertEqual(True, ret_val)
+        ret_val, ret_msg = data_cln.sanity_check_user_spreadsheet(self.input_df_good, self.run_parameters)
+        ret_val_boolean = True if ret_val is not None else False
+        self.assertEqual(True, ret_val_boolean)
 
 
 if __name__ == '__main__':
