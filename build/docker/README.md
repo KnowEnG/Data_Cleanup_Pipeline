@@ -34,36 +34,3 @@ The Dockefile in this directory contains all the commands, in order, needed to b
 * Check on docker.hub to get the latest image. 
 
 * If you don't "cp" your data into the volume you mounted it will disappear when you exit docker.
-
-***
-## Detailed logic for each pipeline
-***
-* geneset_characterization_pipeline
-  1. checks if the user spreadsheet contains NA value. If so, reject it.
-  2. checks if the user spreadsheet only contains value 0 and 1. If not, rejects it.
-  3. checks if the index in user spreasheet contains NA value. If so, removes the row.
-  4. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
-  5. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
-  6. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
-  
-* samples_clustering_pipeline
-  1. checks if the user spreadsheet contains NA value. If so, reject it.
-  2. checks if the user spreadsheet only contains real value. If not, rejects it.
-  3. convert all values within user spreadsheet to be absolute value.
-  4. checks if the index in user spreasheet contains NA value. If so, removes the row.
-  5. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
-  6. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
-  7. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
-
-
-* gene_prioritization_pipeline
-  1. checks if either user spreadsheet or phenotype data is empty. If so, rejects it.
-  2. removes any column if user spreadsheet contains NA value. Rejects the processed user spreadsheet if it becomes empty.
-  3. checks if the user spreadsheet only contains real value. If not, rejects it.
-  4. correlation measure specific check:
-    1. for t_test, checks if the phenotype contains only value 0 and 1.
-    2. for pearson test, checks if the phenotype is real value.
-  5. checks if the index in user spreadsheet contains NA value. If so, removes the row.
-  6. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
-  7. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
-  8. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
