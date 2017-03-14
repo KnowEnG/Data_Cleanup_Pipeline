@@ -236,23 +236,26 @@ def check_duplicate_column_name(data_frame):
         user_spreadsheet_df_genename_dedup.T: a data frame in original format
         ret_msg: error message
     """
-    org_column_cnt = data_frame.shape[1]
     data_frame_transpose = data_frame.T
-    user_spreadsheet_df_genename_dedup, ret_msg = check_duplicate_row_name(data_frame_transpose)
+    user_spreadsheet_df_genename_dedup = data_frame_transpose[~data_frame_transpose.index.duplicated()]
+    if user_spreadsheet_df_genename_dedup.empty:
+        return False, "User spreadsheet becomes empty after remove column duplicates."
 
-    if user_spreadsheet_df_genename_dedup is None:
-        return False, ret_msg
+    row_count_diff = len(data_frame.index) - len(user_spreadsheet_df_genename_dedup.index)
+    if(row_count_diff > 0):
+        log_warnings.append("WARNING: Removed {} duplicate column(s) from user spreadsheet.".format(row_count_diff))
+        return user_spreadsheet_df_genename_dedup.T, "Found duplicate gene names and dropped these duplicates."
 
-    new_column_cnt = user_spreadsheet_df_genename_dedup.shape[0]
-    diff = org_column_cnt - new_column_cnt
-    if(diff > 0):
-        log_warnings.append("WARNING: Removed {} duplicate columns from user spreadsheet.".format(diff))
-    return user_spreadsheet_df_genename_dedup.T, ret_msg
+    if(row_count_diff == 0):
+        return user_spreadsheet_df_genename_dedup.T, "No duplicates detected in this data set."
+
+    return None, "An unexpected error occurred during checking duplicate row name."
 
 
 def check_duplicate_row_name(data_frame):
     """
     Checks duplication on gene name and rejects it if it exists
+
 
     Args:
         data_frame: input data frame
@@ -262,14 +265,16 @@ def check_duplicate_row_name(data_frame):
         ret_msg: error message
     """
     data_frame_genename_dedup = data_frame[~data_frame.index.duplicated()]
-    row_count_diff = len(data_frame.index) - len(data_frame_genename_dedup.index)
+    if data_frame_genename_dedup.empty:
+        return False, "User spreadsheet becomes empty after remove column duplicates."
 
+    row_count_diff = len(data_frame.index) - len(data_frame_genename_dedup.index)
     if row_count_diff > 0:
-        return data_frame_genename_dedup, "Found duplicate gene names " \
-                                          "and dropped these duplicates. "
+        log_warnings.append("WARNING: Removed {} duplicate row(s) from user spreadsheet.".format(row_count_diff))
+        return data_frame_genename_dedup, "Found duplicate gene names and dropped these duplicates."
 
     if row_count_diff == 0:
-        return data_frame_genename_dedup, "No duplication detected in this data set."
+        return data_frame_genename_dedup, "No duplicates detected in this data set."
 
     return None, "An unexpected error occurred during checking duplicate row name."
 
@@ -369,7 +374,8 @@ def check_input_value_for_samples_clustering(data_frame):
 
     # checks number of negative values
     data_frame_negative_cnt = data_frame.lt(0).sum().sum()
-    log_warnings.append("WARNING: Converted {} negative number to their positive value.".format(data_frame_negative_cnt))
+    if data_frame_negative_cnt > 0:
+        log_warnings.append("WARNING: Converted {} negative number to their positive value.".format(data_frame_negative_cnt))
 
     # checks if it contains only positive number
     data_frame_abs = data_frame.abs()
