@@ -133,3 +133,47 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
    ```
   python3 ../src/data_cleanup.py -run_directory ./ -run_file TEMPLATE_data_cleanup.yml
    ```
+
+* * * 
+## Description of "run_parameters" file
+* * * 
+
+| **Key**                   | **Value** | **Comments** |
+| ------------------------- | --------- | ------------ |
+| pipeline_type                    | **gene_priorization_pipeline**, **samples_clustering_pipeline**, **geneset_characterization_pipeline**  | Choose pipeline cleaning type |
+| spreadsheet_name_full_path | directory+spreadsheet_name|  Path and file name of user supplied gene sets |
+| phenotype_full_path | directory+phenotype_data_name| Path and file name of user supplied phenotype data |
+| results_directory | directory | Directory to save the output files |
+| redis_credential| host, password and port | to access gene names lookup|
+| taxonid| 9606 | taxon of the genes |
+| source_hint| ' ' | hint for lookup ensembl names |
+
+spreadsheet_name = TEST_1_gene_expression.tsv</br>
+phenotype_name = TEST_1_phenotype.tsv
+
+* * * 
+## Description of Output files saved in results directory
+* * * 
+
+* Output files
+
+**input_file_name_ETL.tsv**.</br>
+Input file after Extract Transform Load (cleaning)
+
+**input_file_name_MAP.tsv**.</br>
+
+| (translated gene) | (input gene name) |
+ | :--------------------: |:--------------------:|
+ | ENS00000012345 | abc_def_er|
+ |...|...|
+ | ENS00000054321 | def_org_ifi |
+
+
+**input_file_name_UNMAPPED.tsv**.</br>
+
+| (input gene name) | (unmapped-none) |
+ | :--------------------: |:--------------------:|
+ | abcd_iffe | unmapped-none|
+ |...|...|
+ | abdcefg_hijk | unmapped-none |
+
