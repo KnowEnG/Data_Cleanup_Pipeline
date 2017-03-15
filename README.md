@@ -156,6 +156,7 @@ phenotype_name = TEST_1_phenotype.tsv
 * * * 
 
 * Output files
+
 **input_file_name_ETL.tsv**.</br>
 Input file after Extract Transform Load (cleaning)
 
@@ -169,3 +170,10 @@ Input file after Extract Transform Load (cleaning)
 
 
 **input_file_name_UNMAPPED.tsv**.</br>
+
+| (input gene name) | (unmapped-none) |
+ | :--------------------: |:--------------------:|
+ | abcd_iffe | unmapped-none|
+ |...|...|
+ | abdcefg_hijk | unmapped-none |
+
