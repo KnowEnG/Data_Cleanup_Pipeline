@@ -161,4 +161,11 @@ Input file after Extract Transform Load (cleaning)
 
 **input_file_name_MAP.tsv**.</br>
 
+| (translated gene) | (input gene name) |
+ | :--------------------: |:--------------------:|
+ | ENS00000012345 | abc_def_er|
+ |...|...|
+ | ENS00000054321 | def_org_ifi |
+
+
 **input_file_name_UNMAPPED.tsv**.</br>
