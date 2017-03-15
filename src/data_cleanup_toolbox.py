@@ -98,7 +98,7 @@ def run_gene_prioritization_pipeline(run_parameters):
     if user_spreadsheet_df is None:
         return False, ret_msg
 
-    phenotype_df, ret_msg = load_data_file(run_parameters['phenotype_full_path'])
+    phenotype_df, ret_msg = load_data_file(run_parameters['phenotype_name_full_path'])
     if phenotype_df is None:
         return False, ret_msg
 
@@ -117,7 +117,7 @@ def run_gene_prioritization_pipeline(run_parameters):
     else:
         # store cleaned phenotype data to a file
         phenotype_val_checked.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
-            run_parameters['phenotype_full_path']) + "_ETL.tsv",
+            run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
                                      sep='\t', header=True, index=True)
         user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",

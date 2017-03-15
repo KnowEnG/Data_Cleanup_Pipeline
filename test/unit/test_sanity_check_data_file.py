@@ -22,7 +22,7 @@ class TestSanity_check_data_file(unittest.TestCase):
 
         self.run_parameters = {
             "spreadsheet_name_full_path": "../data/spreadsheets/example.tsv",
-            "phenotype_full_path": ".. /data/spreadsheets/phenotype.tsv",
+            "phenotype_name_full_path": ".. /data/spreadsheets/phenotype.tsv",
             "results_directory": "./",
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
