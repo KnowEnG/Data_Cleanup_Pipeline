@@ -156,9 +156,9 @@ phenotype_name = TEST_1_phenotype.tsv
 * * * 
 
 * Output files
-**input_file_prefix_ETL.tsv**.</br>
+**input_file_name_ETL.tsv**.</br>
+Input file after Extract Transform Load (cleaning)
 
- |  |**variance**|
- | :--------------------: |:--------------------:|
- | **gene 1**|float|
- |...|...|
+**input_file_name_MAP.tsv**.</br>
+
+**input_file_name_UNMAPPED.tsv**.</br>
