@@ -3,7 +3,7 @@
 # - phenotype            dataframe in .tsv format                    -
 # --------------------------------------------------------------------
 spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression.tsv
-phenotype_full_path:        ../data/spreadsheets/TEST_1_phenotype.tsv
+phenotype_name_full_path:   ../data/spreadsheets/TEST_1_phenotype.tsv
 
 # --------------------------------------------------------------------
 # - directory where the result files will be written                 -
