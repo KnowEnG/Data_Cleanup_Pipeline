@@ -216,6 +216,7 @@ def load_data_file(file_path):
         logging.append("INFO: Successfully loaded input data: {}.".format(file_path))
         return input_df
     except OSError as err:
+        logging.append("ERROR: {}".format(str(err)))
         return None
 
 
