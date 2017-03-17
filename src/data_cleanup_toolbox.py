@@ -67,8 +67,8 @@ def run_samples_clustering_pipeline(run_parameters):
         return False, logging
 
     phenotype_df_cleaned = None
-    logging.append("Start processing phenotype data.")
     if 'phenotype_name_full_path' in run_parameters.keys():
+        logging.append("Start processing phenotype data.")
         phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
         if phenotype_df is None or phenotype_df.empty:
             logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
