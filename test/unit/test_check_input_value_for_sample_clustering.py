@@ -40,17 +40,17 @@ class TestCheck_input_value_for_samples_clustering(unittest.TestCase):
         del self.input_df_nan
 
     def test_check_input_value_for_samples_clustering(self):
-        ret_df, ret_msg = data_cln.check_input_value_for_samples_clustering(self.input_df)
+        ret_df = data_cln.check_input_value_for_samples_clustering(self.input_df)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 
     def test_check_nan_input_value_in_spreadsheet(self):
-        ret_df, ret_msg = data_cln.check_input_value_for_samples_clustering(self.input_df_nan)
+        ret_df = data_cln.check_input_value_for_samples_clustering(self.input_df_nan)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 
     def test_check_text_input_value_in_spreadsheet(self):
-        ret_df, ret_msg = data_cln.check_input_value_for_samples_clustering(self.input_df_text)
+        ret_df = data_cln.check_input_value_for_samples_clustering(self.input_df_text)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 

@@ -38,17 +38,17 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
 
     def tearDown(self):
         del self.run_parameters
-        os.remove(self.file_ETL)
-        os.remove(self.file_MAP)
-        os.remove(self.file_UNMAPPED)
 
     def test_run_samples_clustering_pipeline(self):
         ret_flag, ret_msg = data_cln.run_samples_clustering_pipeline(self.run_parameters)
         self.assertEqual(True, ret_flag)
+        os.remove(self.file_ETL)
+        os.remove(self.file_MAP)
+        os.remove(self.file_UNMAPPED)
 
     def test_run_samples_clustering_pipeline_no_phenotype(self):
         ret_flag, ret_msg = data_cln.run_samples_clustering_pipeline(self.run_parameters_no_phenotype)
-        self.assertEqual(True, ret_flag)
+        self.assertEqual(False, ret_flag)
 
 
 if __name__ == '__main__':

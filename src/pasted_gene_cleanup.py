@@ -10,34 +10,36 @@ def pasted_gene_cleanup(run_parameters):
 
     # reads pasted_gene_list as a dataframe
     input_small_genes_df = datacln.load_data_file(run_parameters['pasted_gene_list_full_path'])
-    input_small_genes_df["original_gene_name"] = input_small_genes_df.index
+    if input_small_genes_df is not None:
+        input_small_genes_df["original_gene_name"] = input_small_genes_df.index
 
-    # converts pasted_gene_list to ensemble name
-    input_small_genes_df.index = input_small_genes_df.index.map(lambda x: redutil.conv_gene(redis_db, x, run_parameters['source_hint'], run_parameters['taxonid']))
+        # converts pasted_gene_list to ensemble name
+        input_small_genes_df.index = input_small_genes_df.index.map(lambda x: redutil.conv_gene(redis_db, x, run_parameters['source_hint'], run_parameters['taxonid']))
 
-    # filters out the unmapped genes
-    mapped_small_genes_df = input_small_genes_df[~input_small_genes_df.index.str.contains(r'^unmapped.*$')]
-    # insert a column with column name: value 
-    mapped_small_genes_df.insert(0, 'value', 1)
+        # filters out the unmapped genes
+        mapped_small_genes_df = input_small_genes_df[~input_small_genes_df.index.str.contains(r'^unmapped.*$')]
+        # insert a column with column name: value
+        mapped_small_genes_df.insert(0, 'value', 1)
 
-    # reads the univeral_gene_list
-    universal_genes_df = datacln.load_data_file(run_parameters['temp_redis_vector'])
-    # inserts a column with value 0
-    universal_genes_df.insert(0, 'value', 0)
+        # reads the univeral_gene_list
+        universal_genes_df = datacln.load_data_file(run_parameters['temp_redis_vector'])
 
-    # finds the intersection between pasted_gene_list and universal_gene_list
-    common_idx = universal_genes_df.index.intersection(mapped_small_genes_df.index)
-    # inserts a column with value 1
-    universal_genes_df.loc[common_idx] = 1
+        # inserts a column with value 0
+        universal_genes_df.insert(0, 'value', 0)
 
-    # names the column of universal_genes_df to be 'uploaded_gene_set'
-    universal_genes_df.columns = ["uploaded_gene_set"]
-    del universal_genes_df.index.name
+        # finds the intersection between pasted_gene_list and universal_gene_list
+        common_idx = universal_genes_df.index.intersection(mapped_small_genes_df.index)
+        # inserts a column with value 1
+        universal_genes_df.loc[common_idx] = 1
 
-    # outputs final results
-    output_file_basename = datacln.get_file_basename(run_parameters['pasted_gene_list_full_path'])
-    input_small_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv", sep='\t', header=True, index=True)
-    universal_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv", sep='\t', header=True, index=True)
+        # names the column of universal_genes_df to be 'uploaded_gene_set'
+        universal_genes_df.columns = ["uploaded_gene_set"]
+        del universal_genes_df.index.name
+
+        # outputs final results
+        output_file_basename = datacln.get_file_basename(run_parameters['pasted_gene_list_full_path'])
+        input_small_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv", sep='\t', header=True, index=True)
+        universal_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv", sep='\t', header=True, index=True)
 
 
 def main():

@@ -57,18 +57,18 @@ class TestCheck_ensemble_gene_name(unittest.TestCase):
         del self.output_unmapped
 
     def test_check_ensemble_gene_name_good(self):
-        ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_good, self.run_parameters)
+        ret_val = data_cln.check_ensemble_gene_name(self.input_df_good, self.run_parameters)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(True, ret_val_boolean)
         npytest.assert_array_equal(self.golden_output_good, ret_val)
 
     def test_check_ensemble_gene_name_empty_mapped(self):
-        ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_empty_mapped, self.run_parameters)
+        ret_val = data_cln.check_ensemble_gene_name(self.input_df_empty_mapped, self.run_parameters)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(False, ret_val_boolean)
 
     def test_check_ensemble_gene_name_bad(self):
-        ret_val, ret_msg = data_cln.check_ensemble_gene_name(self.input_df_bad, self.run_parameters)
+        ret_val = data_cln.check_ensemble_gene_name(self.input_df_bad, self.run_parameters)
         ret_val_boolean = True if ret_val is not None else False
 
         self.assertEqual(True, ret_val_boolean)
