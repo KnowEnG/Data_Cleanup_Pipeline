@@ -75,7 +75,7 @@ def run_samples_clustering_pipeline(run_parameters):
                 run_parameters['phenotype_name_full_path']))
             return False, logging
         else:
-            phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df)
+            phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.column.values)
             if phenotype_df_cleaned is None:
                 return False, logging
 
@@ -544,7 +544,7 @@ def check_intersection(list_a, list_b):
     return intersection
 
 
-def run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df):
+def run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df_header):
     '''
     Pre-processing phenotype data. This includes checking for na index, duplicate column name and row name.
     Args:
@@ -571,7 +571,7 @@ def run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df):
         return None
 
     # Case 4: checks the intersection on phenotype
-    intersection = check_intersection(phenotype_df_genename_dedup.columns.values, user_spreadsheet_df.index.values)
+    intersection = check_intersection(phenotype_df_genename_dedup.index.values, user_spreadsheet_df_header)
     if intersection is None:
         return None
 
