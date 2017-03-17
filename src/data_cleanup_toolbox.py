@@ -60,25 +60,26 @@ def run_samples_clustering_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not
         message: A message indicates the status of current check
     """
-    logging.append("INFO: Start to process phenotype data...")
-    if 'phenotype_name_full_path' in run_parameters.keys():
-        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
-        if phenotype_df is None or phenotype_df.empty:
-            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
-                run_parameters['phenotype_name_full_path']))
-            return False, logging
-        else:
-            phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df)
-            if phenotype_df_cleaned is None:
-                return False, logging
-
-    logging.append("INFO: Start to process user spreadsheet data...")
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
     if user_spreadsheet_df is None or user_spreadsheet_df.empty:
         logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
             run_parameters['spreadsheet_name_full_path']))
         return False, logging
 
+    phenotype_df_cleaned = None
+    if 'phenotype_name_full_path' in run_parameters.keys():
+        logging.append("INFO: Start processing phenotype data.")
+        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+        if phenotype_df is None or phenotype_df.empty:
+            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
+                run_parameters['phenotype_name_full_path']))
+            return False, logging
+        else:
+            phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.columns.values)
+            if phenotype_df_cleaned is None:
+                return False, logging
+
+    logging.append("INFO: Start processing user spreadsheet data.")
     # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
     user_spreadsheet_val_chked = check_input_value_for_samples_clustering(user_spreadsheet_df)
 
@@ -90,19 +91,20 @@ def run_samples_clustering_pipeline(run_parameters):
 
     if user_spreadsheet_df_cleaned is None:
         return False, logging
-
-    user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
-        run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
-                                       sep='\t', header=True, index=True)
-    logging.append(
-        "INFO: Cleaned user spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                         user_spreadsheet_df_cleaned.shape[1]))
-    phenotype_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
-        run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
-                                sep='\t', header=True, index=True)
-    logging.append(
-        "INFO: Cleaned phenotype data has {} rows, {} columns.".format(phenotype_df_cleaned.shape[0],
-                                                                       phenotype_df_cleaned.shape[1]))
+    else:
+        user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+            run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
+                                           sep='\t', header=True, index=True)
+        logging.append(
+            "INFO: Cleaned user spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                             user_spreadsheet_df_cleaned.shape[1]))
+    if phenotype_df_cleaned is not None:
+        phenotype_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+            run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
+                                    sep='\t', header=True, index=True)
+        logging.append(
+            "INFO: Cleaned phenotype data has {} rows, {} columns.".format(phenotype_df_cleaned.shape[0],
+                                                                           phenotype_df_cleaned.shape[1]))
     return True, logging
 
 
@@ -214,6 +216,7 @@ def load_data_file(file_path):
         logging.append("INFO: Successfully loaded input data: {}.".format(file_path))
         return input_df
     except OSError as err:
+        logging.append("ERROR: {}".format(str(err)))
         return None
 
 
@@ -502,7 +505,7 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
     """
     logging.append("INFO: Start to run sanity checks for user spreadsheet data.")
 
-    # Case 1: remove NA rows in index
+    # Case 1: removes NA rows in index
     user_spreadsheet_df_idx_na_rmd = remove_na_index(user_spreadsheet_df)
     if user_spreadsheet_df_idx_na_rmd is None:
         return None
@@ -525,7 +528,25 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
     return user_spreadsheet_df_final
 
 
-def run_pre_processing_phenotype_data(phenotype_df):
+def check_intersection(list_a, list_b):
+    '''
+    Find intersection between list_a, list_b
+    Args:
+        list_a: list a
+        list_b: list b
+
+    Returns:
+        intersection: the intersection
+    '''
+    intersection = list(set(list_a) & set(list_b))
+    if not intersection:
+        logging.append("ERROR: Cannot find intersection between spreadsheet and phenotype data.")
+        return None
+    logging.append("INFO: Found {} intersections between phenotype and spreadsheet data.".format(len(intersection)))
+    return intersection
+
+
+def run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df_header):
     '''
     Pre-processing phenotype data. This includes checking for na index, duplicate column name and row name.
     Args:
@@ -535,7 +556,8 @@ def run_pre_processing_phenotype_data(phenotype_df):
         phenotype_df_genename_dedup: cleaned phenotype dataframe
     '''
     logging.append("INFO: Start to run sanity check for phenotype data.")
-    # Case 1: remove NA rows in index
+
+    # Case 1: removes NA rows in index
     phenotype_df_idx_na_rmd = remove_na_index(phenotype_df)
     if phenotype_df_idx_na_rmd is None:
         return None
@@ -550,12 +572,28 @@ def run_pre_processing_phenotype_data(phenotype_df):
     if phenotype_df_genename_dedup is None:
         return None
 
+    # Case 4: checks the intersection on phenotype
+    intersection = check_intersection(phenotype_df_genename_dedup.index.values, user_spreadsheet_df_header)
+    if intersection is None:
+        return None
+
     logging.append("INFO: Finished running sanity check for phenotype data.")
 
     return phenotype_df_genename_dedup
 
 
 def generate_logging(flag, message, path):
+    '''
+    Creates logging file
+    Args:
+        flag: a boolean value indicating if the current run is succeeded or not.
+        message: a list of error message
+        path: log file location
+
+    Returns:
+        NA
+
+    '''
     import yaml
     if flag:
         status = "SUCCESS"
