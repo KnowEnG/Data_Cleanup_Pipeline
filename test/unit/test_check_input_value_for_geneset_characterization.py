@@ -22,12 +22,12 @@ class Testcheck_input_value_for_geneset_characterization(unittest.TestCase):
         del self.input_nan_df
 
     def test_check_input_value_for_geneset_characterization_pass(self):
-        ret_df, ret_msg = data_cln.check_input_value_for_geneset_characterization(self.input_df)
+        ret_df = data_cln.check_input_value_for_geneset_characterization(self.input_df)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 
     def test_check_nan_input_value(self):
-        ret_df, ret_msg = data_cln.check_input_value_for_geneset_characterization(self.input_nan_df)
+        ret_df = data_cln.check_input_value_for_geneset_characterization(self.input_nan_df)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 

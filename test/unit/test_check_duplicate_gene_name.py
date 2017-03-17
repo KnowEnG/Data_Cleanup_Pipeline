@@ -40,13 +40,13 @@ class TestCheck_duplicate_gene_name(unittest.TestCase):
         del self.golden_output_nodup
 
     def test_check_duplicate_row_name_with_dup(self):
-        ret_df, ret_msg = data_cln.check_duplicate_row_name(self.input_df_dup)
+        ret_df = data_cln.check_duplicate_row_name(self.input_df_dup)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
         npytest.assert_array_equal(self.golden_output_dedup, ret_df)
 
     def test_check_duplicate_row_name_without_dup(self):
-        ret_df, ret_msg = data_cln.check_duplicate_row_name(self.input_df_nodup)
+        ret_df = data_cln.check_duplicate_row_name(self.input_df_nodup)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
         npytest.assert_array_equal(self.golden_output_nodup, ret_df)
