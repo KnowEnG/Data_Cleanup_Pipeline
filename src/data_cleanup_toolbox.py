@@ -75,7 +75,7 @@ def run_samples_clustering_pipeline(run_parameters):
                 run_parameters['phenotype_name_full_path']))
             return False, logging
         else:
-            phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.column.values)
+            phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.columns.values)
             if phenotype_df_cleaned is None:
                 return False, logging
 
