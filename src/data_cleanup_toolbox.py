@@ -505,7 +505,7 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
     """
     logging.append("INFO: Start to run sanity checks for user spreadsheet data.")
 
-    # Case 1: remove NA rows in index
+    # Case 1: removes NA rows in index
     user_spreadsheet_df_idx_na_rmd = remove_na_index(user_spreadsheet_df)
     if user_spreadsheet_df_idx_na_rmd is None:
         return None
@@ -557,7 +557,7 @@ def run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df_header):
     '''
     logging.append("INFO: Start to run sanity check for phenotype data.")
 
-    # Case 1: remove NA rows in index
+    # Case 1: removes NA rows in index
     phenotype_df_idx_na_rmd = remove_na_index(phenotype_df)
     if phenotype_df_idx_na_rmd is None:
         return None
@@ -583,6 +583,17 @@ def run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df_header):
 
 
 def generate_logging(flag, message, path):
+    '''
+    Creates logging file
+    Args:
+        flag: a boolean value indicating if the current run is succeeded or not.
+        message: a list of error message
+        path: log file location
+
+    Returns:
+        NA
+
+    '''
     import yaml
     if flag:
         status = "SUCCESS"
