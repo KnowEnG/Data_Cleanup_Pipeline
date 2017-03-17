@@ -9,6 +9,7 @@ import os
 
 logging = []
 
+
 def run_geneset_characterization_pipeline(run_parameters):
     """
     Runs data cleaning for geneset_characterization_pipeline.
@@ -21,9 +22,10 @@ def run_geneset_characterization_pipeline(run_parameters):
         message: A message indicates the status of current check
     """
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
-    
+
     if user_spreadsheet_df.empty:
-        logging.append("Input data {} is empty. Please provide a valid input data.".format(run_parameters['spreadsheet_name_full_path']))
+        logging.append("Input data {} is empty. Please provide a valid input data.".format(
+            run_parameters['spreadsheet_name_full_path']))
         return False, logging
 
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
@@ -40,9 +42,10 @@ def run_geneset_characterization_pipeline(run_parameters):
 
     user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
-                            sep='\t', header=True, index=True)
-    logging.append("INFO: Cleaned user spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                                   user_spreadsheet_df_cleaned.shape[1]))
+                                       sep='\t', header=True, index=True)
+    logging.append(
+        "INFO: Cleaned user spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                         user_spreadsheet_df_cleaned.shape[1]))
     return True, logging
 
 
@@ -61,7 +64,8 @@ def run_samples_clustering_pipeline(run_parameters):
     if 'phenotype_name_full_path' in run_parameters.keys():
         phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
         if phenotype_df is None or phenotype_df.empty:
-            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(run_parameters['phenotype_name_full_path']))
+            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
+                run_parameters['phenotype_name_full_path']))
             return False, logging
         else:
             phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df)
@@ -89,16 +93,16 @@ def run_samples_clustering_pipeline(run_parameters):
 
     user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
-                            sep='\t', header=True, index=True)
-    logging.append(
-        "INFO: Cleaned user spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                           user_spreadsheet_df_cleaned.shape[1]))
-    phenotype_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
-        run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
                                        sep='\t', header=True, index=True)
     logging.append(
+        "INFO: Cleaned user spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                         user_spreadsheet_df_cleaned.shape[1]))
+    phenotype_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+        run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
+                                sep='\t', header=True, index=True)
+    logging.append(
         "INFO: Cleaned phenotype data has {} rows, {} columns.".format(phenotype_df_cleaned.shape[0],
-                                                                           phenotype_df_cleaned.shape[1]))
+                                                                       phenotype_df_cleaned.shape[1]))
     return True, logging
 
 
@@ -116,13 +120,15 @@ def run_gene_prioritization_pipeline(run_parameters):
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
     if user_spreadsheet_df is None or user_spreadsheet_df.empty:
-        logging.append("Input data {} is empty. Please provide a valid input data.".format(run_parameters['spreadsheet_name_full_path']))
+        logging.append("Input data {} is empty. Please provide a valid input data.".format(
+            run_parameters['spreadsheet_name_full_path']))
         return False, logging
 
     phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
 
     if phenotype_df is None or phenotype_df.empty:
-        logging.append("Input data {} is empty. Please provide a valid input data.".format(run_parameters['phenotype_name_full_path']))
+        logging.append("Input data {} is empty. Please provide a valid input data.".format(
+            run_parameters['phenotype_name_full_path']))
         return False, logging
 
     # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
@@ -144,10 +150,10 @@ def run_gene_prioritization_pipeline(run_parameters):
                                  sep='\t', header=True, index=True)
     user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
-                                 sep='\t', header=True, index=True)
+                                       sep='\t', header=True, index=True)
     logging.append(
         "INFO: Cleaned user spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                               user_spreadsheet_df_cleaned.shape[1]))
+                                                                         user_spreadsheet_df_cleaned.shape[1]))
     return True, logging
 
 
@@ -167,7 +173,8 @@ def remove_na_index(dataframe):
     if diff > 0:
         logging.append("WARNING: Removed {} row(s) which contains NA in index.".format(diff))
     if dataframe_rm_na_idx.empty:
-        logging.append("ERROR: After removed {} row(s) that contains NA in index, the dataframe becames empty.".format(diff))
+        logging.append(
+            "ERROR: After removed {} row(s) that contains NA in index, the dataframe becames empty.".format(diff))
         return None
     logging.append("INFO: No NA detected in row index.")
     return dataframe_rm_na_idx
@@ -322,7 +329,6 @@ def check_duplicate_row_name(data_frame):
 
 
 def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlation_measure):
-    
     # drops column which contains NA in data_frame
     data_frame_dropna = data_frame.dropna(axis=1)
 
@@ -343,8 +349,9 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
     if correlation_measure == 't_test':
         phenotype_value_set = set(phenotype_df.ix[:, phenotype_df.columns != 0].values.ravel())
         if gold_value_set != phenotype_value_set:
-            logging.append("ERROR: Only 0, 1 are allowed in phenotype data. This phenotype data contains invalid value: {}. ".format(
-                phenotype_value_set) + "Please revise your phenotype and reupload.")
+            logging.append(
+                "ERROR: Only 0, 1 are allowed in phenotype data. This phenotype data contains invalid value: {}. ".format(
+                    phenotype_value_set) + "Please revise your phenotype and reupload.")
             return None, None
 
     if correlation_measure == 'pearson':
@@ -379,8 +386,9 @@ def check_input_value_for_geneset_characterization(data_frame):
     gene_value_set = set(data_frame.ix[:, data_frame.columns != 0].values.ravel())
 
     if gold_value_set != gene_value_set:
-        logging.append("ERROR: Only 0, 1 are allowed in user spreadsheet. This user spreadsheet contains invalid value: {}. ".format(
-            gene_value_set) + "Please revise your spreadsheet and reupload.")
+        logging.append(
+            "ERROR: Only 0, 1 are allowed in user spreadsheet. This user spreadsheet contains invalid value: {}. ".format(
+                gene_value_set) + "Please revise your spreadsheet and reupload.")
         return None
 
     return data_frame
@@ -498,7 +506,7 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
     user_spreadsheet_df_idx_na_rmd = remove_na_index(user_spreadsheet_df)
     if user_spreadsheet_df_idx_na_rmd is None:
         return None
-    
+
     # Case 2: checks the duplication on column name and removes it if exists
     user_spreadsheet_df_col_dedup = check_duplicate_column_name(user_spreadsheet_df_idx_na_rmd)
     if user_spreadsheet_df_col_dedup is None:
@@ -509,7 +517,7 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
     if user_spreadsheet_df_genename_dedup is None:
         return None
 
-    # Case 4: checks the validity of gene name meaning if it can be ensemble or not
+    # Case 4: checks the validity of gene name to see if it can be ensemble or not
     user_spreadsheet_df_final = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, run_parameters)
 
     logging.append("INFO: Finished running sanity check for user spreadsheet data.")
@@ -518,6 +526,14 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
 
 
 def run_pre_processing_phenotype_data(phenotype_df):
+    '''
+    Pre-processing phenotype data. This includes checking for na index, duplicate column name and row name.
+    Args:
+        phenotype_df: input phenotype dataframe to be checked
+
+    Returns:
+        phenotype_df_genename_dedup: cleaned phenotype dataframe
+    '''
     logging.append("INFO: Start to run sanity check for phenotype data.")
     # Case 1: remove NA rows in index
     phenotype_df_idx_na_rmd = remove_na_index(phenotype_df)
@@ -529,11 +545,11 @@ def run_pre_processing_phenotype_data(phenotype_df):
     if phenotype_df_col_dedup is None:
         return None
 
-    # Case 3: checks the duplication on gene name and removes it if exists
+    # Case 3: checks the duplication on row name and removes it if exists
     phenotype_df_genename_dedup = check_duplicate_row_name(phenotype_df_col_dedup)
     if phenotype_df_genename_dedup is None:
         return None
-    
+
     logging.append("INFO: Finished running sanity check for phenotype data.")
 
     return phenotype_df_genename_dedup
@@ -545,7 +561,7 @@ def generate_logging(flag, message, path):
         status = "SUCCESS"
     else:
         status = "FAIL"
-    file_content = {status : message}
+    file_content = {status: message}
     output_stream = open(path, "w")
     yaml.dump(file_content, output_stream, default_flow_style=False)
     output_stream.close()
