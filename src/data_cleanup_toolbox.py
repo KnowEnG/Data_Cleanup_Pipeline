@@ -68,7 +68,7 @@ def run_samples_clustering_pipeline(run_parameters):
 
     phenotype_df_cleaned = None
     if 'phenotype_name_full_path' in run_parameters.keys():
-        logging.append("Start processing phenotype data.")
+        logging.append("INFO: Start processing phenotype data.")
         phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
         if phenotype_df is None or phenotype_df.empty:
             logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
@@ -79,7 +79,7 @@ def run_samples_clustering_pipeline(run_parameters):
             if phenotype_df_cleaned is None:
                 return False, logging
 
-    logging.append("Start processing user spreadsheet data.")
+    logging.append("INFO: Start processing user spreadsheet data.")
     # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
     user_spreadsheet_val_chked = check_input_value_for_samples_clustering(user_spreadsheet_df)
 
@@ -532,16 +532,17 @@ def check_intersection(list_a, list_b):
     '''
     Find intersection between list_a, list_b
     Args:
-        list_a:
-        list_b:
+        list_a: list a
+        list_b: list b
 
     Returns:
-
+        intersection: the intersection
     '''
     intersection = list(set(list_a) & set(list_b))
     if not intersection:
         logging.append("ERROR: Cannot find intersection between spreadsheet and phenotype data.")
         return None
+    logging.append("INFO: Found {} intersections between phenotype and spreadsheet data.".format(len(intersection)))
     return intersection
 
 
