@@ -350,14 +350,14 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
         phenotype_value_set = set(phenotype_df.ix[:, phenotype_df.columns != 0].values.ravel())
         if gold_value_set != phenotype_value_set:
             logging.append(
-                "ERROR: Only 0, 1 are allowed in phenotype data. This phenotype data contains invalid value: {}. ".format(
+                "ERROR: Only 0, 1 are allowed in phenotype data when running t_test. This phenotype data contains invalid value: {}. ".format(
                     phenotype_value_set) + "Please revise your phenotype and reupload.")
             return None, None
 
     if correlation_measure == 'pearson':
         phenotype_df_check = phenotype_df.applymap(lambda x: isinstance(x, (int, float)))
         if False in phenotype_df_check:
-            logging.append("ERROR: Found non-numeric value in phenotype data.")
+            logging.append("ERROR: Only numeric value is allowed in phenotype data when running pearson test. Found non-numeric value in phenotype data.")
             return None, None
     return data_frame_dropna, phenotype_df
 
