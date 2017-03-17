@@ -455,7 +455,6 @@ def check_ensemble_gene_name(data_frame, run_parameters):
         lambda x: redisutil.conv_gene(redis_db, x, run_parameters['source_hint'], run_parameters['taxonid']))
 
     # extracts all mapped rows in dataframe
-    org_gene_count = data_frame.shape[0]
     output_df_mapped = data_frame[~data_frame.index.str.contains(r'^unmapped.*$')]
     output_df_mapped = output_df_mapped.drop('original', axis=1)
 
@@ -463,9 +462,8 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     mapping = data_frame[['original']]
 
     mapping_filtered = mapping[~mapping.index.str.contains(r'^unmapped.*$')]
-    mapped_gene_count = mapping_filtered.shape[0]
 
-    logging.append("INFO: Mapped {} genes to ensemble name.".format(org_gene_count - mapped_gene_count))
+    logging.append("INFO: Mapped {} genes to ensemble name.".format(mapping_filtered.shape[0]))
 
     unmapped_filtered = mapping[mapping.index.str.contains(r'^unmapped.*$')].sort_index(axis=0, ascending=False)
     unmapped_filtered['ensemble'] = unmapped_filtered.index
