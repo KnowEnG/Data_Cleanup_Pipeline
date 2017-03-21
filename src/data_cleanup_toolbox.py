@@ -9,7 +9,6 @@ import os
 
 logging = []
 
-
 def run_geneset_characterization_pipeline(run_parameters):
     """
     Runs data cleaning for geneset_characterization_pipeline.
@@ -24,7 +23,7 @@ def run_geneset_characterization_pipeline(run_parameters):
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
     if user_spreadsheet_df.empty:
-        logging.append("Input data {} is empty. Please provide a valid input data.".format(
+        logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
             run_parameters['spreadsheet_name_full_path']))
         return False, logging
 
@@ -122,14 +121,14 @@ def run_gene_prioritization_pipeline(run_parameters):
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
     if user_spreadsheet_df is None or user_spreadsheet_df.empty:
-        logging.append("Input data {} is empty. Please provide a valid input data.".format(
+        logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
             run_parameters['spreadsheet_name_full_path']))
         return False, logging
 
     phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
 
     if phenotype_df is None or phenotype_df.empty:
-        logging.append("Input data {} is empty. Please provide a valid input data.".format(
+        logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
             run_parameters['phenotype_name_full_path']))
         return False, logging
 
@@ -343,7 +342,7 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
     data_frame_check = data_frame_dropna.applymap(lambda x: isinstance(x, (int, float)))
 
     if False in data_frame_check.values:
-        logging.append("Found non-numeric value in user spreadsheet.")
+        logging.append("ERROR: Found non-numeric value in user spreadsheet.")
         return None, None
 
     # defines the default values that can exist in phenotype data
@@ -468,7 +467,8 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     unmapped_filtered = mapping[mapping.index.str.contains(r'^unmapped.*$')].sort_index(axis=0, ascending=False)
     unmapped_filtered['ensemble'] = unmapped_filtered.index
 
-    logging.append("INFO: Unable to map {} genes to ensemble name.".format(unmapped_filtered.shape[0]))
+    if unmapped_filtered.shape[0] > 0:
+        logging.append("INFO: Unable to map {} genes to ensemble name.".format(unmapped_filtered.shape[0]))
 
     mapping_dedup_df = mapping_filtered[~mapping_filtered.index.duplicated()]
 
@@ -600,4 +600,6 @@ def generate_logging(flag, message, path):
     file_content = {status: message}
     output_stream = open(path, "w")
     yaml.dump(file_content, output_stream, default_flow_style=False)
+    # reset the global logging list
+    del logging[:]
     output_stream.close()
