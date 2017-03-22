@@ -1,5 +1,5 @@
 spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_binary.tsv
-phenotype_full_path:        ../data/spreadsheets/TEST_1_phenotype.tsv
+phenotype_name_full_path:   ../data/spreadsheets/TEST_1_phenotype.tsv
 results_directory:          ./run_dir/results
 
 correlation_measure:        pearson

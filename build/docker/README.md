@@ -34,4 +34,3 @@ The Dockefile in this directory contains all the commands, in order, needed to b
 * Check on docker.hub to get the latest image. 
 
 * If you don't "cp" your data into the volume you mounted it will disappear when you exit docker.
-

@@ -6,7 +6,7 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
     def setUp(self):
         self.run_parameters = {
             "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression_real_value.tsv",
-            "phenotype_full_path": "../../data/spreadsheets/TEST_1_phenotype.tsv",
+            "phenotype_name_full_path": "../../data/spreadsheets/TEST_1_phenotype.tsv",
             "results_directory": "./",
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
@@ -20,7 +20,7 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
 
         self.run_parameters_no_phenotype = {
             "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression_real_value.tsv",
-            "phenotype_full_path": "",
+            "phenotype_name_full_path": "",
             "results_directory": "./",
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
@@ -38,17 +38,17 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
 
     def tearDown(self):
         del self.run_parameters
-        os.remove(self.file_ETL)
-        os.remove(self.file_MAP)
-        os.remove(self.file_UNMAPPED)
 
     def test_run_samples_clustering_pipeline(self):
         ret_flag, ret_msg = data_cln.run_samples_clustering_pipeline(self.run_parameters)
         self.assertEqual(True, ret_flag)
+        os.remove(self.file_ETL)
+        os.remove(self.file_MAP)
+        os.remove(self.file_UNMAPPED)
 
     def test_run_samples_clustering_pipeline_no_phenotype(self):
         ret_flag, ret_msg = data_cln.run_samples_clustering_pipeline(self.run_parameters_no_phenotype)
-        self.assertEqual(True, ret_flag)
+        self.assertEqual(False, ret_flag)
 
 
 if __name__ == '__main__':

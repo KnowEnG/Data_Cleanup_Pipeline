@@ -22,7 +22,7 @@ class TestSanity_check_data_file(unittest.TestCase):
 
         self.run_parameters = {
             "spreadsheet_name_full_path": "../data/spreadsheets/example.tsv",
-            "phenotype_full_path": ".. /data/spreadsheets/phenotype.tsv",
+            "phenotype_name_full_path": ".. /data/spreadsheets/phenotype.tsv",
             "results_directory": "./",
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
@@ -47,7 +47,7 @@ class TestSanity_check_data_file(unittest.TestCase):
         del self.output_unmapped
 
     def test_sanity_check_data_file(self):
-        ret_val, ret_msg = data_cln.sanity_check_user_spreadsheet(self.input_df_good, self.run_parameters)
+        ret_val = data_cln.sanity_check_user_spreadsheet(self.input_df_good, self.run_parameters)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(True, ret_val_boolean)
 
