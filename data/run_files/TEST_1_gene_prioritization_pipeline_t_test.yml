@@ -2,7 +2,7 @@ spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_binary.t
 phenotype_name_full_path:   ../data/spreadsheets/TEST_1_phenotype.tsv
 results_directory:          ./run_dir/results
 
-correlation_measure:        pearson
+correlation_measure:        t_test 
 
 taxonid:                    '9606'                      # taxon id of a given gene name
 source_hint:                ''                          # hint of looking up ensembl name in Redis database
