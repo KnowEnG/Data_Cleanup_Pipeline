@@ -27,15 +27,18 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
 * gene_prioritization_pipeline
   1. checks if the user spreadsheet is empty. If so, rejects it.
   2. checks if either user spreadsheet or phenotype data is empty. If so, rejects it.
-  3. removes any column if user spreadsheet contains NA value. Rejects the processed user spreadsheet if it becomes empty.
+  3. removes any column that contains NA value in user spreadsheet. Rejects the processed user spreadsheet if it becomes empty.
   4. checks if the user spreadsheet only contains real value. If not, rejects it.
-  5. correlation measure specific check:
-    1. for t_test, checks if the phenotype contains only value 0 and 1.
-    2. for pearson test, checks if the phenotype is real value.
+  5. phenotype data check:
+    1. for every single drug, drops NA in phenotype data and intersects its header with the header spreadsheet to check 
+    if there is common columns left. If not, rejects it.
+    2. for t_test, checks if the phenotype contains only value 0 and 1.
+    3. for pearson test, checks if the phenotype contains only real value.
   6. checks if the index in user spreadsheet contains NA value. If so, removes the row.
   7. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
   8. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
+  10. transposes the phenotype data into sample x phenotype and output to a file
   
   
 * * * 
