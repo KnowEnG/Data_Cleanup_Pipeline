@@ -359,7 +359,8 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
     gold_value_set = {0, 1}
 
     if correlation_measure == 't_test':
-        phenotype_value_set = set(pandas.unique(phenotype_df_pxs.values.ravel()))
+        list_values = pandas.unique(phenotype_df_pxs.values.ravel())
+        phenotype_value_set = set(filter(lambda x: x==x, list_values))
         if gold_value_set != phenotype_value_set:
             logging.append(
                 "ERROR: Only 0, 1 are allowed in phenotype data when running t_test. This phenotype data contains invalid value: {}. ".format(
