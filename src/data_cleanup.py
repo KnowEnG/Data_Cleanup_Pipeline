@@ -47,16 +47,10 @@ def gene_prioritization_pipeline(run_parameters):
     generate_logging(validation_flag, message, run_parameters["results_directory"] + "/log_gene_prioritization_pipeline.yml")
 
 
-def post_processing_phenotype_clustering_data(run_parameters):
-    from data_cleanup_toolbox import run_post_processing_phenotype_clustering_data
-    output = run_post_processing_phenotype_clustering_data(run_parameters)
-
-
 SELECT = {
     "geneset_characterization_pipeline": geneset_characterization_pipeline,
     "samples_clustering_pipeline": samples_clustering_pipeline,
-    "gene_prioritization_pipeline": gene_prioritization_pipeline,
-    "post_processing_phenotype_clustering_data" : post_processing_phenotype_clustering_data
+    "gene_prioritization_pipeline": gene_prioritization_pipeline
 }
 
 
