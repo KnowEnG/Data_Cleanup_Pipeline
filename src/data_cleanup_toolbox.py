@@ -341,6 +341,7 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
     for column in phenotype_df_pxs:
         # drops columns with NA value in phenotype dataframe
         phenotype_df_sxp = phenotype_df_pxs[column].to_frame().dropna(axis=0)
+
         phenotype_index = list(phenotype_df_sxp.index.values)
 
         # finds common headers
@@ -348,6 +349,10 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
 
         if not common_headers:
             logging.append("ERROR: Cannot find intersection between user spreadsheet header and phenotype index.")
+            return None
+
+        if len(common_headers) < 2:
+            logging.append("ERROR: Number of samples in too small to run further tests (Pearson, t-test).")
             return None
 
     # defines the default values that can exist in phenotype data
