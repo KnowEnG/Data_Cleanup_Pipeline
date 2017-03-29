@@ -150,6 +150,8 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 | redis_credential| host, password and port | to access gene names lookup|
 | taxonid| 9606 | taxon of the genes |
 | source_hint| ' ' | hint for lookup ensembl names |
+| correlation_measure| t_test/pearson | correlation measure to run gene_prioritization_pipeline |
+
 
 spreadsheet_name = TEST_1_gene_expression.tsv</br>
 phenotype_name = TEST_1_phenotype.tsv
