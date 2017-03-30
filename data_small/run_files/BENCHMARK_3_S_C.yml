@@ -1,0 +1,22 @@
+spreadsheet_name_full_path: ../data/spreadsheets/spreadsheets.G.GP.etc/spreadsheet_A_.G.tsv
+phenotype_full_path:        ../data/spreadsheets/phenotypes_t_test.P.GP.etc/spreadsheet_A_.P.t_test.tsv
+
+results_directory:          ./run_dir/results
+
+# correlation_measure:        pearson
+
+taxonid:                    '9606'                      # taxon id of a given gene name
+source_hint:                ''                          # hint of looking up ensembl name in Redis database
+pipeline_type:              samples_clustering_pipeline
+                                                        # samples_clustering_pipeline
+                                                        # gene_prioritization_pipeline
+                                                        # geneset_characterization_pipeline
+
+redis_credential:                                       # knoweng Redis database credentials
+                            host: knowredis.knowhub.org
+                            password: KnowEnG
+                            port: 6379
+
+spreadsheet_data_dir:       ../data/spreadsheets/spreadsheets.G.SC.etc
+pheno_data_dir:             ../data/spreadsheets/phenotypes.P.SC.etc
+

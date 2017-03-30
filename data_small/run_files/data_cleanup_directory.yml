@@ -1,0 +1,23 @@
+spreadsheet_name_full_path: ../data/spreadsheets/GDSC_Expression_ensembl.tsv
+phenotype_full_path:        ../data/spreadsheets/GDSC_drug_cpd_ic50_sample.tsv
+
+results_directory:          ./run_dir/results
+
+correlation_measure:        t_test
+
+taxonid:                    '9606'                      # taxon id of a given gene name
+source_hint:                ''                          # hint of looking up ensembl name in Redis database
+pipeline_type:              gene_prioritization_pipeline 
+                                                        # samples_clustering_pipeline
+                                                        # gene_prioritization_pipeline
+                                                        # geneset_characterization_pipeline
+
+redis_credential:                                       # knoweng Redis database credentials
+                            host: knowredis.knowhub.org
+                            password: KnowEnG
+                            port: 6379
+
+spreadsheet_data_dir:  '/Users/lanier4/dlanier_KnowEnG/keg_test_tools/local_only_ephemera/spreadsheets.G.etc'
+pheno_data_dir: '/Users/lanier4/dlanier_KnowEnG/keg_test_tools/local_only_ephemera/phenotypes.P.etc'
+
+data_cleanup_toolbox_directory: '/Users/lanier4/dlanier_KnowEnG/Data_Cleanup_Pipeline/src'
