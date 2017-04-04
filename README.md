@@ -23,6 +23,11 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   7. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   8. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
 
+  If the user provides with the phenotype data:
+  1. checks if the phenotype data is empty. If so, rejects it.
+  2. checks if the phenotype contains duplicate column name. If so, removes the duplicates.
+  3. checks if the phenotype contains duplicate row name. If so, removes the duplicates.
+  4. checks if the intersection between user spreadsheet and phenotype is empty. If so, rejects it.
 
 * gene_prioritization_pipeline
   1. checks if the user spreadsheet is empty. If so, rejects it.
@@ -32,14 +37,13 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   5. phenotype data check:
     1. for every single drug, drops NA in phenotype data and intersects its header with the header spreadsheet to check 
     if there is common columns left. If not, rejects it.
-    2. for t_test, checks if the phenotype contains only value 0 and 1.
-    3. for pearson test, checks if the phenotype contains only real value.
+    2. for t_test, checks if the phenotype contains only value 0, 1 or NAN.
+    3. for pearson test, checks if the phenotype contains only real value or NAN.
   6. checks if the index in user spreadsheet contains NA value. If so, removes the row.
   7. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
   8. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
-  10. transposes the phenotype data into sample x phenotype and output to a file
-  
+  10. transposes the phenotype data into sample x phenotype and output to a file.
   
 * * * 
 ## How to run this pipeline with Our data
