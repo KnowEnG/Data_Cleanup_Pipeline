@@ -393,7 +393,7 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
         return None, None
 
     # output dimension: sample x phenotype
-    data_frame_header = list(data_frame.columns.values)
+    data_frame_header = list(data_frame_dropna.columns.values)
     logging.append("INFO: Start to run checks for phenotypic data.")
     phenotype_df_pxs = check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df,
                                                                     correlation_measure)
