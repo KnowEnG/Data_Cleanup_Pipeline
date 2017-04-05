@@ -9,6 +9,7 @@ import os
 
 logging = []
 
+
 def run_geneset_characterization_pipeline(run_parameters):
     """
     Runs data cleaning for geneset_characterization_pipeline.
@@ -43,8 +44,8 @@ def run_geneset_characterization_pipeline(run_parameters):
         run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                        sep='\t', header=True, index=True)
     logging.append(
-        "INFO: Cleaned user spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                         user_spreadsheet_df_cleaned.shape[1]))
+        "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                             user_spreadsheet_df_cleaned.shape[1]))
     return True, logging
 
 
@@ -88,6 +89,7 @@ def run_samples_clustering_pipeline(run_parameters):
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
     user_spreadsheet_df_cleaned = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
 
+    # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
     if user_spreadsheet_df_cleaned is None:
         return False, logging
     else:
@@ -95,15 +97,15 @@ def run_samples_clustering_pipeline(run_parameters):
             run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                            sep='\t', header=True, index=True)
         logging.append(
-            "INFO: Cleaned user spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                             user_spreadsheet_df_cleaned.shape[1]))
+            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                                 user_spreadsheet_df_cleaned.shape[1]))
     if phenotype_df_cleaned is not None:
         phenotype_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
             run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
                                     sep='\t', header=True, index=True)
         logging.append(
-            "INFO: Cleaned phenotype data has {} rows, {} columns.".format(phenotype_df_cleaned.shape[0],
-                                                                           phenotype_df_cleaned.shape[1]))
+            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_cleaned.shape[0],
+                                                                               phenotype_df_cleaned.shape[1]))
     return True, logging
 
 
@@ -126,7 +128,7 @@ def run_gene_prioritization_pipeline(run_parameters):
             run_parameters['spreadsheet_name_full_path']))
         return False, logging
 
-    # dimension: phenotype x sample
+    # dimension: sample x phenotype
     phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
 
     if phenotype_df is None or phenotype_df.empty:
@@ -150,13 +152,16 @@ def run_gene_prioritization_pipeline(run_parameters):
     # stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
     phenotype_val_checked.T.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
-                                 sep='\t', header=True, index=True)
+                                   sep='\t', header=True, index=True)
     user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                        sep='\t', header=True, index=True)
     logging.append(
-        "INFO: Cleaned user spreadsheet has {} rows, {} columns.".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                         user_spreadsheet_df_cleaned.shape[1]))
+        "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                             user_spreadsheet_df_cleaned.shape[1]))
+    logging.append(
+        "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_val_checked.shape[1],
+                                                                           phenotype_val_checked.shape[0]))
     return True, logging
 
 
@@ -334,23 +339,28 @@ def check_duplicate_row_name(data_frame):
 
 def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df_pxs, correlation_measure):
     # loop through phenotype (phenotype x sample) to check header intersection between phenotype and spreadsheet
-    for column in phenotype_df_pxs:
+    for column in range(0, len(phenotype_df_pxs.columns)):
         # drops columns with NA value in phenotype dataframe
-        phenotype_df_sxp = phenotype_df_pxs[column].to_frame().dropna(axis=0)
+        phenotype_df_sxp = phenotype_df_pxs.ix[:,column].to_frame().dropna(axis=0)
+
         phenotype_index = list(phenotype_df_sxp.index.values)
 
         # finds common headers
         common_headers = list(set(phenotype_index) & set(data_frame_header))
 
         if not common_headers:
-            logging.append("ERROR: Cannot find intersection between user spreadsheet column and phenotype data.")
+            logging.append("ERROR: Cannot find intersection between user spreadsheet header and phenotype index.")
+            return None
+
+        if len(common_headers) < 2:
+            logging.append("ERROR: Number of samples is too small to run further tests (Pearson, t-test).")
             return None
 
     # defines the default values that can exist in phenotype data
     gold_value_set = {0, 1}
-
     if correlation_measure == 't_test':
-        phenotype_value_set = set(pandas.unique(phenotype_df_pxs.values.ravel()))
+        list_values = pandas.unique(phenotype_df_pxs.values.ravel())
+        phenotype_value_set = set(filter(lambda x: x == x, list_values))
         if gold_value_set != phenotype_value_set:
             logging.append(
                 "ERROR: Only 0, 1 are allowed in phenotype data when running t_test. This phenotype data contains invalid value: {}. ".format(
@@ -365,14 +375,14 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
             return None
 
     return phenotype_df_pxs
-    
+
 
 def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlation_measure):
     # drops column which contains NA in data_frame to reduce phenotype dimension
     data_frame_dropna = data_frame.dropna(axis=1)
 
     if data_frame_dropna.empty:
-        logging.append("User spreadsheet is empty after removing NA.")
+        logging.append("ERROR: User spreadsheet is empty after removing NA.")
         return None, None
 
     # checks real number negative to positive infinite
@@ -383,8 +393,11 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
         return None, None
 
     # output dimension: sample x phenotype
-    data_frame_header = list(data_frame.columns.values)
-    phenotype_df_pxs = check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df, correlation_measure)
+    data_frame_header = list(data_frame_dropna.columns.values)
+    logging.append("INFO: Start to run checks for phenotypic data.")
+    phenotype_df_pxs = check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df,
+                                                                    correlation_measure)
+    logging.append("INFO: Finished running checks for phenotypic data.")
 
     return data_frame_dropna, phenotype_df_pxs
 
