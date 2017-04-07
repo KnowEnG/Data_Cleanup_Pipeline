@@ -64,7 +64,7 @@ class Testcheck_input_value(unittest.TestCase):
         ret_user_spreadsheet_flag = ret_user_spreadsheet is not None
         ret_phenotype_flag = ret_phenotype is not None
         self.assertEqual(True, ret_user_spreadsheet_flag)
-        self.assertEqual(True, ret_phenotype_flag)
+        self.assertEqual(False, ret_phenotype_flag)
 
 
     def test_check_text_spreadsheet_value(self):

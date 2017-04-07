@@ -6,7 +6,6 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
     def setUp(self):
         self.run_parameters = {
             "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression_real_value.tsv",
-            "phenotype_name_full_path": "../../data/spreadsheets/TEST_1_phenotype.tsv",
             "results_directory": "./",
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
