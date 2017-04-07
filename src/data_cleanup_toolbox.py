@@ -150,7 +150,7 @@ def run_gene_prioritization_pipeline(run_parameters):
         return False, logging
 
     # stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
-    phenotype_val_checked.T.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+    phenotype_val_checked.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
                                    sep='\t', header=True, index=True)
     user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(

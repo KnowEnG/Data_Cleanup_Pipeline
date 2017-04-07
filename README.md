@@ -43,7 +43,6 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   7. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
   8. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
-  10. transposes the phenotype data into sample x phenotype and output to a file.
   
 * * * 
 ## How to run this pipeline with Our data
