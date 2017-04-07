@@ -43,22 +43,17 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   7. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
   8. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
-  10. transposes the phenotype data into sample x phenotype and output to a file.
   
 * * * 
 ## How to run this pipeline with Our data
 * * * 
-###1. Get Access to KnowEnG-Research Repository:
-Email omarsobh@illinois.edu infrastructure team (IST) lead to:
 
-* __Access__ KnowEnG-Research github repo
-
-###2. Clone the Data_Cleanup_Pipeline Repo
+### 1. Clone the Data_Cleanup_Pipeline Repo
 ```
  git clone https://github.com/KnowEnG-Research/Data_Cleanup_Pipeline.git
 ```
  
-###3. Install the following (Ubuntu or Linux)
+### 2. Install the following (Ubuntu or Linux)
 ```
  apt-get install -y python3-pip
  apt-get install -y libblas-dev liblapack-dev libatlas-base-dev gfortran
@@ -73,24 +68,24 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
  pip3 install redis
 ```
 
-###4. Change directory to Data_Cleanup_Pipeline
+### 3. Change directory to Data_Cleanup_Pipeline
 
 ```
 cd Data_Cleanup_Pipeline 
 ```
 
-###5. Change directory to test
+### 4. Change directory to test
 
 ```
 cd test
 ```
  
-###6. Create a local directory "run_dir" and place all the run files in it
+### 5. Create a local directory "run_dir" and place all the run files in it
 ```
 make env_setup
 ```
 
-###7. Use following "make" commands to run a data cleanup pipeline
+### 6. Use following "make" commands to run a data cleanup pipeline
 ```
 make run_data_cleaning
 ```
