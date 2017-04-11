@@ -129,7 +129,7 @@ Look for examples of run_parameters in ./Data_Cleanup_Pipeline/data/run_files/TE
 set the spreadsheet, and drug_response (phenotype data) file names to point to your data
 ```
 
-### * Run the Samples Clustering Pipeline:
+### * Run the Data Cleanup Pipeline:
 
   * Update PYTHONPATH enviroment variable
    ``` 
@@ -157,8 +157,8 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 | correlation_measure| t_test/pearson | correlation measure to run gene_prioritization_pipeline |
 
 
-spreadsheet_name = TEST_1_gene_expression.tsv</br>
-phenotype_name = TEST_1_phenotype.tsv
+spreadsheet_name_full_path = TEST_1_gene_expression.tsv</br>
+phenotype_full_path = TEST_1_phenotype.tsv
 
 * * * 
 ## Description of Output files saved in results directory
