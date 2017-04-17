@@ -152,7 +152,7 @@ def run_gene_prioritization_pipeline(run_parameters):
     # stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
     phenotype_val_checked.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
-                                   sep='\t', header=True, index=True)
+                                 sep='\t', header=True, index=True)
     user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                        sep='\t', header=True, index=True)
@@ -341,7 +341,7 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
     # loop through phenotype (phenotype x sample) to check header intersection between phenotype and spreadsheet
     for column in range(0, len(phenotype_df_pxs.columns)):
         # drops columns with NA value in phenotype dataframe
-        phenotype_df_sxp = phenotype_df_pxs.ix[:,column].to_frame().dropna(axis=0)
+        phenotype_df_sxp = phenotype_df_pxs.ix[:, column].to_frame().dropna(axis=0)
 
         phenotype_index = list(phenotype_df_sxp.index.values)
 
@@ -494,6 +494,9 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     # extracts all mapped rows in dataframe
     output_df_mapped = data_frame[~data_frame.index.str.contains(r'^unmapped.*$')]
     output_df_mapped = output_df_mapped.drop('original', axis=1)
+    output_df_mapped_dedup = output_df_mapped[~output_df_mapped.index.duplicated()]
+    logging.append("INFO: Found {} duplicate Ensembl gene name.".format(
+        output_df_mapped.shape[0] - output_df_mapped_dedup.shape[0]))
 
     # dedup on gene name mapping dictionary
     mapping = data_frame[['original']]
@@ -520,11 +523,11 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     mapping_dedup_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv",
                             sep='\t', header=False, index=True)
 
-    if output_df_mapped.empty:
+    if output_df_mapped_dedup.empty:
         logging.append("ERROR: No valid ensemble name can be found.")
         return None
 
-    return output_df_mapped
+    return output_df_mapped_dedup
 
 
 def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
