@@ -494,6 +494,9 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     # extracts all mapped rows in dataframe
     output_df_mapped = data_frame[~data_frame.index.str.contains(r'^unmapped.*$')]
     output_df_mapped = output_df_mapped.drop('original', axis=1)
+    output_df_mapped_dup = output_df_mapped.index.duplicated()
+    logging.append("INFO: Found {} duplicate Ensembl gene name.".format(output_df_mapped_dup.shape[0]))
+    output_df_mapped_dedup = output_df_mapped[~output_df_mapped_dup]
 
     # dedup on gene name mapping dictionary
     mapping = data_frame[['original']]
@@ -520,11 +523,11 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     mapping_dedup_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv",
                             sep='\t', header=False, index=True)
 
-    if output_df_mapped.empty:
+    if output_df_mapped_dedup.empty:
         logging.append("ERROR: No valid ensemble name can be found.")
         return None
 
-    return output_df_mapped
+    return output_df_mapped_dedup
 
 
 def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
