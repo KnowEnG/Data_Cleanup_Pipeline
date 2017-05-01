@@ -6,6 +6,7 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
     def setUp(self):
         self.run_parameters = {
             "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression_real_value.tsv",
+            "gg_network_name_full_path":  "../../data/networks/TEST_1_gene_gene.edge",
             "results_directory": "./",
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
@@ -19,6 +20,7 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
 
         self.run_parameters_no_phenotype = {
             "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression_real_value.tsv",
+            "gg_network_name_full_path": "../../data/networks/TEST_1_gene_gene.edge",
             "phenotype_name_full_path": "",
             "results_directory": "./",
             "redis_credential": {
