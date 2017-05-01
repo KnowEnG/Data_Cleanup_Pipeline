@@ -85,11 +85,17 @@ cd test
 make env_setup
 ```
 
-### 6. Use following "make" commands to run a data cleanup pipeline
-```
-make run_data_cleaning
-```
+### 6. Use one of the following "make" commands to select and run a data cleanup pipeline
 
+
+| **Command**                        | **Option**                                        | 
+|:---------------------------------- |:------------------------------------------------- | 
+| make run_data_cleaning          | basic benchmark test                                      |
+| make run_samples_clustering_pipeline          | samples clustering benchmark                                       |
+| make run_gene_prioritization_pipeline_pearson | pearson correlation benchmark                   |
+| make run_gene_prioritization_pipeline_t_test     | t-test correlation benchmark          |
+| make run_geneset_characterization_pipeline | geneset characterization benchmark  |
+| make run_pasted_gene_list          | pasted gene list benchmark                                      |
 
 * * * 
 ## How to run this pipeline with Your data
