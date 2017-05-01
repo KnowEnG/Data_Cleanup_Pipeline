@@ -5,7 +5,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
 
 ## Detailed cleanup logic for each pipeline
 * geneset_characterization_pipeline
-  1. checks if the user spreadsheet is empty. If so, rejects it.
+  1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.
   2. checks if the user spreadsheet contains NA value. If so, rejects it.
   3. checks if the user spreadsheet only contains value 0 and 1. If not, rejects it.
   4. checks if the index in user spreasheet contains NA value. If so, removes the row.
@@ -14,7 +14,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   7. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
   
 * samples_clustering_pipeline
-  1. checks if the user spreadsheet is empty. If so, rejects it.
+  1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.
   2. checks if the user spreadsheet contains NA value. If so, rejects it.
   3. checks if the user spreadsheet only contains real value. If not, rejects it.
   4. convert all values within user spreadsheet to be absolute value.
@@ -22,6 +22,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   6. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
   7. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   8. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
+  9. checks if there is intersected ensembl name between user spreadsheet and gene-gene network data. If no intersection, rejects the spreadsheet.
 
   If the user provides with the phenotype data:
   1. checks if the phenotype data is empty. If so, rejects it.
@@ -30,7 +31,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   4. checks if the intersection between user spreadsheet and phenotype is empty. If so, rejects it.
 
 * gene_prioritization_pipeline
-  1. checks if the user spreadsheet is empty. If so, rejects it.
+  1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.
   2. checks if either user spreadsheet or phenotype data is empty. If so, rejects it.
   3. removes any column that contains NA value in user spreadsheet. Rejects the processed user spreadsheet if it becomes empty.
   4. checks if the user spreadsheet only contains real value. If not, rejects it.
@@ -149,8 +150,9 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 | **Key**                   | **Value** | **Comments** |
 | ------------------------- | --------- | ------------ |
 | pipeline_type                    | **gene_priorization_pipeline**, **samples_clustering_pipeline**, **geneset_characterization_pipeline**  | Choose pipeline cleaning type |
-| spreadsheet_name_full_path | directory+spreadsheet_name|  Path and file name of user supplied gene sets |
-| phenotype_full_path | directory+phenotype_data_name| Path and file name of user supplied phenotype data |
+| spreadsheet_name_full_path | directory+spreadsheet_name |  Path and file name of user supplied gene sets |
+| phenotype_full_path | directory+phenotype_data_name | Path and file name of user supplied phenotype data |
+| gg_network_name_full_path | directory+gg_network_name | Path and file name of user supplied gene-gene network data |
 | results_directory | directory | Directory to save the output files |
 | redis_credential| host, password and port | to access gene names lookup|
 | taxonid| 9606 | taxon of the genes |
