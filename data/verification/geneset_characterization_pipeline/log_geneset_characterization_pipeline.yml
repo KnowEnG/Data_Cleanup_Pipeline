@@ -1,0 +1,9 @@
+SUCCESS:
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_binary.tsv.'
+- 'INFO: Start to run sanity checks for user spreadsheet data.'
+- 'WARNING: Removed 1 duplicate column(s) from user spreadsheet.'
+- 'WARNING: Removed 1 duplicate row(s) from user spreadsheet.'
+- 'INFO: Mapped 9 gene(s) to ensemble name.'
+- 'INFO: Unable to map 3 gene(s) to ensemble name.'
+- 'INFO: Finished running sanity check for user spreadsheet data.'
+- 'INFO: Cleaned user spreadsheet has 9 row(s), 4 column(s).'
