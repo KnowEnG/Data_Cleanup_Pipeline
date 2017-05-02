@@ -46,7 +46,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
   
 * * * 
-## How to run this pipeline with Our data
+## How to run this pipeline with our data
 * * * 
 
 ### 1. Clone the Data_Cleanup_Pipeline Repo
@@ -154,13 +154,13 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 | phenotype_full_path | directory+phenotype_data_name | Path and file name of user supplied phenotype data |
 | gg_network_name_full_path | directory+gg_network_name | Path and file name of user supplied gene-gene network data |
 | results_directory | directory | Directory to save the output files |
-| redis_credential| host, password and port | to access gene names lookup|
-| taxonid| 9606 | taxon of the genes |
-| source_hint| ' ' | hint for lookup ensembl names |
-| correlation_measure| t_test/pearson | correlation measure to run gene_prioritization_pipeline |
+| redis_credential| host, password and port | Credential to access gene names lookup|
+| taxonid| 9606 | Taxon id of the genes |
+| source_hint| ' ' | Hint for lookup ensembl names |
+| correlation_measure| t_test/pearson | Correlation measure to run gene_prioritization_pipeline |
 
 
-spreadsheet_name_full_path = TEST_1_gene_expression.tsv</br>
+spreadsheet_name_full_path = TEST_1_gene_expression.tsv
 phenotype_full_path = TEST_1_phenotype.tsv
 
 * * * 
@@ -169,10 +169,10 @@ phenotype_full_path = TEST_1_phenotype.tsv
 
 * Output files
 
-**input_file_name_ETL.tsv**.</br>
+**input_file_name_ETL.tsv**.
 Input file after Extract Transform Load (cleaning)
 
-**input_file_name_MAP.tsv**.</br>
+**input_file_name_MAP.tsv**.
 
 | (translated gene) | (input gene name) |
  | :--------------------: |:--------------------:|
@@ -181,7 +181,7 @@ Input file after Extract Transform Load (cleaning)
  | ENS00000054321 | def_org_ifi |
 
 
-**input_file_name_UNMAPPED.tsv**.</br>
+**input_file_name_UNMAPPED.tsv**.
 
 | (input gene name) | (unmapped-none) |
  | :--------------------: |:--------------------:|
