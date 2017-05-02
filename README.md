@@ -46,7 +46,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
   
 * * * 
-## How to run this pipeline with Our data
+## How to run this pipeline with our data
 * * * 
 
 ### 1. Clone the Data_Cleanup_Pipeline Repo
