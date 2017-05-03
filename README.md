@@ -91,12 +91,12 @@ make env_setup
 
 | **Command**                        | **Option**                                        | 
 |:---------------------------------- |:------------------------------------------------- | 
-| make run_data_cleaning          | basic benchmark test                                      |
-| make run_samples_clustering_pipeline          | samples clustering benchmark                                       |
-| make run_gene_prioritization_pipeline_pearson | pearson correlation benchmark                   |
-| make run_gene_prioritization_pipeline_t_test     | t-test correlation benchmark          |
-| make run_geneset_characterization_pipeline | geneset characterization benchmark  |
-| make run_pasted_gene_list          | pasted gene list benchmark                                      |
+| make run_data_cleaning          | example test with large dataset |
+| make run_samples_clustering_pipeline          | samples clustering test                                       |
+| make run_gene_prioritization_pipeline_pearson | pearson correlation test                   |
+| make run_gene_prioritization_pipeline_t_test     | t-test correlation test          |
+| make run_geneset_characterization_pipeline | geneset characterization test  |
+| make run_pasted_gene_list          | pasted gene list test                                      |
 
 * * * 
 ## How to run this pipeline with Your data
