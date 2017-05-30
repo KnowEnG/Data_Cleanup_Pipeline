@@ -10,7 +10,7 @@ def pasted_gene_cleanup(run_parameters):
 
     # reads pasted_gene_list as a dataframe
     input_small_genes_df = get_spreadsheet_df(run_parameters['pasted_gene_list_full_path'])
-    if input_small_genes_df is not None:
+    if len(input_small_genes_df.index) > 0:
         input_small_genes_df["original_gene_name"] = input_small_genes_df.index
 
         # converts pasted_gene_list to ensemble name
