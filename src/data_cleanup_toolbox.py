@@ -247,6 +247,7 @@ def load_data_file(file_path):
     try:
         # loads input data
         input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
+        input_df.columns = input_df.columns.map(str)
         logging.append("INFO: Successfully loaded input data: {}.".format(file_path))
 
         # removes empty rows
