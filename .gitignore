@@ -1,5 +1,6 @@
 # IDE
 .idea
+.DS_Store
 
 # Python
 __pycache__/
@@ -20,3 +21,4 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+test/run_dir/
