@@ -378,7 +378,9 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
         common_headers = list(set(phenotype_index) & set(data_frame_header))
 
         if not common_headers:
-            logging.append("ERROR: Cannot find intersection between user spreadsheet header and phenotype index.")
+            logging.append(
+                "ERROR: Cannot find intersection between user spreadsheet header and phenotype index on column: {}.".format(
+                    phenotype_df_pxs.columns[column]))
             return None
 
         if len(common_headers) < 2:
