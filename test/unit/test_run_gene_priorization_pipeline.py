@@ -14,7 +14,7 @@ class TestRun_gene_prioritization_pipeline(unittest.TestCase):
             "correlation_measure": 'pearson',
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
-                "port": 6379,
+                "port": 6380,
                 "password": "KnowEnG"
             }
         }

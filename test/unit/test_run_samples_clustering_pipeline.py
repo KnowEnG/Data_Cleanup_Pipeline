@@ -10,7 +10,7 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
             "results_directory": "./",
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
-                "port": 6379,
+                "port": 6380,
                 "password": "KnowEnG"
             },
             "source_hint": "",
@@ -25,7 +25,7 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
             "results_directory": "./",
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
-                "port": 6379,
+                "port": 6380,
                 "password": "KnowEnG"
             },
             "source_hint": "",
