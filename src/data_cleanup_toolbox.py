@@ -5,6 +5,7 @@
 """
 import pandas
 import knpackage.redis_utilities as redisutil
+from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
 import os
 
 logging = []
@@ -23,9 +24,7 @@ def run_geneset_characterization_pipeline(run_parameters):
     """
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
-    if user_spreadsheet_df.empty:
-        logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
-            run_parameters['spreadsheet_name_full_path']))
+    if user_spreadsheet_df is None:
         return False, logging
 
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
@@ -61,18 +60,14 @@ def run_samples_clustering_pipeline(run_parameters):
         message: A message indicates the status of current check
     """
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
-    if user_spreadsheet_df is None or user_spreadsheet_df.empty:
-        logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
-            run_parameters['spreadsheet_name_full_path']))
+    if user_spreadsheet_df is None:
         return False, logging
 
     phenotype_df_cleaned = None
     if 'phenotype_name_full_path' in run_parameters.keys():
         logging.append("INFO: Start processing phenotype data.")
         phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
-        if phenotype_df is None or phenotype_df.empty:
-            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
-                run_parameters['phenotype_name_full_path']))
+        if phenotype_df is None:
             return False, logging
         else:
             phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.columns.values)
@@ -88,6 +83,20 @@ def run_samples_clustering_pipeline(run_parameters):
 
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
     user_spreadsheet_df_cleaned = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
+
+    # Loads network dataframe to check intersection between spreadsheet and network
+    network_df = get_network_df(run_parameters['gg_network_name_full_path'])
+    if network_df.empty:
+        logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
+            run_parameters['gg_network_name_full_path']))
+        return False, logging
+    node_1_names, node_2_names = extract_network_node_names(network_df)
+    unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
+
+    intersection = find_intersection(unique_gene_names, user_spreadsheet_df_cleaned.index)
+    if intersection is None:
+        logging.append('ERROR: Cannot find intersection between spreadsheet genes and network genes.')
+        return False, logging
 
     # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
     if user_spreadsheet_df_cleaned is None:
@@ -123,17 +132,13 @@ def run_gene_prioritization_pipeline(run_parameters):
     # dimension: sample x phenotype
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
-    if user_spreadsheet_df is None or user_spreadsheet_df.empty:
-        logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
-            run_parameters['spreadsheet_name_full_path']))
+    if user_spreadsheet_df is None:
         return False, logging
 
     # dimension: sample x phenotype
     phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
 
-    if phenotype_df is None or phenotype_df.empty:
-        logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
-            run_parameters['phenotype_name_full_path']))
+    if phenotype_df is None:
         return False, logging
 
     # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
@@ -152,7 +157,7 @@ def run_gene_prioritization_pipeline(run_parameters):
     # stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
     phenotype_val_checked.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
-                                   sep='\t', header=True, index=True)
+                                 sep='\t', header=True, index=True)
     user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                        sep='\t', header=True, index=True)
@@ -163,6 +168,29 @@ def run_gene_prioritization_pipeline(run_parameters):
         "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_val_checked.shape[1],
                                                                            phenotype_val_checked.shape[0]))
     return True, logging
+
+
+def remove_empty_row(dataframe):
+    '''
+    Remove empty rows in a dataframe
+    Args:
+        dataframe: input dataframe
+
+    Returns:
+        a dataframe without empty line
+
+    '''
+    org_row_cnt = dataframe.shape[0]
+    dataframe_no_empty_line = dataframe.dropna(how='all')
+    new_row_cnt = dataframe_no_empty_line.shape[0]
+    diff = org_row_cnt - new_row_cnt
+    if diff > 0:
+        logging.append("WARNING: Removed {} empty row(s).".format(diff))
+    if dataframe_no_empty_line.empty:
+        logging.append(
+            "ERROR: After removed {} empty row(s), the dataframe becames empty.".format(diff))
+        return None
+    return dataframe_no_empty_line
 
 
 def remove_na_index(dataframe):
@@ -184,7 +212,6 @@ def remove_na_index(dataframe):
         logging.append(
             "ERROR: After removed {} row(s) that contains NA in index, the dataframe becames empty.".format(diff))
         return None
-    logging.append("INFO: No NA detected in row index.")
     return dataframe_rm_na_idx
 
 
@@ -218,20 +245,22 @@ def load_data_file(file_path):
         return None
 
     try:
+        # loads input data
         input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
+        input_df.columns = input_df.columns.map(str)
         logging.append("INFO: Successfully loaded input data: {}.".format(file_path))
-        return input_df
+
+        # removes empty rows
+        input_df_wo_empty_ln = remove_empty_row(input_df)
+
+        if input_df_wo_empty_ln.empty:
+            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(file_path))
+            return None
+
+        return input_df_wo_empty_ln
     except OSError as err:
         logging.append("ERROR: {}".format(str(err)))
         return None
-
-
-def validate_load_data_file(file_path):
-    ret_df = load_data_file(file_path)
-    if ret_df.empty:
-        ret_msg = "Input data in {} is empty. Please provide a valid input data.".format(file_path)
-        logging.append(ret_msg)
-        return False
 
 
 def check_duplicate_rows(data_frame):
@@ -341,7 +370,7 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
     # loop through phenotype (phenotype x sample) to check header intersection between phenotype and spreadsheet
     for column in range(0, len(phenotype_df_pxs.columns)):
         # drops columns with NA value in phenotype dataframe
-        phenotype_df_sxp = phenotype_df_pxs.ix[:,column].to_frame().dropna(axis=0)
+        phenotype_df_sxp = phenotype_df_pxs.ix[:, column].to_frame().dropna(axis=0)
 
         phenotype_index = list(phenotype_df_sxp.index.values)
 
@@ -462,7 +491,7 @@ def check_input_value_for_samples_clustering(data_frame):
     # checks number of negative values
     data_frame_negative_cnt = data_frame.lt(0).sum().sum()
     if data_frame_negative_cnt > 0:
-        logging.append("WARNING: Converted {} negative number to their positive value.".format(data_frame_negative_cnt))
+        logging.append("WARNING: Converted {} negative number to positive value.".format(data_frame_negative_cnt))
 
     # checks if it contains only positive number
     data_frame_abs = data_frame.abs()
@@ -494,19 +523,24 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     # extracts all mapped rows in dataframe
     output_df_mapped = data_frame[~data_frame.index.str.contains(r'^unmapped.*$')]
     output_df_mapped = output_df_mapped.drop('original', axis=1)
+    output_df_mapped_dedup = output_df_mapped[~output_df_mapped.index.duplicated()]
+
+    dup_cnt = output_df_mapped.shape[0] - output_df_mapped_dedup.shape[0]
+    if dup_cnt > 0:
+        logging.append("INFO: Found {} duplicate Ensembl gene name.".format(dup_cnt))
 
     # dedup on gene name mapping dictionary
     mapping = data_frame[['original']]
 
     mapping_filtered = mapping[~mapping.index.str.contains(r'^unmapped.*$')]
 
-    logging.append("INFO: Mapped {} genes to ensemble name.".format(mapping_filtered.shape[0]))
+    logging.append("INFO: Mapped {} gene(s) to ensemble name.".format(mapping_filtered.shape[0]))
 
     unmapped_filtered = mapping[mapping.index.str.contains(r'^unmapped.*$')].sort_index(axis=0, ascending=False)
     unmapped_filtered['ensemble'] = unmapped_filtered.index
 
     if unmapped_filtered.shape[0] > 0:
-        logging.append("INFO: Unable to map {} genes to ensemble name.".format(unmapped_filtered.shape[0]))
+        logging.append("INFO: Unable to map {} gene(s) to ensemble name.".format(unmapped_filtered.shape[0]))
 
     mapping_dedup_df = mapping_filtered[~mapping_filtered.index.duplicated()]
 
@@ -520,11 +554,11 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     mapping_dedup_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv",
                             sep='\t', header=False, index=True)
 
-    if output_df_mapped.empty:
+    if output_df_mapped_dedup.empty:
         logging.append("ERROR: No valid ensemble name can be found.")
         return None
 
-    return output_df_mapped
+    return output_df_mapped_dedup
 
 
 def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
@@ -564,7 +598,7 @@ def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
     return user_spreadsheet_df_final
 
 
-def check_intersection(list_a, list_b):
+def find_intersection(list_a, list_b):
     '''
     Find intersection between list_a, list_b
     Args:
@@ -578,7 +612,8 @@ def check_intersection(list_a, list_b):
     if not intersection:
         logging.append("ERROR: Cannot find intersection between spreadsheet and phenotype data.")
         return None
-    logging.append("INFO: Found {} intersections between phenotype and spreadsheet data.".format(len(intersection)))
+    logging.append(
+        "INFO: Found {} intersected gene(s) between phenotype and spreadsheet data.".format(len(intersection)))
     return intersection
 
 
@@ -609,7 +644,7 @@ def run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df_header):
         return None
 
     # Case 4: checks the intersection on phenotype
-    intersection = check_intersection(phenotype_df_genename_dedup.index.values, user_spreadsheet_df_header)
+    intersection = find_intersection(phenotype_df_genename_dedup.index.values, user_spreadsheet_df_header)
     if intersection is None:
         return None
 

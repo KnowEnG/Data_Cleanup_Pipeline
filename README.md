@@ -5,7 +5,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
 
 ## Detailed cleanup logic for each pipeline
 * geneset_characterization_pipeline
-  1. checks if the user spreadsheet is empty. If so, rejects it.
+  1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.
   2. checks if the user spreadsheet contains NA value. If so, rejects it.
   3. checks if the user spreadsheet only contains value 0 and 1. If not, rejects it.
   4. checks if the index in user spreasheet contains NA value. If so, removes the row.
@@ -14,7 +14,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   7. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
   
 * samples_clustering_pipeline
-  1. checks if the user spreadsheet is empty. If so, rejects it.
+  1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.
   2. checks if the user spreadsheet contains NA value. If so, rejects it.
   3. checks if the user spreadsheet only contains real value. If not, rejects it.
   4. convert all values within user spreadsheet to be absolute value.
@@ -22,6 +22,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   6. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
   7. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   8. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
+  9. checks if there is intersected ensembl name between user spreadsheet and gene-gene network data. If no intersection, rejects the spreadsheet.
 
   If the user provides with the phenotype data:
   1. checks if the phenotype data is empty. If so, rejects it.
@@ -30,7 +31,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   4. checks if the intersection between user spreadsheet and phenotype is empty. If so, rejects it.
 
 * gene_prioritization_pipeline
-  1. checks if the user spreadsheet is empty. If so, rejects it.
+  1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.
   2. checks if either user spreadsheet or phenotype data is empty. If so, rejects it.
   3. removes any column that contains NA value in user spreadsheet. Rejects the processed user spreadsheet if it becomes empty.
   4. checks if the user spreadsheet only contains real value. If not, rejects it.
@@ -45,7 +46,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
   
 * * * 
-## How to run this pipeline with Our data
+## How to run this pipeline with our data
 * * * 
 
 ### 1. Clone the Data_Cleanup_Pipeline Repo
@@ -85,11 +86,17 @@ cd test
 make env_setup
 ```
 
-### 6. Use following "make" commands to run a data cleanup pipeline
-```
-make run_data_cleaning
-```
+### 6. Use one of the following "make" commands to select and run a data cleanup pipeline
 
+
+| **Command**                        | **Option**                                        | 
+|:---------------------------------- |:------------------------------------------------- | 
+| make run_data_cleaning          | example test with large dataset |
+| make run_samples_clustering_pipeline          | samples clustering test                                       |
+| make run_gene_prioritization_pipeline_pearson | pearson correlation test                   |
+| make run_gene_prioritization_pipeline_t_test     | t-test correlation test          |
+| make run_geneset_characterization_pipeline | geneset characterization test  |
+| make run_pasted_gene_list          | pasted gene list test                                      |
 
 * * * 
 ## How to run this pipeline with Your data
@@ -124,7 +131,7 @@ Look for examples of run_parameters in ./Data_Cleanup_Pipeline/data/run_files/TE
 set the spreadsheet, and drug_response (phenotype data) file names to point to your data
 ```
 
-### * Run the Samples Clustering Pipeline:
+### * Run the Data Cleanup Pipeline:
 
   * Update PYTHONPATH enviroment variable
    ``` 
@@ -143,17 +150,18 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 | **Key**                   | **Value** | **Comments** |
 | ------------------------- | --------- | ------------ |
 | pipeline_type                    | **gene_priorization_pipeline**, **samples_clustering_pipeline**, **geneset_characterization_pipeline**  | Choose pipeline cleaning type |
-| spreadsheet_name_full_path | directory+spreadsheet_name|  Path and file name of user supplied gene sets |
-| phenotype_full_path | directory+phenotype_data_name| Path and file name of user supplied phenotype data |
+| spreadsheet_name_full_path | directory+spreadsheet_name |  Path and file name of user supplied gene sets |
+| phenotype_full_path | directory+phenotype_data_name | Path and file name of user supplied phenotype data |
+| gg_network_name_full_path | directory+gg_network_name | Path and file name of user supplied gene-gene network data |
 | results_directory | directory | Directory to save the output files |
-| redis_credential| host, password and port | to access gene names lookup|
-| taxonid| 9606 | taxon of the genes |
-| source_hint| ' ' | hint for lookup ensembl names |
-| correlation_measure| t_test/pearson | correlation measure to run gene_prioritization_pipeline |
+| redis_credential| host, password and port | Credential to access gene names lookup|
+| taxonid| 9606 | Taxon id of the genes |
+| source_hint| ' ' | Hint for lookup ensembl names |
+| correlation_measure| t_test/pearson | Correlation measure to run gene_prioritization_pipeline |
 
 
-spreadsheet_name = TEST_1_gene_expression.tsv</br>
-phenotype_name = TEST_1_phenotype.tsv
+spreadsheet_name_full_path = TEST_1_gene_expression.tsv
+phenotype_full_path = TEST_1_phenotype.tsv
 
 * * * 
 ## Description of Output files saved in results directory
@@ -161,10 +169,10 @@ phenotype_name = TEST_1_phenotype.tsv
 
 * Output files
 
-**input_file_name_ETL.tsv**.</br>
+**input_file_name_ETL.tsv**.
 Input file after Extract Transform Load (cleaning)
 
-**input_file_name_MAP.tsv**.</br>
+**input_file_name_MAP.tsv**.
 
 | (translated gene) | (input gene name) |
  | :--------------------: |:--------------------:|
@@ -173,7 +181,7 @@ Input file after Extract Transform Load (cleaning)
  | ENS00000054321 | def_org_ifi |
 
 
-**input_file_name_UNMAPPED.tsv**.</br>
+**input_file_name_UNMAPPED.tsv**.
 
 | (input gene name) | (unmapped-none) |
  | :--------------------: |:--------------------:|
