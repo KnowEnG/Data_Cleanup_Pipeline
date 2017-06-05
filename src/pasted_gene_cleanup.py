@@ -1,4 +1,5 @@
 import sys
+import pandas
 import redis_utilities as redutil
 import data_cleanup_toolbox as datacln
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file, get_spreadsheet_df
@@ -14,7 +15,10 @@ def pasted_gene_cleanup(run_parameters):
         input_small_genes_df["original_gene_name"] = input_small_genes_df.index
 
         # converts pasted_gene_list to ensemble name
-        input_small_genes_df.index = input_small_genes_df.index.map(lambda x: redutil.conv_gene(redis_db, x, run_parameters['source_hint'], run_parameters['taxonid']))
+        redis_ret = redutil.get_node_info(redis_db, input_small_genes_df.index, "Gene", run_parameters['source_hint'],
+                                            run_parameters['taxonid'])
+        ensemble_names = [x[1] for x in redis_ret]
+        input_small_genes_df.index = pandas.Series(ensemble_names)
 
         # filters out the unmapped genes
         mapped_small_genes_df = input_small_genes_df[~input_small_genes_df.index.str.contains(r'^unmapped.*$')]
@@ -42,6 +46,8 @@ def pasted_gene_cleanup(run_parameters):
         universal_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv", sep='\t', header=True, index=True)
     else:
         print("Input data is empty.")
+
+
 
 def main():
     run_directory, run_file = get_run_directory_and_file(sys.argv)

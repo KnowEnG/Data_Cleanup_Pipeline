@@ -30,4 +30,4 @@ pipeline_type:              gene_priorization_pipeline  # valid pipeline names:
 redis_credential:                                       # knoweng Redis database credentials
                             host: knowredis.knowhub.org
                             password: KnowEnG
-                            port: 6379
+                            port: 6380

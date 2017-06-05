@@ -8,4 +8,4 @@ pipeline_type:              geneset_characterization_pipeline # pipeline name
 redis_credential:                                             # knoweng Redis database credentials
                             host: knowredis.knowhub.org
                             password: KnowEnG
-                            port: 6379
+                            port: 6380

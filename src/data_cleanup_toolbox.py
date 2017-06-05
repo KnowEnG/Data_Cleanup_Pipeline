@@ -4,8 +4,8 @@
     indicate if the user spreadsheet is valid or not. 
 """
 import pandas
-import knpackage.redis_utilities as redisutil
-from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
+import redis_utilities as redisutil
+from knpackage.toolbox import get_spreadsheet_df, get_network_df, extract_network_node_names, find_unique_node_names
 import os
 
 logging = []
@@ -378,7 +378,9 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
         common_headers = list(set(phenotype_index) & set(data_frame_header))
 
         if not common_headers:
-            logging.append("ERROR: Cannot find intersection between user spreadsheet header and phenotype index.")
+            logging.append(
+                "ERROR: Cannot find intersection between user spreadsheet header and phenotype index on column: {}.".format(
+                    phenotype_df_pxs.columns[column]))
             return None
 
         if len(common_headers) < 2:
@@ -513,12 +515,15 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     """
     redis_db = redisutil.get_database(run_parameters['redis_credential'])
 
-    # disable this flag to avoid SettingWithCopyWarning
-    data_frame.is_copy = False
-    data_frame['original'] = data_frame.index
+    # copy index to new column named with 'original'
+    data_frame = data_frame.assign(original=data_frame.index)
+    redis_ret = redisutil.get_node_info(redis_db, data_frame.index, "Gene", run_parameters['source_hint'],
+                                       run_parameters['taxonid'])
 
-    data_frame.index = data_frame.index.map(
-        lambda x: redisutil.conv_gene(redis_db, x, run_parameters['source_hint'], run_parameters['taxonid']))
+    # extract ensemble names as a list from a call to redis database
+    ensemble_names = [x[1] for x in redis_ret]
+    # resets data_frame's index with ensembel name
+    data_frame.index = pandas.Series(ensemble_names)
 
     # extracts all mapped rows in dataframe
     output_df_mapped = data_frame[~data_frame.index.str.contains(r'^unmapped.*$')]
