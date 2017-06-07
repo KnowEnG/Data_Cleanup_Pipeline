@@ -5,13 +5,21 @@ import data_cleanup_toolbox as datacln
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file, get_spreadsheet_df
 
 
+
 def pasted_gene_cleanup(run_parameters):
     # gets redis database instance by its credential
     redis_db = redutil.get_database(run_parameters['redis_credential'])
 
     # reads pasted_gene_list as a dataframe
     input_small_genes_df = get_spreadsheet_df(run_parameters['pasted_gene_list_full_path'])
-    if len(input_small_genes_df.index) > 0:
+
+    # removes nan index rows
+    input_small_genes_df = datacln.remove_na_index(input_small_genes_df)
+
+    # casting index to String type
+    input_small_genes_df.index = input_small_genes_df.index.map(str)
+
+    if input_small_genes_df is not None and len(input_small_genes_df.index) > 0:
         input_small_genes_df["original_gene_name"] = input_small_genes_df.index
 
         # converts pasted_gene_list to ensemble name
