@@ -84,7 +84,7 @@ def run_samples_clustering_pipeline(run_parameters):
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
     user_spreadsheet_df_cleaned = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
 
-    # Loads network dataframe to check intersection between spreadsheet and network
+    # Loads network dataframe to check number of genes intersected between spreadsheet and network
     network_df = get_network_df(run_parameters['gg_network_name_full_path'])
     if network_df.empty:
         logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
@@ -188,7 +188,8 @@ def remove_empty_row(dataframe):
         logging.append("WARNING: Removed {} empty row(s).".format(diff))
     if dataframe_no_empty_line.empty:
         logging.append(
-            "ERROR: After removed {} empty row(s), the dataframe becames empty.".format(diff))
+            "ERROR: After removed {} empty row(s), original dataframe in shape ({},{}) "
+            "becames empty.".format(diff, dataframe.shape[0], dataframe.shape[1]))
         return None
     return dataframe_no_empty_line
 
@@ -208,10 +209,14 @@ def remove_na_index(dataframe):
     diff = org_row_cnt - new_row_cnt
     if diff > 0:
         logging.append("WARNING: Removed {} row(s) which contains NA in index.".format(diff))
-    if dataframe_rm_na_idx.empty:
+
+    if diff > 0 and org_row_cnt == new_row_cnt:
         logging.append(
-            "ERROR: After removed {} row(s) that contains NA in index, the dataframe becames empty.".format(diff))
+            "ERROR: After removed {} row(s) that contains NA in index, original dataframe "
+            "in shape ({},{}) becames empty.".format(
+                diff, dataframe.shape[0], dataframe.shape[1]))
         return None
+
     return dataframe_rm_na_idx
 
 
@@ -247,13 +252,16 @@ def load_data_file(file_path):
     try:
         # loads input data
         input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
+
+        # casting index and columns to String type
+        input_df.index = input_df.index.map(str)
         input_df.columns = input_df.columns.map(str)
+
         logging.append("INFO: Successfully loaded input data: {}.".format(file_path))
 
         # removes empty rows
         input_df_wo_empty_ln = remove_empty_row(input_df)
-
-        if input_df_wo_empty_ln.empty:
+        if input_df_wo_empty_ln is None or input_df_wo_empty_ln.empty:
             logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(file_path))
             return None
 
@@ -518,7 +526,7 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     # copy index to new column named with 'original'
     data_frame = data_frame.assign(original=data_frame.index)
     redis_ret = redisutil.get_node_info(redis_db, data_frame.index, "Gene", run_parameters['source_hint'],
-                                       run_parameters['taxonid'])
+                                        run_parameters['taxonid'])
 
     # extract ensemble names as a list from a call to redis database
     ensemble_names = [x[1] for x in redis_ret]
