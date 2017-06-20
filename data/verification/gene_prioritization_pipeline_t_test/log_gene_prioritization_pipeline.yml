@@ -1,14 +1,16 @@
 SUCCESS:
-- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_binary.tsv.'
-- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_t_test.tsv.'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_binary.tsv
+  with 13 row(s) and 5 column(s)'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_t_test.tsv
+  with 6 row(s) and 1 column(s)'
 - 'WARNING: Removed 1 empty row(s).'
 - 'INFO: Start to run checks for phenotypic data.'
 - 'INFO: Finished running checks for phenotypic data.'
 - 'INFO: Start to run sanity checks for user spreadsheet data.'
 - 'WARNING: Removed 1 duplicate column(s) from user spreadsheet.'
 - 'WARNING: Removed 1 duplicate row(s) from user spreadsheet.'
-- 'INFO: Mapped 9 gene(s) to ensemble name.'
-- 'INFO: Unable to map 3 gene(s) to ensemble name.'
+- 'INFO: Mapped 8 gene(s) to ensemble name.'
+- 'INFO: Unable to map 4 gene(s) to ensemble name.'
 - 'INFO: Finished running sanity check for user spreadsheet data.'
-- 'INFO: Cleaned user spreadsheet has 9 row(s), 4 column(s).'
+- 'INFO: Cleaned user spreadsheet has 8 row(s), 4 column(s).'
 - 'INFO: Cleaned phenotype data has 1 row(s), 5 column(s).'
