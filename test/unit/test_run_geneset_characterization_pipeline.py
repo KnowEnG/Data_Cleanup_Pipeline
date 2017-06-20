@@ -11,7 +11,7 @@ class TestRun_geneset_characterization_pipeline(unittest.TestCase):
             "taxonid": '9606',
             "redis_credential": {
                 "host": "knowredis.knowhub.org",
-                "port": 6379,
+                "port": 6380,
                 "password": "KnowEnG"
             },
             "pipeline_type": "geneset_characterization_pipeline"

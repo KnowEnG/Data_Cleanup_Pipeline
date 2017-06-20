@@ -4,8 +4,8 @@
     indicate if the user spreadsheet is valid or not. 
 """
 import pandas
-import knpackage.redis_utilities as redisutil
-from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
+import redis_utilities as redisutil
+from knpackage.toolbox import get_spreadsheet_df, get_network_df, extract_network_node_names, find_unique_node_names
 import os
 
 logging = []
@@ -84,7 +84,7 @@ def run_samples_clustering_pipeline(run_parameters):
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
     user_spreadsheet_df_cleaned = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
 
-    # Loads network dataframe to check intersection between spreadsheet and network
+    # Loads network dataframe to check number of genes intersected between spreadsheet and network
     network_df = get_network_df(run_parameters['gg_network_name_full_path'])
     if network_df.empty:
         logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
@@ -188,7 +188,8 @@ def remove_empty_row(dataframe):
         logging.append("WARNING: Removed {} empty row(s).".format(diff))
     if dataframe_no_empty_line.empty:
         logging.append(
-            "ERROR: After removed {} empty row(s), the dataframe becames empty.".format(diff))
+            "ERROR: After removed {} empty row(s), original dataframe in shape ({},{}) "
+            "becames empty.".format(diff, dataframe.shape[0], dataframe.shape[1]))
         return None
     return dataframe_no_empty_line
 
@@ -208,10 +209,14 @@ def remove_na_index(dataframe):
     diff = org_row_cnt - new_row_cnt
     if diff > 0:
         logging.append("WARNING: Removed {} row(s) which contains NA in index.".format(diff))
-    if dataframe_rm_na_idx.empty:
+
+    if diff > 0 and org_row_cnt == new_row_cnt:
         logging.append(
-            "ERROR: After removed {} row(s) that contains NA in index, the dataframe becames empty.".format(diff))
+            "ERROR: After removed {} row(s) that contains NA in index, original dataframe "
+            "in shape ({},{}) becames empty.".format(
+                diff, dataframe.shape[0], dataframe.shape[1]))
         return None
+
     return dataframe_rm_na_idx
 
 
@@ -247,13 +252,16 @@ def load_data_file(file_path):
     try:
         # loads input data
         input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
+
+        # casting index and columns to String type
+        input_df.index = input_df.index.map(str)
         input_df.columns = input_df.columns.map(str)
+
         logging.append("INFO: Successfully loaded input data: {}.".format(file_path))
 
         # removes empty rows
         input_df_wo_empty_ln = remove_empty_row(input_df)
-
-        if input_df_wo_empty_ln.empty:
+        if input_df_wo_empty_ln is None or input_df_wo_empty_ln.empty:
             logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(file_path))
             return None
 
@@ -378,7 +386,9 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
         common_headers = list(set(phenotype_index) & set(data_frame_header))
 
         if not common_headers:
-            logging.append("ERROR: Cannot find intersection between user spreadsheet header and phenotype index.")
+            logging.append(
+                "ERROR: Cannot find intersection between user spreadsheet header and phenotype index on column: {}.".format(
+                    phenotype_df_pxs.columns[column]))
             return None
 
         if len(common_headers) < 2:
@@ -513,12 +523,15 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     """
     redis_db = redisutil.get_database(run_parameters['redis_credential'])
 
-    # disable this flag to avoid SettingWithCopyWarning
-    data_frame.is_copy = False
-    data_frame['original'] = data_frame.index
+    # copy index to new column named with 'original'
+    data_frame = data_frame.assign(original=data_frame.index)
+    redis_ret = redisutil.get_node_info(redis_db, data_frame.index, "Gene", run_parameters['source_hint'],
+                                        run_parameters['taxonid'])
 
-    data_frame.index = data_frame.index.map(
-        lambda x: redisutil.conv_gene(redis_db, x, run_parameters['source_hint'], run_parameters['taxonid']))
+    # extract ensemble names as a list from a call to redis database
+    ensemble_names = [x[1] for x in redis_ret]
+    # resets data_frame's index with ensembel name
+    data_frame.index = pandas.Series(ensemble_names)
 
     # extracts all mapped rows in dataframe
     output_df_mapped = data_frame[~data_frame.index.str.contains(r'^unmapped.*$')]

@@ -8,4 +8,4 @@ source_hint:                ''                          # hint of looking up ens
 redis_credential:                                       # knoweng Redis database credentials
                             host: knowredis.knowhub.org
                             password: KnowEnG
-                            port: 6379
+                            port: 6380
