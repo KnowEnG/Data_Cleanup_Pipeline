@@ -245,8 +245,8 @@ def load_data_file(file_path):
     Returns:
         user_spreadsheet_df: user spreadsheet as a data frame
     """
-    if file_path == None:
-        logging.append("ERROR: Input file path is empty. Please provide a valid input path.")
+    if not file_path or file_path == None:
+        logging.append("ERROR: Input file path is empty: {}. Please provide a valid input path.".format(file_path))
         return None
 
     try:
@@ -257,7 +257,8 @@ def load_data_file(file_path):
         input_df.index = input_df.index.map(str)
         input_df.columns = input_df.columns.map(str)
 
-        logging.append("INFO: Successfully loaded input data: {}.".format(file_path))
+        logging.append("INFO: Successfully loaded input data: {} with {} row(s) and {} "
+                       "column(s)".format(file_path, input_df.shape[0], input_df.shape[1]))
 
         # removes empty rows
         input_df_wo_empty_ln = remove_empty_row(input_df)
