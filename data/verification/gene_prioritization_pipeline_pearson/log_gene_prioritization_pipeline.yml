@@ -1,7 +1,9 @@
 SUCCESS:
-- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv.'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv
+  with 15 row(s) and 5 column(s)'
 - 'WARNING: Removed 1 empty row(s).'
-- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_pearson.tsv.'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_pearson.tsv
+  with 6 row(s) and 2 column(s)'
 - 'INFO: Start to run checks for phenotypic data.'
 - 'INFO: Finished running checks for phenotypic data.'
 - 'INFO: Start to run sanity checks for user spreadsheet data.'
