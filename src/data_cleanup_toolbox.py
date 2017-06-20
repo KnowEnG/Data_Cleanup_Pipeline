@@ -245,7 +245,7 @@ def load_data_file(file_path):
     Returns:
         user_spreadsheet_df: user spreadsheet as a data frame
     """
-    if not file_path or file_path == None:
+    if not file_path or not file_path.strip():
         logging.append("ERROR: Input file path is empty: {}. Please provide a valid input path.".format(file_path))
         return None
 
