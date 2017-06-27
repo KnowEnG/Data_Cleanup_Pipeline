@@ -267,7 +267,7 @@ def load_data_file(file_path):
             return None
 
         return input_df_wo_empty_ln
-    except OSError as err:
+    except Exception as err:
         logging.append("ERROR: {}".format(str(err)))
         return None
 
