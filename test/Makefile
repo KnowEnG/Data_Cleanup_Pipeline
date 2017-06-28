@@ -52,6 +52,9 @@ run_gene_prioritization_pipeline_t_test:
 run_geneset_characterization_pipeline:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_geneset_characterization_pipeline.yml
 
+run_file_format:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_2_data_cleanup.yml
+
 # ----------------------------------------------------------------
 # - VERIFICATION TESTS RUN SECTION                                       -
 # ----------------------------------------------------------------
