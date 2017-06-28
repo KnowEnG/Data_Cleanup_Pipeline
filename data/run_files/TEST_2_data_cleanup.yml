@@ -1,0 +1,13 @@
+spreadsheet_name_full_path: ../data/spreadsheets/TEST_2_gene_expression.zip
+phenotype_name_full_path:   ../data/spreadsheets/TEST_1_phenotype_pearson.tsv
+results_directory:          ./run_dir/results
+correlation_measure:        pearson 
+
+taxonid:                    '9606'                      # taxon id of a given gene name
+source_hint:                ''                          # hint of looking up ensembl name in Redis database
+pipeline_type:              gene_prioritization_pipeline  # pipeline name
+
+redis_credential:                                       # knoweng Redis database credentials
+                            host: knowredis.knowhub.org
+                            password: KnowEnG
+                            port: 6380
