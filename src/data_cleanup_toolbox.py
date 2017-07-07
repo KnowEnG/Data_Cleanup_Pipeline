@@ -267,7 +267,7 @@ def load_data_file(file_path):
             return None
 
         return input_df_wo_empty_ln
-    except OSError as err:
+    except Exception as err:
         logging.append("ERROR: {}".format(str(err)))
         return None
 
@@ -493,7 +493,7 @@ def check_input_value_for_samples_clustering(data_frame):
         return None
 
     # checks if it contains only real number
-    data_frame_real_number = data_frame.applymap(lambda x: isinstance(x, (int, float)))
+    data_frame_real_number = data_frame.applymap(lambda x: isinstance(x, (int, float)) and x >= 0)
 
     if False in data_frame_real_number.values:
         logging.append("ERROR: Found non-numeric value in user spreadsheet.")
