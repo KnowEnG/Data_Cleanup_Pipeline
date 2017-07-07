@@ -7,6 +7,7 @@ import pandas
 import redis_utilities as redisutil
 from knpackage.toolbox import get_spreadsheet_df, get_network_df, extract_network_node_names, find_unique_node_names
 import os
+import random
 
 logging = []
 
@@ -28,7 +29,7 @@ def run_geneset_characterization_pipeline(run_parameters):
         return False, logging
 
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
-    user_spreadsheet_val_chked = check_input_value_for_geneset_characterization(user_spreadsheet_df)
+    user_spreadsheet_val_chked = check_input_value_for_gsc_sc_common(user_spreadsheet_df)
 
     if user_spreadsheet_val_chked is None:
         return False, logging
@@ -76,7 +77,7 @@ def run_samples_clustering_pipeline(run_parameters):
 
     logging.append("INFO: Start processing user spreadsheet data.")
     # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
-    user_spreadsheet_val_chked = check_input_value_for_samples_clustering(user_spreadsheet_df)
+    user_spreadsheet_val_chked = check_input_value_for_gsc_sc_common(user_spreadsheet_df)
 
     if user_spreadsheet_val_chked is None:
         return False, logging
@@ -403,13 +404,12 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
         phenotype_value_set = set(filter(lambda x: x == x, list_values))
         if gold_value_set != phenotype_value_set:
             logging.append(
-                "ERROR: Only 0, 1 are allowed in phenotype data when running t_test. This phenotype data contains invalid value: {}. ".format(
-                    phenotype_value_set) + "Please revise your phenotype and reupload.")
+                "ERROR: Only 0, 1 are allowed in phenotype data when running t_test. Example invalid values are : {}. ".format(
+                    random.sample(phenotype_value_set, 5)) + "Please revise your phenotype and reupload.")
             return None
 
     if correlation_measure == 'pearson':
-        phenotype_df_check = phenotype_df_pxs.applymap(lambda x: isinstance(x, (int, float)))
-        if False in phenotype_df_check:
+        if False in phenotype_df_pxs.applymap(lambda x: isinstance(x, (int, float))):
             logging.append(
                 "ERROR: Only numeric value is allowed in phenotype data when running pearson test. Found non-numeric value in phenotype data.")
             return None
@@ -426,9 +426,7 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
         return None, None
 
     # checks real number negative to positive infinite
-    data_frame_check = data_frame_dropna.applymap(lambda x: isinstance(x, (int, float)))
-
-    if False in data_frame_check.values:
+    if False in data_frame_dropna.applymap(lambda x: isinstance(x, (int, float))).values:
         logging.append("ERROR: Found non-numeric value in user spreadsheet.")
         return None, None
 
@@ -442,42 +440,12 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
     return data_frame_dropna, phenotype_df_pxs
 
 
-def check_input_value_for_geneset_characterization(data_frame):
+def check_input_value_for_gsc_sc_common(data_frame):
     """
-    Checks if the values in user spreadsheet passed data validation
-        and rename phenotype file to have suffix _ETL.tsv
-
-    Args:
-        data_frame: input data frame
-        phenotype_df: input phenotype data frame
-        gold_value_set: gold standard value set to be compared with
-
-    Returns:
-        data_frame: processed data_frame
-        message: A message indicates the status of current check
-    """
-    # defines the default values that can exist in user spreadsheet
-    gold_value_set = {0, 1}
-
-    if data_frame.isnull().values.any():
-        logging.append("ERROR: This user spreadsheet contains invalid NaN value.")
-        return None
-
-    gene_value_set = set(data_frame.ix[:, data_frame.columns != 0].values.ravel())
-
-    if gold_value_set != gene_value_set:
-        logging.append(
-            "ERROR: Only 0, 1 are allowed in user spreadsheet. This user spreadsheet contains invalid value: {}. ".format(
-                gene_value_set) + "Please revise your spreadsheet and reupload.")
-        return None
-
-    return data_frame
-
-
-def check_input_value_for_samples_clustering(data_frame):
-    """
-    Checks if the values in user spreadsheet passed data validation
-        and rename phenotype file to have suffix _ETL.tsv
+    Checks if the values in user spreadsheet passed the following criteria:
+    1. no None value
+    2. only real number is allowed
+    3. no negative value
 
     Args:
         data_frame: input data frame
@@ -492,22 +460,17 @@ def check_input_value_for_samples_clustering(data_frame):
         logging.append("ERROR: This user spreadsheet contains invalid NaN value.")
         return None
 
-    # checks if it contains only real number
-    data_frame_real_number = data_frame.applymap(lambda x: isinstance(x, (int, float)) and x >= 0)
-
-    if False in data_frame_real_number.values:
+    # checks if user spreadsheet contains only real number
+    if False in data_frame.applymap(lambda x: isinstance(x, (int, float))).values:
         logging.append("ERROR: Found non-numeric value in user spreadsheet.")
         return None
 
-    # checks number of negative values
-    data_frame_negative_cnt = data_frame.lt(0).sum().sum()
-    if data_frame_negative_cnt > 0:
-        logging.append("WARNING: Converted {} negative number to positive value.".format(data_frame_negative_cnt))
+    # checks if user spreadsheet contains only non-negative number
+    if False in data_frame.applymap(lambda x: x >= 0).values:
+        logging.append("ERROR: Found negative value in user spreadsheet.")
+        return None
 
-    # checks if it contains only positive number
-    data_frame_abs = data_frame.abs()
-
-    return data_frame_abs
+    return data_frame
 
 
 def check_ensemble_gene_name(data_frame, run_parameters):
