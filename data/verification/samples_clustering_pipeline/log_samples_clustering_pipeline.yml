@@ -3,7 +3,6 @@ SUCCESS:
   with 15 row(s) and 5 column(s)'
 - 'WARNING: Removed 1 empty row(s).'
 - 'INFO: Start processing user spreadsheet data.'
-- 'WARNING: Converted 2 negative number to positive value.'
 - 'INFO: Start to run sanity checks for user spreadsheet data.'
 - 'WARNING: Removed 1 duplicate column(s) from user spreadsheet.'
 - 'WARNING: Removed 1 duplicate row(s) from user spreadsheet.'
