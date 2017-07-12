@@ -31,7 +31,10 @@ def run_all_BENCHMARKs_and_TESTs():
         os.system(verification_method)
         python_file_compare(verification_directory, results_dir)
         print('remove result files:')
-        os.system("make clean_dir_recursively create_run_dir copy_run_files")
+        for tmp_file_name in os.listdir(results_dir):
+            if os.path.isfile(os.path.join(results_dir, tmp_file_name)):
+                os.remove(os.path.join(results_dir, tmp_file_name))
+        # os.system("make clean_dir_recursively create_run_dir copy_run_files")
 
 
 def python_file_compare(verif_dir, results_dir):
