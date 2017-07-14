@@ -65,7 +65,7 @@ def run_samples_clustering_pipeline(run_parameters):
 
     phenotype_df_cleaned = None
     if 'phenotype_name_full_path' in run_parameters.keys():
-        logging.append("INFO: Start processing phenotype data.")
+        logging.append("INFO: Start to process phenotype data.")
         phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
         if phenotype_df is None:
             return False, logging
@@ -74,7 +74,7 @@ def run_samples_clustering_pipeline(run_parameters):
             if phenotype_df_cleaned is None:
                 return False, logging
 
-    logging.append("INFO: Start processing user spreadsheet data.")
+    logging.append("INFO: Start to process user spreadsheet data.")
     # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
     user_spreadsheet_val_chked = check_input_value_for_gsc_sc_common(user_spreadsheet_df)
 
@@ -84,19 +84,21 @@ def run_samples_clustering_pipeline(run_parameters):
     # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
     user_spreadsheet_df_cleaned = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
 
-    # Loads network dataframe to check number of genes intersected between spreadsheet and network
-    network_df = get_network_df(run_parameters['gg_network_name_full_path'])
-    if network_df.empty:
-        logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
-            run_parameters['gg_network_name_full_path']))
-        return False, logging
-    node_1_names, node_2_names = extract_network_node_names(network_df)
-    unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
+    if 'gg_network_name_full_path' in run_parameters.keys():
+        logging.append("INFO: Start to process network data.")
+        # Loads network dataframe to check number of genes intersected between spreadsheet and network
+        network_df = get_network_df(run_parameters['gg_network_name_full_path'])
+        if network_df.empty:
+            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
+                run_parameters['gg_network_name_full_path']))
+            return False, logging
+        node_1_names, node_2_names = extract_network_node_names(network_df)
+        unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
 
-    intersection = find_intersection(unique_gene_names, user_spreadsheet_df_cleaned.index)
-    if intersection is None:
-        logging.append('ERROR: Cannot find intersection between spreadsheet genes and network genes.')
-        return False, logging
+        intersection = find_intersection(unique_gene_names, user_spreadsheet_df_cleaned.index)
+        if intersection is None:
+            logging.append('ERROR: Cannot find intersection between spreadsheet genes and network genes.')
+            return False, logging
 
     # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
     if user_spreadsheet_df_cleaned is None:
