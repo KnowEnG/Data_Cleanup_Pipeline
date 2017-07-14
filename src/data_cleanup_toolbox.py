@@ -5,9 +5,8 @@
 """
 import pandas
 import redis_utilities as redisutil
-from knpackage.toolbox import get_spreadsheet_df, get_network_df, extract_network_node_names, find_unique_node_names
+from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
 import os
-import random
 
 logging = []
 
@@ -252,7 +251,8 @@ def load_data_file(file_path):
 
     try:
         # loads input data
-        input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False)
+        input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False,
+                                   error_bad_lines=False, warn_bad_lines=True)
 
         # casting index and columns to String type
         input_df.index = input_df.index.map(str)
@@ -376,48 +376,79 @@ def check_duplicate_row_name(data_frame):
         return None
 
 
-def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df_pxs, correlation_measure):
+def check_phenotype_data_for_gene_prioritization(data_frame, phenotype_df_pxs, correlation_measure):
+    """
+    Phenotype data check for gene_prioritization_pipeline
+    1. checks intersection between phenotype data and user spreadsheet on each drug
+    2. verifies data value for t-test and pearson separately
+    Args:
+        data_frame_header: user spreadsheet
+        phenotype_df_pxs: phenotype data
+        correlation_measure: correlation measure: pearson or t-test
+
+    Returns:
+        phenotype_df_pxs_trimmed: trimmed phenotype data
+
+    """
+    # output dimension: sample x phenotype
+    data_frame_header = list(data_frame.columns.values)
+
+    # a list to store headers that has intersection between phenotype data and user spreadsheet
+    common_phenotype_set = set()
+
     # loop through phenotype (phenotype x sample) to check header intersection between phenotype and spreadsheet
     for column in range(0, len(phenotype_df_pxs.columns)):
         # drops columns with NA value in phenotype dataframe
         phenotype_df_sxp = phenotype_df_pxs.ix[:, column].to_frame().dropna(axis=0)
-
         phenotype_index = list(phenotype_df_sxp.index.values)
-
         # finds common headers
-        common_headers = list(set(phenotype_index) & set(data_frame_header))
+        common_headers = set(phenotype_index) & set(data_frame_header)
 
         if not common_headers:
             logging.append(
-                "ERROR: Cannot find intersection between user spreadsheet header and phenotype index on column: {}.".format(
-                    phenotype_df_pxs.columns[column]))
-            return None
+                "WARNING: Cannot find intersection on phenotype between user spreadsheet and "
+                "phenotype data on column: {}. Removing it now.".format(phenotype_df_pxs.columns[column]))
+        else:
+            common_phenotype_set.update(common_headers)
 
-        if len(common_headers) < 2:
-            logging.append("ERROR: Number of samples is too small to run further tests (Pearson, t-test).")
-            return None
+    # remove the columns that doesn't contain intersections in phenotype data
+    phenotype_df_pxs_trimmed = phenotype_df_pxs.loc[list(common_phenotype_set)]
+    data_frame_trimmed = data_frame[list(common_phenotype_set)]
 
     # defines the default values that can exist in phenotype data
     gold_value_set = {0, 1}
     if correlation_measure == 't_test':
-        list_values = pandas.unique(phenotype_df_pxs.values.ravel())
+        list_values = pandas.unique(phenotype_df_pxs_trimmed.values.ravel())
         phenotype_value_set = set(filter(lambda x: x == x, list_values))
         if gold_value_set != phenotype_value_set:
             logging.append(
-                "ERROR: Only 0, 1 are allowed in phenotype data when running t_test. Example invalid values are : {}. ".format(
-                    random.sample(phenotype_value_set, 5)) + "Please revise your phenotype and reupload.")
-            return None
+                "ERROR: Only 0, 1 are allowed in phenotype data when running t_test. "
+                "Please revise your phenotype data and reupload.")
+            return None, None
 
     if correlation_measure == 'pearson':
-        if False in phenotype_df_pxs.applymap(lambda x: isinstance(x, (int, float))):
+        if False in phenotype_df_pxs_trimmed.applymap(lambda x: isinstance(x, (int, float))):
             logging.append(
-                "ERROR: Only numeric value is allowed in phenotype data when running pearson test. Found non-numeric value in phenotype data.")
-            return None
+                "ERROR: Only numeric value is allowed in phenotype data when running pearson test. "
+                "Found non-numeric value in phenotype data.")
+            return None, None
 
-    return phenotype_df_pxs
+    return phenotype_df_pxs_trimmed, data_frame_trimmed
 
 
 def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlation_measure):
+    """
+    Input data check for Gene_Prioritization_Pipelien
+    Args:
+        data_frame: original data frame generated by user spreadsheet
+        phenotype_df: original phenotype data
+        correlation_measure: correlation measure : pearson or t-test
+
+    Returns:
+        data_frame_dropna: cleaned user spreadsheet
+        phenotype_df_pxs: phenotype data
+
+    """
     # drops column which contains NA in data_frame to reduce phenotype dimension
     data_frame_dropna = data_frame.dropna(axis=1)
 
@@ -430,14 +461,12 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
         logging.append("ERROR: Found non-numeric value in user spreadsheet.")
         return None, None
 
-    # output dimension: sample x phenotype
-    data_frame_header = list(data_frame_dropna.columns.values)
     logging.append("INFO: Start to run checks for phenotypic data.")
-    phenotype_df_pxs = check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df,
-                                                                    correlation_measure)
+    phenotype_df_pxs, data_frame_trimmed = check_phenotype_data_for_gene_prioritization(data_frame_dropna, phenotype_df,
+                                                                                        correlation_measure)
     logging.append("INFO: Finished running checks for phenotypic data.")
 
-    return data_frame_dropna, phenotype_df_pxs
+    return data_frame_trimmed, phenotype_df_pxs
 
 
 def check_input_value_for_gsc_sc_common(data_frame):
@@ -459,6 +488,8 @@ def check_input_value_for_gsc_sc_common(data_frame):
     if data_frame.isnull().values.any():
         logging.append("ERROR: This user spreadsheet contains invalid NaN value.")
         return None
+
+    check_value = data_frame.applymap(lambda x: isinstance(x, (int, float))).values
 
     # checks if user spreadsheet contains only real number
     if False in data_frame.applymap(lambda x: isinstance(x, (int, float))).values:

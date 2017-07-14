@@ -1,7 +1,6 @@
 import unittest
 import pandas as pd
 import data_cleanup_toolbox as data_cln
-import os
 
 
 class Testcheck_input_value(unittest.TestCase):
@@ -63,7 +62,7 @@ class Testcheck_input_value(unittest.TestCase):
                                                                                           self.input_phenotype_df, 't_test')
         ret_user_spreadsheet_flag = ret_user_spreadsheet is not None
         ret_phenotype_flag = ret_phenotype is not None
-        self.assertEqual(True, ret_user_spreadsheet_flag)
+        self.assertEqual(False, ret_user_spreadsheet_flag)
         self.assertEqual(False, ret_phenotype_flag)
 
 
