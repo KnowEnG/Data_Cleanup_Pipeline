@@ -5,9 +5,8 @@
 """
 import pandas
 import redis_utilities as redisutil
-from knpackage.toolbox import get_spreadsheet_df, get_network_df, extract_network_node_names, find_unique_node_names
+from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
 import os
-import random
 
 logging = []
 

@@ -1,7 +1,6 @@
 import unittest
 import pandas as pd
 import data_cleanup_toolbox as data_cln
-import os
 
 
 class Testcheck_input_value(unittest.TestCase):
