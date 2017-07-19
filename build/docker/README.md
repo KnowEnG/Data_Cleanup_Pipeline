@@ -20,21 +20,20 @@ The Dockefile in this directory contains all the commands, in order, needed to b
 * * * 
 ## How to run this docker image
 * * * 
+1 Check on docker.hub to get the latest image tag: 07_14_2017 used here.
 
-* 1 Change directory to the directory  where you want to run and start the container.
+2 Change directory to the directory  where you want to run and start the container.
 ```
 docker run -v \`pwd\`:/home/test/run_dir/ -it knowengdev/data_cleanup_pipeline:07_14_2017 
 ```
-* 2 Inside the container change to the test directory.
+3 Inside the container change to the test directory.
 ```
 cd test
 ```
-* 4 Run set up.
+4 Run set up.
 ```
 make env_setup
 ```
-* 5 edit the .yml file (use the comments to see options)
+5 edit the .yml file (use the comments to see options)
 
-* Check on docker.hub to get the latest image. 
-
-* If you don't "cp" your data into the volume you mounted it will disappear when you exit docker.
+6 If you don't "cp" your data into the volume you mounted it will disappear when you exit docker.
