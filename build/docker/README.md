@@ -34,7 +34,7 @@ cd test
 ```
 make env_setup
 ```
-### 5. edit the (data_cleanup) .yml file (use the comments to see options).
+### 5. edit and run the (data_cleanup) .yml file (use the comments to see options).
 ```
 make run_data_cleaning
 ```
