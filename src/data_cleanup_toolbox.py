@@ -414,8 +414,8 @@ def check_phenotype_data_for_gene_prioritization(data_frame, phenotype_df_pxs, c
             common_phenotype_set.update(common_headers)
 
     # remove the columns that doesn't contain intersections in phenotype data
-    phenotype_df_pxs_trimmed = phenotype_df_pxs.loc[list(common_phenotype_set)]
-    data_frame_trimmed = data_frame[list(common_phenotype_set)]
+    phenotype_df_pxs_trimmed = phenotype_df_pxs.loc[list(sorted(common_phenotype_set))]
+    data_frame_trimmed = data_frame[list(sorted(common_phenotype_set))]
 
     # defines the default values that can exist in phenotype data
     gold_value_set = {0, 1}
