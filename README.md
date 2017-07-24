@@ -37,7 +37,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   4. checks if the user spreadsheet only contains real value. If not, rejects it.
   5. phenotype data check:
     1. for every single drug, drops NA in phenotype data and intersects its header with the header spreadsheet to check 
-    if there is common columns left. If not, removes this drug from phenotype.
+    if there is common columns (>=2) left. If not, removes this drug from phenotype data.
     2. for t_test, checks if the phenotype contains only value 0, 1 or NAN.
     3. for pearson test, checks if the phenotype contains only real value or NAN.
   6. checks if the gene name in user spreadsheet contains NA value. If so, removes the row.
