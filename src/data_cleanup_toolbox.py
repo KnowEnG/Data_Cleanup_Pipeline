@@ -167,8 +167,8 @@ def run_gene_prioritization_pipeline(run_parameters):
         "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
                                                                              user_spreadsheet_df_cleaned.shape[1]))
     logging.append(
-        "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_val_checked.shape[1],
-                                                                           phenotype_val_checked.shape[0]))
+        "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_val_checked.shape[0],
+                                                                           phenotype_val_checked.shape[1]))
     return True, logging
 
 
@@ -378,7 +378,7 @@ def check_duplicate_row_name(data_frame):
         return None
 
 
-def check_phenotype_data_for_gene_prioritization(data_frame, phenotype_df_pxs, correlation_measure):
+def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df_pxs, correlation_measure):
     """
     Phenotype data check for gene_prioritization_pipeline
     1. checks intersection between phenotype data and user spreadsheet on each drug
@@ -392,11 +392,8 @@ def check_phenotype_data_for_gene_prioritization(data_frame, phenotype_df_pxs, c
         phenotype_df_pxs_trimmed: trimmed phenotype data
 
     """
-    # output dimension: sample x phenotype
-    data_frame_header = list(data_frame.columns.values)
-
     # a list to store headers that has intersection between phenotype data and user spreadsheet
-    common_phenotype_set = set()
+    valid_samples = []
 
     # loop through phenotype (phenotype x sample) to check header intersection between phenotype and spreadsheet
     for column in range(0, len(phenotype_df_pxs.columns)):
@@ -405,17 +402,25 @@ def check_phenotype_data_for_gene_prioritization(data_frame, phenotype_df_pxs, c
         phenotype_index = list(phenotype_df_sxp.index.values)
         # finds common headers
         common_headers = set(phenotype_index) & set(data_frame_header)
-
+        cur_column_name = phenotype_df_pxs.columns[column]
         if not common_headers:
             logging.append(
                 "WARNING: Cannot find intersection on phenotype between user spreadsheet and "
-                "phenotype data on column: {}. Removing it now.".format(phenotype_df_pxs.columns[column]))
+                "phenotype data on column: {}. Removing it now.".format(cur_column_name))
+        elif len(common_headers) < 2:
+            logging.append(
+                "WARNING: Number of samples is too small to run further tests (Pearson, t-test) "
+                "on column: {}. Removing it now.".format(cur_column_name))
         else:
-            common_phenotype_set.update(common_headers)
+            valid_samples.append(phenotype_df_pxs.columns[column])
+
+    if len(valid_samples) == 0:
+        logging.append("ERROR: Cannot find any valid column in phenotype data "
+                       "that has intersection with spreadsheet data.")
+        return None
 
     # remove the columns that doesn't contain intersections in phenotype data
-    phenotype_df_pxs_trimmed = phenotype_df_pxs.loc[list(sorted(common_phenotype_set))]
-    data_frame_trimmed = data_frame[list(sorted(common_phenotype_set))]
+    phenotype_df_pxs_trimmed = phenotype_df_pxs[sorted(valid_samples)]
 
     # defines the default values that can exist in phenotype data
     gold_value_set = {0, 1}
@@ -426,16 +431,16 @@ def check_phenotype_data_for_gene_prioritization(data_frame, phenotype_df_pxs, c
             logging.append(
                 "ERROR: Only 0, 1 are allowed in phenotype data when running t_test. "
                 "Please revise your phenotype data and reupload.")
-            return None, None
+            return None
 
     if correlation_measure == 'pearson':
         if False in phenotype_df_pxs_trimmed.applymap(lambda x: isinstance(x, (int, float))):
             logging.append(
                 "ERROR: Only numeric value is allowed in phenotype data when running pearson test. "
                 "Found non-numeric value in phenotype data.")
-            return None, None
+            return None
 
-    return phenotype_df_pxs_trimmed, data_frame_trimmed
+    return phenotype_df_pxs_trimmed
 
 
 def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlation_measure):
@@ -464,11 +469,15 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
         return None, None
 
     logging.append("INFO: Start to run checks for phenotypic data.")
-    phenotype_df_pxs, data_frame_trimmed = check_phenotype_data_for_gene_prioritization(data_frame_dropna, phenotype_df,
-                                                                                        correlation_measure)
+
+    # output dimension: sample x phenotype
+    data_frame_header = list(data_frame_dropna.columns.values)
+
+    phenotype_df_pxs = check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df,
+                                                                    correlation_measure)
     logging.append("INFO: Finished running checks for phenotypic data.")
 
-    return data_frame_trimmed, phenotype_df_pxs
+    return data_frame_dropna, phenotype_df_pxs
 
 
 def check_input_value_for_gsc_sc_common(data_frame):
