@@ -13,4 +13,4 @@ SUCCESS:
 - 'INFO: Unable to map 5 gene(s) to ensemble name.'
 - 'INFO: Finished running sanity check for user spreadsheet data.'
 - 'INFO: Cleaned user spreadsheet has 8 row(s), 4 column(s).'
-- 'INFO: Cleaned phenotype data has 2 row(s), 4 column(s).'
+- 'INFO: Cleaned phenotype data has 6 row(s), 2 column(s).'

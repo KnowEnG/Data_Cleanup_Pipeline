@@ -30,6 +30,10 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   3. checks if the phenotype contains duplicate row name. If so, removes the duplicates.
   4. checks if the intersection between user spreadsheet and phenotype is empty. If so, rejects it.
 
+  If the user provides with the phenotype data:
+  1. checks if the network data is empty. If so, rejects it.
+  2. checks if there is no intersection between two columns in network data. If so, rejects it. 
+
 * gene_prioritization_pipeline
   1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.
   2. checks if either user spreadsheet or phenotype data is empty. If so, rejects it.
@@ -64,6 +68,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
  pip3 install scikit-learn==0.17.1
  apt-get install -y libfreetype6-dev libxft-dev
  pip3 install matplotlib==1.4.2
+ pip3 install xmlrunner
  pip3 install pyyaml
  pip3 install knpackage
  pip3 install redis
