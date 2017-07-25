@@ -49,6 +49,16 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   8. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
   
+* pasted_gene_list
+  1. removes NA from input genes dataframe.
+  2. casts input genes dataframe to string type
+  3. if input genes dataframe is empty, the program exits.
+  
+  If input genes dataframe is not empty:
+  1. checks the intersection between universal genes list and input genes dataframe. 
+  Returns the universal genes list with intersected genes set to value 1 and not intersected genes to 0.
+  
+  
 * * * 
 ## How to run this pipeline with our data
 * * * 
