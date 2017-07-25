@@ -51,12 +51,9 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   
 * pasted_gene_list
   1. removes NA from input genes dataframe.
-  2. casts input genes dataframe to string type
-  3. if input genes dataframe is empty, the program exits.
-  
-  If input genes dataframe is not empty:
-  1. checks the intersection between universal genes list and input genes dataframe. 
-  Returns the universal genes list with intersected genes set to value 1 and not intersected genes to 0.
+  2. casts index of input genes dataframe to string type
+  3. if input genes dataframe is empty, the program exits. If input genes dataframe is not empty, checks the intersection 
+  between universal genes list and input genes dataframe. Returns the universal genes list with intersected genes set to value 1 and not intersected genes to 0.
   
   
 * * * 
