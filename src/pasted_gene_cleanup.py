@@ -30,8 +30,6 @@ def pasted_gene_cleanup(run_parameters):
 
         # filters out the unmapped genes
         mapped_small_genes_df = input_small_genes_df[~input_small_genes_df.index.str.contains(r'^unmapped.*$')]
-        # insert a column with column name: value
-        mapped_small_genes_df.insert(0, 'value', 1)
 
         # reads the univeral_gene_list
         universal_genes_df = get_spreadsheet_df(run_parameters['temp_redis_vector'])
@@ -50,7 +48,7 @@ def pasted_gene_cleanup(run_parameters):
 
         # outputs final results
         output_file_basename = datacln.get_file_basename(run_parameters['pasted_gene_list_full_path'])
-        input_small_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv", sep='\t', header=True, index=True)
+        mapped_small_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_MAP.tsv", sep='\t', header=True, index=True)
         universal_genes_df.to_csv(run_parameters['results_directory'] + '/' + output_file_basename + "_ETL.tsv", sep='\t', header=True, index=True)
     else:
         print("Input data is empty.")
