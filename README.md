@@ -17,18 +17,22 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.
   2. checks if the user spreadsheet contains NA value. If so, rejects it.
   3. checks if the user spreadsheet only contains real value. If not, rejects it.
-  4. convert all values within user spreadsheet to be absolute value.
+  4. converts all values within user spreadsheet to be absolute value.
   5. checks if the gene name in user spreasheet contains NA value. If so, removes the row.
   6. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
   7. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   8. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
-  9. checks if there is intersected ensembl name between user spreadsheet and gene-gene network data. If no intersection, rejects the spreadsheet.
+  9. checks if there is an intersected ensemble name between user spreadsheet and gene-gene network data. If there is no intersection, rejects the spreadsheet.
 
   If the user provides with the phenotype data:
   1. checks if the phenotype data is empty. If so, rejects it.
   2. checks if the phenotype contains duplicate column name. If so, removes the duplicates.
   3. checks if the phenotype contains duplicate row name. If so, removes the duplicates.
   4. checks if the intersection between user spreadsheet and phenotype is empty. If so, rejects it.
+
+  If the user provides with the phenotype data:
+  1. checks if the network data is empty. If so, rejects it.
+  2. checks if there is no intersection between two columns in network data. If so, rejects it. 
 
 * gene_prioritization_pipeline
   1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.
@@ -37,13 +41,20 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   4. checks if the user spreadsheet only contains real value. If not, rejects it.
   5. phenotype data check:
     1. for every single drug, drops NA in phenotype data and intersects its header with the header spreadsheet to check 
-    if there is common columns left. If not, rejects it.
+    if there is common columns (>=2) left. If not, removes this drug from phenotype data.
     2. for t_test, checks if the phenotype contains only value 0, 1 or NAN.
     3. for pearson test, checks if the phenotype contains only real value or NAN.
   6. checks if the gene name in user spreadsheet contains NA value. If so, removes the row.
   7. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
   8. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
+  
+* pasted_gene_list
+  1. removes NA from input genes dataframe.
+  2. casts index of input genes dataframe to string type
+  3. if input genes dataframe is empty, the program exits. If input genes dataframe is not empty, checks the intersection 
+  between universal genes list and input genes dataframe. Returns the universal genes list with intersected genes set to value 1 and not intersected genes to 0.
+  
   
 * * * 
 ## How to run this pipeline with our data
@@ -64,6 +75,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
  pip3 install scikit-learn==0.17.1
  apt-get install -y libfreetype6-dev libxft-dev
  pip3 install matplotlib==1.4.2
+ pip3 install xmlrunner
  pip3 install pyyaml
  pip3 install knpackage
  pip3 install redis
