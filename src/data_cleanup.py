@@ -47,10 +47,19 @@ def gene_prioritization_pipeline(run_parameters):
     generate_logging(validation_flag, message, run_parameters["results_directory"] + "/log_gene_prioritization_pipeline.yml")
 
 
+def phenotype_prediction_pipeline(run_parameters):
+    from data_cleanup_toolbox import run_phenotype_prediction_pipeline, generate_logging
+    validation_flag, message = run_phenotype_prediction_pipeline(run_parameters)
+    generate_logging(validation_flag, message,
+                     run_parameters["results_directory"] + "/log_phenotype_prediction_pipeline.yml")
+
+
+
 SELECT = {
     "geneset_characterization_pipeline": geneset_characterization_pipeline,
     "samples_clustering_pipeline": samples_clustering_pipeline,
-    "gene_prioritization_pipeline": gene_prioritization_pipeline
+    "gene_prioritization_pipeline": gene_prioritization_pipeline,
+    "phenotype_prediction_pipeline": phenotype_prediction_pipeline
 }
 
 

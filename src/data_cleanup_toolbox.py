@@ -173,6 +173,16 @@ def run_gene_prioritization_pipeline(run_parameters):
 
 
 def run_phenotype_prediction_pipeline(run_parameters):
+    """
+        Runs data cleaning for phenotype_prediction_pipeline.
+
+        Args:
+            run_parameters: configuration dictionary
+
+        Returns:
+            validation_flag: Boolean type value indicating if input data is valid or not
+            message: A message indicates the status of current check
+        """
     # dimension: sample x phenotype
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
@@ -185,7 +195,6 @@ def run_phenotype_prediction_pipeline(run_parameters):
     if phenotype_df is None:
         return False, logging
 
-
     user_spreadsheet_df_cleaned = check_user_spreadsheet_data(user_spreadsheet_df)
 
     # output dimension: sample x phenotype
@@ -195,10 +204,10 @@ def run_phenotype_prediction_pipeline(run_parameters):
     if data_frame_header is None or phenotype_df_pxs_trimmed is None:
         return False, logging
 
-        # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
+    # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
     phenotype_df_pxs_trimmed.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
-                                 sep='\t', header=True, index=True)
+                                    sep='\t', header=True, index=True)
     user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
                                        sep='\t', header=True, index=True)
@@ -211,19 +220,15 @@ def run_phenotype_prediction_pipeline(run_parameters):
     return True, logging
 
 
-
-
-
 def remove_empty_row(dataframe):
-    '''
+    """
     Remove empty rows in a dataframe
     Args:
         dataframe: input dataframe
 
     Returns:
         a dataframe without empty line
-
-    '''
+    """
     org_row_cnt = dataframe.shape[0]
     dataframe_no_empty_line = dataframe.dropna(how='all')
     new_row_cnt = dataframe_no_empty_line.shape[0]
@@ -511,6 +516,8 @@ def check_user_spreadsheet_data(data_frame):
     """
     # drops column which contains NA in data_frame to reduce phenotype dimension
     data_frame_dropna = data_frame.dropna(axis=1)
+    if data_frame.shape[1] - data_frame_dropna.shape[1] > 0:
+        logging.append("INFO: Remove {} column(s) which contains NA.".format(data_frame.shape[1] - data_frame_dropna.shape[1]))
 
     if data_frame_dropna.empty:
         logging.append("ERROR: User spreadsheet is empty after removing NA.")
@@ -520,7 +527,7 @@ def check_user_spreadsheet_data(data_frame):
     if False in data_frame_dropna.applymap(lambda x: isinstance(x, (int, float))).values:
         logging.append("ERROR: Found non-numeric value in user spreadsheet.")
         return None
-    
+
     return data_frame_dropna
 
 
@@ -537,7 +544,7 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
         phenotype_df_pxs: phenotype data
 
     """
-  
+
     data_frame_dropna = check_user_spreadsheet_data(data_frame)
     logging.append("INFO: Start to run checks for phenotypic data.")
 
