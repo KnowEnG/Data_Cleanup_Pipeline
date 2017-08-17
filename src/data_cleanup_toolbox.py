@@ -156,7 +156,7 @@ def run_gene_prioritization_pipeline(run_parameters):
     if user_spreadsheet_df_cleaned is None or phenotype_val_checked is None:
         return False, logging
 
-    # stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
+    # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
     phenotype_val_checked.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
                                  sep='\t', header=True, index=True)
@@ -170,6 +170,48 @@ def run_gene_prioritization_pipeline(run_parameters):
         "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_val_checked.shape[0],
                                                                            phenotype_val_checked.shape[1]))
     return True, logging
+
+
+def run_phenotype_prediction_pipeline(run_parameters):
+    # dimension: sample x phenotype
+    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+
+    if user_spreadsheet_df is None:
+        return False, logging
+
+    # dimension: sample x phenotype
+    phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+
+    if phenotype_df is None:
+        return False, logging
+
+
+    user_spreadsheet_df_cleaned = check_user_spreadsheet_data(user_spreadsheet_df)
+
+    # output dimension: sample x phenotype
+    data_frame_header = list(user_spreadsheet_df_cleaned.columns.values)
+    phenotype_df_pxs_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(data_frame_header, phenotype_df)
+
+    if data_frame_header is None or phenotype_df_pxs_trimmed is None:
+        return False, logging
+
+        # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
+    phenotype_df_pxs_trimmed.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+        run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
+                                 sep='\t', header=True, index=True)
+    user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+        run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
+                                       sep='\t', header=True, index=True)
+    logging.append(
+        "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                             user_spreadsheet_df_cleaned.shape[1]))
+    logging.append(
+        "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_pxs_trimmed.shape[0],
+                                                                           phenotype_df_pxs_trimmed.shape[1]))
+    return True, logging
+
+
+
 
 
 def remove_empty_row(dataframe):
@@ -378,20 +420,17 @@ def check_duplicate_row_name(data_frame):
         return None
 
 
-def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df_pxs, correlation_measure):
-    """
-    Phenotype data check for gene_prioritization_pipeline
-    1. checks intersection between phenotype data and user spreadsheet on each drug
-    2. verifies data value for t-test and pearson separately
+def check_intersection_for_phenotype_and_user_spreadsheet(data_frame_header, phenotype_df_pxs):
+    '''
+    Checks intersection between phenotype data and user spreadsheet on each drug
+
     Args:
-        data_frame_header: user spreadsheet
-        phenotype_df_pxs: phenotype data
-        correlation_measure: correlation measure: pearson or t-test
+        data_frame_header: 
+        phenotype_df_pxs: 
 
     Returns:
-        phenotype_df_pxs_trimmed: trimmed phenotype data
 
-    """
+    '''
     # a list to store headers that has intersection between phenotype data and user spreadsheet
     valid_samples = []
 
@@ -422,10 +461,24 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
     # remove the columns that doesn't contain intersections in phenotype data
     phenotype_df_pxs_trimmed = phenotype_df_pxs[sorted(valid_samples)]
 
+    return phenotype_df_pxs_trimmed
+
+
+def check_data_for_t_test_and_pearson(phenotype_df_pxs, correlation_measure):
+    """
+    Verifies data value for t-test and pearson separately
+    Args:
+        phenotype_df_pxs: phenotype data
+        correlation_measure: correlation measure: pearson or t-test
+
+    Returns:
+        phenotype_df_pxs: cleaned phenotype data
+
+    """
     # defines the default values that can exist in phenotype data
     gold_value_set = {0, 1}
     if correlation_measure == 't_test':
-        list_values = pandas.unique(phenotype_df_pxs_trimmed.values.ravel())
+        list_values = pandas.unique(phenotype_df_pxs.values.ravel())
         phenotype_value_set = set(filter(lambda x: x == x, list_values))
         if gold_value_set != phenotype_value_set:
             logging.append(
@@ -434,13 +487,41 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
             return None
 
     if correlation_measure == 'pearson':
-        if False in phenotype_df_pxs_trimmed.applymap(lambda x: isinstance(x, (int, float))):
+        if False in phenotype_df_pxs.applymap(lambda x: isinstance(x, (int, float))):
             logging.append(
                 "ERROR: Only numeric value is allowed in phenotype data when running pearson test. "
                 "Found non-numeric value in phenotype data.")
             return None
 
-    return phenotype_df_pxs_trimmed
+    return phenotype_df_pxs
+
+
+def check_user_spreadsheet_data(data_frame):
+    """
+    User spreadsheet data check :
+    1. remove na in column wise
+    2. check if data frame is empty
+    3. check if data frame contains only real value
+    Args:
+        data_frame: the original data frame to be cleaned
+
+    Returns:
+        data_frame_dropna: a cleaned data frame
+
+    """
+    # drops column which contains NA in data_frame to reduce phenotype dimension
+    data_frame_dropna = data_frame.dropna(axis=1)
+
+    if data_frame_dropna.empty:
+        logging.append("ERROR: User spreadsheet is empty after removing NA.")
+        return None
+
+    # checks real number negative to positive infinite
+    if False in data_frame_dropna.applymap(lambda x: isinstance(x, (int, float))).values:
+        logging.append("ERROR: Found non-numeric value in user spreadsheet.")
+        return None
+    
+    return data_frame_dropna
 
 
 def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlation_measure):
@@ -456,25 +537,16 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
         phenotype_df_pxs: phenotype data
 
     """
-    # drops column which contains NA in data_frame to reduce phenotype dimension
-    data_frame_dropna = data_frame.dropna(axis=1)
-
-    if data_frame_dropna.empty:
-        logging.append("ERROR: User spreadsheet is empty after removing NA.")
-        return None, None
-
-    # checks real number negative to positive infinite
-    if False in data_frame_dropna.applymap(lambda x: isinstance(x, (int, float))).values:
-        logging.append("ERROR: Found non-numeric value in user spreadsheet.")
-        return None, None
-
+  
+    data_frame_dropna = check_user_spreadsheet_data(data_frame)
     logging.append("INFO: Start to run checks for phenotypic data.")
 
     # output dimension: sample x phenotype
     data_frame_header = list(data_frame_dropna.columns.values)
 
-    phenotype_df_pxs = check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df,
-                                                                    correlation_measure)
+    phenotype_df_pxs_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(data_frame_header, phenotype_df)
+
+    phenotype_df_pxs = check_data_for_t_test_and_pearson(phenotype_df_pxs_trimmed, correlation_measure)
     logging.append("INFO: Finished running checks for phenotypic data.")
 
     return data_frame_dropna, phenotype_df_pxs
@@ -499,8 +571,6 @@ def check_input_value_for_gsc_sc_common(data_frame):
     if data_frame.isnull().values.any():
         logging.append("ERROR: This user spreadsheet contains invalid NaN value.")
         return None
-
-    check_value = data_frame.applymap(lambda x: isinstance(x, (int, float))).values
 
     # checks if user spreadsheet contains only real number
     if False in data_frame.applymap(lambda x: isinstance(x, (int, float))).values:
