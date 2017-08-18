@@ -207,6 +207,10 @@ def run_phenotype_prediction_pipeline(run_parameters):
 
     user_spreadsheet_dropna = check_real_value_dropna(user_spreadsheet_df)
 
+    if user_spreadsheet_dropna is None or user_spreadsheet_dropna.empty:
+        logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
+        return None, None
+
     # Checks if there is valid intersection between phenotype data and user spreadsheet data
     data_frame_header = list(user_spreadsheet_dropna.columns.values)
     phenotype_df_pxs_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(data_frame_header, phenotype_df)
@@ -266,9 +270,10 @@ def remove_na_index(dataframe):
         dataframe_rm_na_idx: a cleaned dataframe
     """
     org_row_cnt = dataframe.shape[0]
-    dataframe_rm_na_idx = dataframe[pandas.notnull(dataframe.index)]
+    dataframe_rm_na_idx = dataframe[dataframe.index != 'nan']
     new_row_cnt = dataframe_rm_na_idx.shape[0]
     diff = org_row_cnt - new_row_cnt
+
     if diff > 0:
         logging.append("WARNING: Removed {} row(s) which contains NA in index.".format(diff))
 
