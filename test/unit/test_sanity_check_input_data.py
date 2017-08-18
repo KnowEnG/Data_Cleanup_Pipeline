@@ -5,7 +5,7 @@ import numpy.testing as npytest
 import data_cleanup_toolbox as data_cln
 
 
-class TestSanity_check_data_file(unittest.TestCase):
+class TestSanity_check_input_data(unittest.TestCase):
     def setUp(self):
         self.input_df_good = pd.DataFrame(
             [[1, 0],
@@ -35,19 +35,13 @@ class TestSanity_check_data_file(unittest.TestCase):
             "input_data_type": ""
         }
 
-        self.output_mapped = "./example_MAP.tsv"
-        self.output_unmapped = "./example_UNMAPPED.tsv"
 
     def tearDown(self):
         del self.input_df_good
         del self.run_parameters
-        os.remove(self.output_mapped)
-        os.remove(self.output_unmapped)
-        del self.output_mapped
-        del self.output_unmapped
 
-    def test_sanity_check_data_file(self):
-        ret_val = data_cln.sanity_check_user_spreadsheet(self.input_df_good, self.run_parameters)
+    def test_sanity_check_input_data(self):
+        ret_val = data_cln.sanity_check_input_data(self.input_df_good)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(True, ret_val_boolean)
 

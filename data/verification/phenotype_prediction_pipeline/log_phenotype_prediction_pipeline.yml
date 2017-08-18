@@ -2,15 +2,11 @@ SUCCESS:
 - 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv
   with 15 row(s) and 5 column(s)'
 - 'WARNING: Removed 1 empty row(s).'
-- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_pearson.tsv
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_prediction.tsv
   with 6 row(s) and 2 column(s)'
-- 'INFO: Start to run checks for phenotypic data.'
-- 'INFO: Finished running checks for phenotypic data.'
 - 'INFO: Start to run sanity checks for input data.'
 - 'WARNING: Removed 1 duplicate column(s) from user spreadsheet.'
 - 'WARNING: Removed 1 duplicate row(s) from user spreadsheet.'
 - 'INFO: Finished running sanity check for input data.'
-- 'INFO: Mapped 8 gene(s) to ensemble name.'
-- 'INFO: Unable to map 5 gene(s) to ensemble name.'
-- 'INFO: Cleaned user spreadsheet has 8 row(s), 4 column(s).'
+- 'INFO: Cleaned user spreadsheet has 13 row(s), 4 column(s).'
 - 'INFO: Cleaned phenotype data has 6 row(s), 2 column(s).'
