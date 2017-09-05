@@ -9,4 +9,4 @@ login_to_dockerhub:
 	docker login --username=$(username) --email=$(email)
 
 push_to_dockerhub:
-	docker push knowengdev/data_cleanup_pipeline
+	docker push knowengdev/data_cleanup_pipeline:$(CUR_DATE)
