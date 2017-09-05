@@ -2,14 +2,12 @@ SUCCESS:
 - 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv
   with 15 row(s) and 5 column(s)'
 - 'WARNING: Removed 1 empty row(s).'
-- 'INFO: Start to process user spreadsheet data.'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_prediction.tsv
+  with 6 row(s) and 2 column(s)'
 - 'INFO: Start to run sanity checks for input data.'
 - 'WARNING: Removed 1 row(s) which contains NA in index.'
 - 'WARNING: Removed 1 duplicate column(s) from user spreadsheet.'
 - 'WARNING: Removed 1 duplicate row(s) from user spreadsheet.'
 - 'INFO: Finished running sanity check for input data.'
-- 'INFO: Mapped 8 gene(s) to ensemble name.'
-- 'INFO: Unable to map 4 gene(s) to ensemble name.'
-- 'INFO: Start to process network data.'
-- 'INFO: Found 8 intersected gene(s) between phenotype and spreadsheet data.'
-- 'INFO: Cleaned user spreadsheet has 8 row(s), 4 column(s).'
+- 'INFO: Cleaned user spreadsheet has 12 row(s), 4 column(s).'
+- 'INFO: Cleaned phenotype data has 6 row(s), 2 column(s).'

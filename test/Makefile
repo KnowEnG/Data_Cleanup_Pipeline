@@ -31,8 +31,8 @@ copy_run_files:
 run_data_cleaning:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file data_cleanup.yml
 
-run_pasted_gene_list:
-	python3 ../src/pasted_gene_cleanup.py -run_directory $(RUN_DIR) -run_file pasted_gene_cleanup.yml
+run_pasted_gene_set_conversion:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file pasted_gene_set_conversion.yml
 
 # ----------------------------------------------------------------
 # Small Benchmarks RUN Section                                   -
@@ -51,6 +51,9 @@ run_gene_prioritization_pipeline_t_test:
 
 run_geneset_characterization_pipeline:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_geneset_characterization_pipeline.yml
+
+run_phenotype_prediction_pipeline:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_phenotype_prediction_pipeline.yml
 
 run_file_format:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_2_data_cleanup.yml

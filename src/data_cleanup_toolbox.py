@@ -28,13 +28,16 @@ def run_geneset_characterization_pipeline(run_parameters):
         return False, logging
 
     # Value check logic a: checks if only 0 and 1 appears in user spreadsheet and rename phenotype data file to have _ETL.tsv suffix
-    user_spreadsheet_val_chked = check_input_value_for_gsc_sc_common(user_spreadsheet_df)
+    user_spreadsheet_val_chked = check_non_negative_real_value(user_spreadsheet_df)
 
     if user_spreadsheet_val_chked is None:
         return False, logging
 
-    # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
-    user_spreadsheet_df_cleaned = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
+    # Checks duplication on column and row name
+    user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
+
+    # Checks the validity of gene name to see if it can be ensemble or not
+    user_spreadsheet_df_cleaned = check_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
 
     if user_spreadsheet_df_cleaned is None:
         return False, logging
@@ -75,14 +78,18 @@ def run_samples_clustering_pipeline(run_parameters):
                 return False, logging
 
     logging.append("INFO: Start to process user spreadsheet data.")
+    
     # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
-    user_spreadsheet_val_chked = check_input_value_for_gsc_sc_common(user_spreadsheet_df)
+    user_spreadsheet_val_chked = check_non_negative_real_value(user_spreadsheet_df)
 
     if user_spreadsheet_val_chked is None:
         return False, logging
 
-    # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
-    user_spreadsheet_df_cleaned = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
+    # Checks duplication on column and row name
+    user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
+
+    # Checks the validity of gene name to see if it can be ensemble or not
+    user_spreadsheet_df_cleaned = check_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
 
     if 'gg_network_name_full_path' in run_parameters.keys():
         logging.append("INFO: Start to process network data.")
@@ -150,13 +157,16 @@ def run_gene_prioritization_pipeline(run_parameters):
     if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
         return False, logging
 
-    # Other checks including duplicate column/row name check and gene name to ensemble name mapping check
-    user_spreadsheet_df_cleaned = sanity_check_user_spreadsheet(user_spreadsheet_val_chked, run_parameters)
+    # Checks duplication on column and row name
+    user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
+
+    # Checks the validity of gene name to see if it can be ensemble or not
+    user_spreadsheet_df_cleaned = check_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
 
     if user_spreadsheet_df_cleaned is None or phenotype_val_checked is None:
         return False, logging
 
-    # stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
+    # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
     phenotype_val_checked.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
         run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
                                  sep='\t', header=True, index=True)
@@ -172,16 +182,70 @@ def run_gene_prioritization_pipeline(run_parameters):
     return True, logging
 
 
+def run_phenotype_prediction_pipeline(run_parameters):
+    """
+        Runs data cleaning for phenotype_prediction_pipeline.
+
+        Args:
+            run_parameters: configuration dictionary
+
+        Returns:
+            validation_flag: Boolean type value indicating if input data is valid or not
+            message: A message indicates the status of current check
+        """
+    # dimension: sample x phenotype
+    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+
+    if user_spreadsheet_df is None:
+        return False, logging
+
+    # dimension: sample x phenotype
+    phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+
+    if phenotype_df is None:
+        return False, logging
+
+    user_spreadsheet_dropna = check_real_value_dropna(user_spreadsheet_df)
+
+    if user_spreadsheet_dropna is None or user_spreadsheet_dropna.empty:
+        logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
+        return None, None
+
+    # Checks if there is valid intersection between phenotype data and user spreadsheet data
+    data_frame_header = list(user_spreadsheet_dropna.columns.values)
+    phenotype_df_pxs_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(data_frame_header, phenotype_df)
+
+    # Checks duplication on column and row name
+    user_spreadsheet_df_cleaned = sanity_check_input_data(user_spreadsheet_dropna)
+
+    if user_spreadsheet_df_cleaned is None or phenotype_df_pxs_trimmed is None:
+        return False, logging
+
+    # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
+    phenotype_df_pxs_trimmed.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+        run_parameters['phenotype_name_full_path']) + "_ETL.tsv",
+                                    sep='\t', header=True, index=True)
+    user_spreadsheet_df_cleaned.to_csv(run_parameters['results_directory'] + '/' + get_file_basename(
+        run_parameters['spreadsheet_name_full_path']) + "_ETL.tsv",
+                                       sep='\t', header=True, index=True)
+    logging.append(
+        "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                             user_spreadsheet_df_cleaned.shape[1]))
+    logging.append(
+        "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_pxs_trimmed.shape[0],
+                                                                           phenotype_df_pxs_trimmed.shape[1]))
+    return True, logging
+
+
 def remove_empty_row(dataframe):
-    '''
+    """
     Remove empty rows in a dataframe
     Args:
         dataframe: input dataframe
 
     Returns:
         a dataframe without empty line
-
-    '''
+    """
     org_row_cnt = dataframe.shape[0]
     dataframe_no_empty_line = dataframe.dropna(how='all')
     new_row_cnt = dataframe_no_empty_line.shape[0]
@@ -206,9 +270,10 @@ def remove_na_index(dataframe):
         dataframe_rm_na_idx: a cleaned dataframe
     """
     org_row_cnt = dataframe.shape[0]
-    dataframe_rm_na_idx = dataframe[pandas.notnull(dataframe.index)]
+    dataframe_rm_na_idx = dataframe[dataframe.index != 'nan']
     new_row_cnt = dataframe_rm_na_idx.shape[0]
     diff = org_row_cnt - new_row_cnt
+
     if diff > 0:
         logging.append("WARNING: Removed {} row(s) which contains NA in index.".format(diff))
 
@@ -378,20 +443,17 @@ def check_duplicate_row_name(data_frame):
         return None
 
 
-def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df_pxs, correlation_measure):
-    """
-    Phenotype data check for gene_prioritization_pipeline
-    1. checks intersection between phenotype data and user spreadsheet on each drug
-    2. verifies data value for t-test and pearson separately
+def check_intersection_for_phenotype_and_user_spreadsheet(data_frame_header, phenotype_df_pxs):
+    '''
+    Checks intersection between phenotype data and user spreadsheet on each drug
+
     Args:
-        data_frame_header: user spreadsheet
-        phenotype_df_pxs: phenotype data
-        correlation_measure: correlation measure: pearson or t-test
+        data_frame_header: 
+        phenotype_df_pxs: 
 
     Returns:
-        phenotype_df_pxs_trimmed: trimmed phenotype data
 
-    """
+    '''
     # a list to store headers that has intersection between phenotype data and user spreadsheet
     valid_samples = []
 
@@ -422,10 +484,24 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
     # remove the columns that doesn't contain intersections in phenotype data
     phenotype_df_pxs_trimmed = phenotype_df_pxs[sorted(valid_samples)]
 
+    return phenotype_df_pxs_trimmed
+
+
+def check_data_for_t_test_and_pearson(phenotype_df_pxs, correlation_measure):
+    """
+    Verifies data value for t-test and pearson separately
+    Args:
+        phenotype_df_pxs: phenotype data
+        correlation_measure: correlation measure: pearson or t-test
+
+    Returns:
+        phenotype_df_pxs: cleaned phenotype data
+
+    """
     # defines the default values that can exist in phenotype data
     gold_value_set = {0, 1}
     if correlation_measure == 't_test':
-        list_values = pandas.unique(phenotype_df_pxs_trimmed.values.ravel())
+        list_values = pandas.unique(phenotype_df_pxs.values.ravel())
         phenotype_value_set = set(filter(lambda x: x == x, list_values))
         if gold_value_set != phenotype_value_set:
             logging.append(
@@ -434,13 +510,44 @@ def check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df
             return None
 
     if correlation_measure == 'pearson':
-        if False in phenotype_df_pxs_trimmed.applymap(lambda x: isinstance(x, (int, float))):
+        if False in phenotype_df_pxs.applymap(lambda x: isinstance(x, (int, float))):
             logging.append(
                 "ERROR: Only numeric value is allowed in phenotype data when running pearson test. "
                 "Found non-numeric value in phenotype data.")
             return None
 
-    return phenotype_df_pxs_trimmed
+    return phenotype_df_pxs
+
+
+def check_real_value_dropna(data_frame):
+    """
+    User spreadsheet data check :
+    1. remove na in column wise
+    2. check if data frame is empty
+    3. check if data frame contains only real value
+    Args:
+        data_frame: the original data frame to be cleaned
+
+    Returns:
+        data_frame_dropna: a cleaned data frame
+
+    """
+    # drops column which contains NA in data_frame to reduce phenotype dimension
+    data_frame_dropna = data_frame.dropna(axis=1)
+    if data_frame.shape[1] - data_frame_dropna.shape[1] > 0:
+        logging.append(
+            "INFO: Remove {} column(s) which contains NA.".format(data_frame.shape[1] - data_frame_dropna.shape[1]))
+
+    if data_frame_dropna.empty:
+        logging.append("ERROR: User spreadsheet is empty after removing NA.")
+        return None
+
+    # checks real number negative to positive infinite
+    if False in data_frame_dropna.applymap(lambda x: isinstance(x, (int, float))).values:
+        logging.append("ERROR: Found non-numeric value in user spreadsheet.")
+        return None
+
+    return data_frame_dropna
 
 
 def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlation_measure):
@@ -456,31 +563,29 @@ def check_input_value_for_gene_prioritization(data_frame, phenotype_df, correlat
         phenotype_df_pxs: phenotype data
 
     """
-    # drops column which contains NA in data_frame to reduce phenotype dimension
-    data_frame_dropna = data_frame.dropna(axis=1)
 
-    if data_frame_dropna.empty:
-        logging.append("ERROR: User spreadsheet is empty after removing NA.")
-        return None, None
-
-    # checks real number negative to positive infinite
-    if False in data_frame_dropna.applymap(lambda x: isinstance(x, (int, float))).values:
-        logging.append("ERROR: Found non-numeric value in user spreadsheet.")
-        return None, None
-
+    data_frame_dropna = check_real_value_dropna(data_frame)
     logging.append("INFO: Start to run checks for phenotypic data.")
+
+    if data_frame_dropna is None or data_frame_dropna.empty:
+        logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
+        return None, None
 
     # output dimension: sample x phenotype
     data_frame_header = list(data_frame_dropna.columns.values)
 
-    phenotype_df_pxs = check_phenotype_data_for_gene_prioritization(data_frame_header, phenotype_df,
-                                                                    correlation_measure)
+    phenotype_df_pxs_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(data_frame_header, phenotype_df)
+
+    if phenotype_df_pxs_trimmed is None or phenotype_df_pxs_trimmed.empty:
+        logging.append("ERROR: After drop NA, phenotype data becomes empty.")
+        return None, None
+    phenotype_df_pxs = check_data_for_t_test_and_pearson(phenotype_df_pxs_trimmed, correlation_measure)
     logging.append("INFO: Finished running checks for phenotypic data.")
 
     return data_frame_dropna, phenotype_df_pxs
 
 
-def check_input_value_for_gsc_sc_common(data_frame):
+def check_non_negative_real_value(data_frame):
     """
     Checks if the values in user spreadsheet passed the following criteria:
     1. no None value
@@ -499,8 +604,6 @@ def check_input_value_for_gsc_sc_common(data_frame):
     if data_frame.isnull().values.any():
         logging.append("ERROR: This user spreadsheet contains invalid NaN value.")
         return None
-
-    check_value = data_frame.applymap(lambda x: isinstance(x, (int, float))).values
 
     # checks if user spreadsheet contains only real number
     if False in data_frame.applymap(lambda x: isinstance(x, (int, float))).values:
@@ -580,41 +683,38 @@ def check_ensemble_gene_name(data_frame, run_parameters):
     return output_df_mapped_dedup
 
 
-def sanity_check_user_spreadsheet(user_spreadsheet_df, run_parameters):
+def sanity_check_input_data(input_dataframe):
     """
-    Checks the validity of user input spreadsheet data file
+    Checks the validity of user input spreadsheet data file, including duplication and nan
 
     Args:
-        user_spreadsheet_df: user spreadsheet input file data frame, which is uploaded from frontend
+        input_dataframe: user spreadsheet input file data frame, which is uploaded from frontend
         run_parameters: run_file parameter dictionary
 
     Returns:
         flag: Boolean value indicates the status of current check
         message: A message indicates the status of current check
     """
-    logging.append("INFO: Start to run sanity checks for user spreadsheet data.")
+    logging.append("INFO: Start to run sanity checks for input data.")
 
     # Case 1: removes NA rows in index
-    user_spreadsheet_df_idx_na_rmd = remove_na_index(user_spreadsheet_df)
-    if user_spreadsheet_df_idx_na_rmd is None:
+    input_dataframe_idx_na_rmd = remove_na_index(input_dataframe)
+    if input_dataframe_idx_na_rmd is None:
         return None
 
     # Case 2: checks the duplication on column name and removes it if exists
-    user_spreadsheet_df_col_dedup = check_duplicate_column_name(user_spreadsheet_df_idx_na_rmd)
-    if user_spreadsheet_df_col_dedup is None:
+    input_dataframe_col_dedup = check_duplicate_column_name(input_dataframe_idx_na_rmd)
+    if input_dataframe_col_dedup is None:
         return None
 
     # Case 3: checks the duplication on gene name and removes it if exists
-    user_spreadsheet_df_genename_dedup = check_duplicate_row_name(user_spreadsheet_df_col_dedup)
-    if user_spreadsheet_df_genename_dedup is None:
+    input_dataframe_genename_dedup = check_duplicate_row_name(input_dataframe_col_dedup)
+    if input_dataframe_genename_dedup is None:
         return None
 
-    # Case 4: checks the validity of gene name to see if it can be ensemble or not
-    user_spreadsheet_df_final = check_ensemble_gene_name(user_spreadsheet_df_genename_dedup, run_parameters)
+    logging.append("INFO: Finished running sanity check for input data.")
 
-    logging.append("INFO: Finished running sanity check for user spreadsheet data.")
-
-    return user_spreadsheet_df_final
+    return input_dataframe_genename_dedup
 
 
 def find_intersection(list_a, list_b):
