@@ -71,7 +71,7 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
  apt-get install -y libblas-dev liblapack-dev libatlas-base-dev gfortran
  pip3 install numpy==1.11.1
  pip3 install pandas==0.18.1
- pip3 install scipy==0.18.0
+ pip3 install scipy==0.19.1
  pip3 install scikit-learn==0.17.1
  apt-get install -y libfreetype6-dev libxft-dev
  pip3 install matplotlib==1.4.2
