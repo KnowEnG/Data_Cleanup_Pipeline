@@ -57,12 +57,12 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
 
 * general_clustering_pipeline
   1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.  
-  2. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
-  3. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
+  2. checks if the user spreadsheet contins NA value. If so, rejects it.  
+  3. checks if the user spreadsheet only contains real value. If not, rejects it.
   4. checks if the gene name in user spreasheet contains NA value. If so, removes the row.
   5. checks if the header in user spreasheet contains NA value. If so, removes the row.
-  6. checks if the user spreadsheet contins NA value. If so, rejects it.  
-  7. checks if the user spreadsheet only contains real value. If not, rejects it.
+  6. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
+  7. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
 
 * * * 
 ## How to run this pipeline with our data
