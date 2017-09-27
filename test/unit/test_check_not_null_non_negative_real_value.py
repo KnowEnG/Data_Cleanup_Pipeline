@@ -3,7 +3,7 @@ import pandas as pd
 import data_cleanup_toolbox as data_cln
 
 
-class Testcheck_non_negative_real_value(unittest.TestCase):
+class Testcheck_not_null_non_negative_real_value(unittest.TestCase):
     def setUp(self):
         self.input_df = pd.DataFrame([[1, 2],
                                       [0, 10],
@@ -30,23 +30,23 @@ class Testcheck_non_negative_real_value(unittest.TestCase):
         del self.input_df
         del self.input_df_nan
 
-    def test_check_non_negative_real_value(self):
-        ret_df = data_cln.check_non_negative_real_value(self.input_df)
+    def test_check_not_null_non_negative_real_value(self):
+        ret_df = data_cln.check_not_null_non_negative_real_value(self.input_df)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 
     def test_check_nan_input_value_in_spreadsheet(self):
-        ret_df = data_cln.check_non_negative_real_value(self.input_df_nan)
+        ret_df = data_cln.check_not_null_non_negative_real_value(self.input_df_nan)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 
     def test_check_text_input_value_in_spreadsheet(self):
-        ret_df = data_cln.check_non_negative_real_value(self.input_df_text)
+        ret_df = data_cln.check_not_null_non_negative_real_value(self.input_df_text)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 
     def test_check_negative_input_value(self):
-        ret_df = data_cln.check_non_negative_real_value(self.input_df_negative)
+        ret_df = data_cln.check_not_null_non_negative_real_value(self.input_df_negative)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 
