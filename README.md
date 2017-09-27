@@ -62,8 +62,16 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   3. if input genes dataframe is empty, the program exits. If input genes dataframe is not empty, checks the intersection 
 
   between universal genes list and input genes dataframe. Returns the universal genes list with intersected genes set to value 1 and not intersected genes to 0.
-  
-  
+
+* general_clustering_pipeline
+  1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.  
+  2. checks if the user spreadsheet contins NA value. If so, rejects it.  
+  3. checks if the user spreadsheet only contains real value. If not, rejects it.
+  4. checks if the gene name in user spreasheet contains NA value. If so, removes the row.
+  5. checks if the header in user spreasheet contains NA value. If so, removes the row.
+  6. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
+  7. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
+
 * * * 
 ## How to run this pipeline with our data
 * * * 
@@ -109,15 +117,15 @@ make env_setup
 ### 6. Use one of the following "make" commands to select and run a data cleanup pipeline
 
 
-| **Command**                                   | **Option**                                        | 
-|:--------------------------------------------- |:------------------------------------------------- | 
-| make run_data_cleaning                        | example test with large dataset                   |
-| make run_samples_clustering_pipeline          | samples clustering test                           |
-| make run_gene_prioritization_pipeline_pearson | pearson correlation test                          |
-| make run_gene_prioritization_pipeline_t_test  | t-test correlation test                           |
-| make run_geneset_characterization_pipeline    | geneset characterization test                     |
-| make run_general_clustering_pipelin      e    | general clustering test                           |
-| make run_pasted_gene_list                     | pasted gene list test                             |
+| **Command**                        | **Option**                                        | 
+|:---------------------------------- |:------------------------------------------------- | 
+| make run_data_cleaning          | example test with large dataset |
+| make run_samples_clustering_pipeline          | samples clustering test                                       |
+| make run_gene_prioritization_pipeline_pearson | pearson correlation test                   |
+| make run_gene_prioritization_pipeline_t_test     | t-test correlation test          |
+| make run_geneset_characterization_pipeline | geneset characterization test  |
+| make run_general_clustering_pipeline          | general clustering test                                       |
+| make run_pasted_gene_list          | pasted gene list test                                      |
 
 * * * 
 ## How to run this pipeline with Your data
@@ -179,6 +187,7 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 | taxonid                    | 9606                                 | Taxon id of the genes                             |
 | source_hint                | ' '                                  | Hint for lookup ensembl names                     |
 | correlation_measure        | t_test/pearson                       | Correlation measure gene prioritization pipeline  |
+
 
 
 spreadsheet_name_full_path = TEST_1_gene_expression.tsv
