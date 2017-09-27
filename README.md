@@ -4,7 +4,8 @@
 This pipeline **cleanup** the data of a given spreadsheet for subsequent processing by KnowEnG Analytics Platform.
 
 ## Detailed cleanup steps for each pipeline
-* geneset_characterization_pipeline
+
+### geneset_characterization_pipeline
 
   Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
 
@@ -16,7 +17,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   6. contains duplicate row    names. 
   7. gene names can be mapped to ensemble gene name.
   
-* samples_clustering_pipeline
+### samples_clustering_pipeline
 
   Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
 
@@ -41,7 +42,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   1. checks if the network data is empty. If so, rejects it.
   2. checks if there is no intersection between two columns in network data. If so, rejects it. 
 
-* gene_prioritization_pipeline
+### gene_prioritization_pipeline
 
   Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
 
@@ -58,7 +59,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   8. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
   
-* pasted_gene_list
+### pasted_gene_list
 
   1. removes NA from input genes dataframe.
   2. casts index of input genes dataframe to string type
