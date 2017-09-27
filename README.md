@@ -5,7 +5,9 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 
 ## Detailed cleanup steps for each pipeline
 * geneset_characterization_pipeline
+
   Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
+
   1. is empty. 
   2. contains NA value/s. 
   3. contains value 0 and 1.
@@ -15,7 +17,9 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   7. gene names can be mapped to ensemble gene name.
   
 * samples_clustering_pipeline
+
   Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
+
   2. contains NA value.
   3. contains real values (then replace with their absolute value)
   5. gene name contains NA value.
@@ -25,17 +29,22 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   9. intersects  gene-gene network data (network option only) 
 
   If the user provides with the phenotype data:
+
   Afrer removing empty rows and columns, This data cleaning section will check if a phenotypic spreadsheet
+
   2. contains duplicate column name. 
   3. contains duplicate row name. 
   4. intersects with the genomic spreadsheet.
 
   If the user provides with the phenotype data: (ask Jing)
+
   1. checks if the network data is empty. If so, rejects it.
   2. checks if there is no intersection between two columns in network data. If so, rejects it. 
 
 * gene_prioritization_pipeline
+
   Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
+
   2. genomic or phenotypic data is empty. 
   3. column contains NA.
   4. contains real value.
@@ -50,9 +59,11 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
   
 * pasted_gene_list
+
   1. removes NA from input genes dataframe.
   2. casts index of input genes dataframe to string type
   3. if input genes dataframe is empty, the program exits. If input genes dataframe is not empty, checks the intersection 
+
   between universal genes list and input genes dataframe. Returns the universal genes list with intersected genes set to value 1 and not intersected genes to 0.
   
   
