@@ -1,14 +1,12 @@
 # KnowEnG's Data Cleanup Pipeline
  This is the Knowledge Engine for Genomics (KnowEnG), an NIH BD2K Center of Excellence, Data Cleanup Pipeline.
-
 This pipeline **cleanup** the data of a given spreadsheet for subsequent processing by KnowEnG Analytics Platform.
 
 ## Detailed cleanup steps for each pipeline
 
 ### geneset_characterization_pipeline
 
-  Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
-
+  After removing empty rows and columns, check if a speadsheet:
   1. is empty. 
   2. contains NA value/s. 
   3. contains value 0 and 1.
@@ -19,23 +17,21 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   
 ### samples_clustering_pipeline
 
-  Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
-
-  2. contains NA value.
-  3. contains real values (then replace with their absolute value)
-  5. gene name contains NA value.
-  6. contains duplicate column name.
-  7. contains duplicate row name.
-  8. gene name can be mapped to ensemble gene name.
-  9. intersects  gene-gene network data (network option only) 
+  After removing empty rows and columns, check if a speadsheet
+  1. contains NA value.
+  2. contains real values (then replace with their absolute value)
+  3. gene name contains NA value.
+  4. contains duplicate column name.
+  5. contains duplicate row name.
+  6. gene name can be mapped to ensemble gene name.
+  7. intersects  gene-gene network data (network option only) 
 
   If the user provides with the phenotype data:
 
-  Afrer removing empty rows and columns, This data cleaning section will check if a phenotypic spreadsheet
-
-  2. contains duplicate column name. 
-  3. contains duplicate row name. 
-  4. intersects with the genomic spreadsheet.
+  After removing empty rows and columns, check if a phenotypic spreadsheet
+  1. contains duplicate column name. 
+  2. contains duplicate row name. 
+  3. intersects with the genomic spreadsheet.
 
   If the user provides with the phenotype data: (ask Jing)
 
@@ -44,20 +40,19 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 
 ### gene_prioritization_pipeline
 
-  Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
-
-  2. genomic or phenotypic data is empty. 
-  3. column contains NA.
-  4. contains real value.
-  5. phenotype data check:
-    1. for every single drug, drops NA in phenotype data and intersects its header with the header spreadsheet to check 
+  After removing empty rows and columns, check if a speadsheet
+  1. genomic or phenotypic data is empty. 
+  2. column contains NA.
+  3. contains real value.
+  4. phenotype data check:
+    1. Single drug: drops NA in phenotype data and intersects its header with the header spreadsheet to check 
     if there is common columns (>=2) left. If not, removes this drug from phenotype data.
     2. for t_test, checks if the phenotype contains only value 0, 1 or NAN.
     3. for pearson test, checks if the phenotype contains only real value or NAN.
-  6. checks if the gene name in user spreadsheet contains NA value. If so, removes the row.
-  7. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
-  8. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
-  9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
+  5. checks if the gene name in user spreadsheet contains NA value. If so, removes the row.
+  6. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
+  7. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
+  8. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
   
 ### pasted_gene_list
 
