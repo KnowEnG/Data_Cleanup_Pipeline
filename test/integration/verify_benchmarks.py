@@ -46,12 +46,12 @@ def python_file_compare(verif_dir, results_dir):
     match, mismatch, errs = filecmp.cmpfiles(results_dir, verif_dir, os.listdir(verif_dir))
     tt = '%0.3f' % (time.time() - t0)
     if len(errs) > 0:
-        print('\n\t', tt, '\t', pipeline_name, 'test: FAIL')
+        print('\n\t', tt, '\t', pipeline_name, 'test: FAILED')
         print('Errors:')
         for e in errs:
             print(e)
     if len(mismatch) > 0:
-        print('\n\t', tt, '\t', pipeline_name, 'test: not passed')
+        print('\n\t', tt, '\t', pipeline_name, 'test: FAILED')
         print('Mismatch:')
         for mm in mismatch:
             print(mm)
