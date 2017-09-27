@@ -251,23 +251,15 @@ def run_general_clustering_pipeline(run_parameters):
     if user_spreadsheet_df_val_check is None:
         return False, logging
 
-    user_spreadsheet_df_rm_na_index = remove_na_index(user_spreadsheet_df_val_check)
-    if user_spreadsheet_df_rm_na_index is None:
-        return False, logging
-
-    user_spreadsheet_df_rm_na_header = remove_na_header(user_spreadsheet_df_rm_na_index)
+    user_spreadsheet_df_rm_na_header = remove_na_header(user_spreadsheet_df_val_check)
     if user_spreadsheet_df_rm_na_header is None:
         return False, logging
 
-    user_spreadsheet_df_dedup_row_name = check_duplicate_row_name(user_spreadsheet_df_rm_na_header)
-    if user_spreadsheet_df_dedup_row_name is None:
+    user_spreadsheet_df_cleaned = sanity_check_input_data(user_spreadsheet_df_rm_na_header)
+    if user_spreadsheet_df_cleaned is None:
         return False, logging
 
-    user_spreadsheet_df_dedup_col_name = check_duplicate_column_name(user_spreadsheet_df_dedup_row_name)
-    if user_spreadsheet_df_dedup_col_name is None:
-        return False, logging
-
-    write_to_file(user_spreadsheet_df_dedup_col_name, run_parameters['spreadsheet_name_full_path'],
+    write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
                   run_parameters['results_directory'], "_ETL.tsv")
     logging.append(
         "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_val_check.shape[0],
