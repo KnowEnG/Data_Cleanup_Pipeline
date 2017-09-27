@@ -108,6 +108,7 @@ make env_setup
 
 ### 6. Use one of the following "make" commands to select and run a data cleanup pipeline
 
+
 | **Command**                        | **Option**                                        | 
 |:---------------------------------- |:------------------------------------------------- | 
 | make run_data_cleaning          | example test with large dataset |
