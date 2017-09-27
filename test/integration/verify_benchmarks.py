@@ -9,6 +9,7 @@ import time
 DC_options_dict = {
     'run_pasted_gene_set_conversion': 'pasted_gene_set_conversion',
     'run_samples_clustering_pipeline': 'samples_clustering_pipeline',
+    'run_general_clustering_pipeline': 'general_clustering_pipeline',
     'run_gene_prioritization_pipeline_pearson': 'gene_prioritization_pipeline_pearson',
     'run_gene_prioritization_pipeline_t_test': 'gene_prioritization_pipeline_t_test',
     'run_geneset_characterization_pipeline': 'geneset_characterization_pipeline',

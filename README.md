@@ -54,8 +54,16 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   2. casts index of input genes dataframe to string type
   3. if input genes dataframe is empty, the program exits. If input genes dataframe is not empty, checks the intersection 
   between universal genes list and input genes dataframe. Returns the universal genes list with intersected genes set to value 1 and not intersected genes to 0.
-  
-  
+
+* general_clustering_pipeline
+  1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.  
+  2. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
+  3. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
+  4. checks if the gene name in user spreasheet contains NA value. If so, removes the row.
+  5. checks if the header in user spreasheet contains NA value. If so, removes the row.
+  6. checks if the user spreadsheet contins NA value. If so, rejects it.  
+  7. checks if the user spreadsheet only contains real value. If not, rejects it.
+
 * * * 
 ## How to run this pipeline with our data
 * * * 
@@ -105,6 +113,7 @@ make env_setup
 |:---------------------------------- |:------------------------------------------------- | 
 | make run_data_cleaning          | example test with large dataset |
 | make run_samples_clustering_pipeline          | samples clustering test                                       |
+| make run_general_clustering_pipeline          | general clustering test                                       |
 | make run_gene_prioritization_pipeline_pearson | pearson correlation test                   |
 | make run_gene_prioritization_pipeline_t_test     | t-test correlation test          |
 | make run_geneset_characterization_pipeline | geneset characterization test  |
@@ -161,7 +170,7 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 
 | **Key**                   | **Value** | **Comments** |
 | ------------------------- | --------- | ------------ |
-| pipeline_type                    | **gene_priorization_pipeline**, **samples_clustering_pipeline**, **geneset_characterization_pipeline**  | Choose pipeline cleaning type |
+| pipeline_type                    | **gene_priorization_pipeline**, **samples_clustering_pipeline**, **geneset_characterization_pipeline**, **general_clustering_pipeline** | Choose pipeline cleaning type |
 | spreadsheet_name_full_path | directory+spreadsheet_name |  Path and file name of user supplied gene sets |
 | phenotype_full_path | directory+phenotype_data_name | Path and file name of user supplied phenotype data |
 | gg_network_name_full_path | directory+gg_network_name | Path and file name of user supplied gene-gene network data |

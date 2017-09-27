@@ -4,6 +4,7 @@
     indicate if the user spreadsheet is valid or not. 
 """
 import os
+
 import pandas
 import redis_utilities as redisutil
 from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names, get_spreadsheet_df
@@ -246,14 +247,15 @@ def run_general_clustering_pipeline(run_parameters):
     if user_spreadsheet_df is None:
         return False, logging
 
-    user_spreadsheet_dedup_row_name = check_duplicate_row_name(user_spreadsheet_df)
-    if user_spreadsheet_dedup_row_name is None:
-        return False, logging
-    user_spreadsheet_dedup_col_name = check_duplicate_column_name(user_spreadsheet_df)
-    if user_spreadsheet_dedup_col_name is None:
+    user_spreadsheet_df_dedup_row_name = check_duplicate_row_name(user_spreadsheet_df)
+    if user_spreadsheet_df_dedup_row_name is None:
         return False, logging
 
-    user_spreadsheet_df_rm_na_index = remove_na_index(user_spreadsheet_dedup_row_name)
+    user_spreadsheet_df_dedup_col_name = check_duplicate_column_name(user_spreadsheet_df_dedup_row_name)
+    if user_spreadsheet_df_dedup_col_name is None:
+        return False, logging
+
+    user_spreadsheet_df_rm_na_index = remove_na_index(user_spreadsheet_df_dedup_col_name)
     if user_spreadsheet_df_rm_na_index is None:
         return False, logging
 
@@ -315,7 +317,7 @@ def run_pasted_gene_set_conversion(run_parameters):
     del universal_genes_df.index.name
 
     # outputs final results
-    write_to_file(mapped_small_genes_df,run_parameters['pasted_gene_list_full_path'],
+    write_to_file(mapped_small_genes_df, run_parameters['pasted_gene_list_full_path'],
                   run_parameters['results_directory'], "_MAP.tsv")
     write_to_file(universal_genes_df, run_parameters['pasted_gene_list_full_path'],
                   run_parameters['results_directory'], "_ETL.tsv")
@@ -419,7 +421,7 @@ def write_to_file(target_file, target_path, result_directory, suffix, use_index=
     """
     output_file_basename = os.path.splitext(os.path.basename(os.path.normpath(target_path)))[0]
     target_file.to_csv(result_directory + '/' + output_file_basename + suffix,
-                       sep='\t',index=use_index, header=use_header)
+                       sep='\t', index=use_index, header=use_header)
 
 
 def load_data_file(file_path):
@@ -520,7 +522,6 @@ def check_duplicate_row_name(dataframe):
     if row_count_diff < 0:
         logging.append("ERROR: An unexpected error occurred during checking duplicate row name.")
         return None
-
 
 
 def check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df_pxs):
