@@ -112,10 +112,10 @@ make env_setup
 |:---------------------------------- |:------------------------------------------------- | 
 | make run_data_cleaning          | example test with large dataset |
 | make run_samples_clustering_pipeline          | samples clustering test                                       |
-| make run_general_clustering_pipeline          | general clustering test                                       |
 | make run_gene_prioritization_pipeline_pearson | pearson correlation test                   |
 | make run_gene_prioritization_pipeline_t_test     | t-test correlation test          |
 | make run_geneset_characterization_pipeline | geneset characterization test  |
+| make run_general_clustering_pipeline          | general clustering test                                       |
 | make run_pasted_gene_list          | pasted gene list test                                      |
 
 * * * 
