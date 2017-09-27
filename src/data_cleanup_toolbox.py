@@ -4,7 +4,6 @@
     indicate if the user spreadsheet is valid or not. 
 """
 import os
-
 import pandas
 import redis_utilities as redisutil
 from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names, get_spreadsheet_df
@@ -249,6 +248,9 @@ def run_general_clustering_pipeline(run_parameters):
 
     user_spreadsheet_dedup_row_name = check_duplicate_row_name(user_spreadsheet_df)
     if user_spreadsheet_dedup_row_name is None:
+        return False, logging
+    user_spreadsheet_dedup_col_name = check_duplicate_column_name(user_spreadsheet_df)
+    if user_spreadsheet_dedup_col_name is None:
         return False, logging
 
     user_spreadsheet_df_rm_na_index = remove_na_index(user_spreadsheet_dedup_row_name)
