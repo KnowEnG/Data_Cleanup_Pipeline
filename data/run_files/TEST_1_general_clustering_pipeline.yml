@@ -1,6 +1,4 @@
 spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv
-
 results_directory:          ./run_dir/results
-
 
 pipeline_type:              general_clustering_pipeline # pipeline name

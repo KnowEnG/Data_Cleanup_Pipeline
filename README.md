@@ -17,12 +17,12 @@ This pipeline **cleanup** the data of a given spreadsheet. Given a spreadsheet t
   1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.
   2. checks if the user spreadsheet contains NA value. If so, rejects it.
   3. checks if the user spreadsheet only contains real value. If not, rejects it.
-  4. convert all values within user spreadsheet to be absolute value.
+  4. converts all values within user spreadsheet to be absolute value.
   5. checks if the gene name in user spreasheet contains NA value. If so, removes the row.
   6. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
   7. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
   8. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
-  9. checks if there is intersected ensembl name between user spreadsheet and gene-gene network data. If no intersection, rejects the spreadsheet.
+  9. checks if there is an intersected ensemble name between user spreadsheet and gene-gene network data. If there is no intersection, rejects the spreadsheet.
 
   If the user provides with the phenotype data:
   1. checks if the phenotype data is empty. If so, rejects it.
@@ -159,9 +159,9 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
    export PYTHONPATH='../src':$PYTHONPATH    
    ```
    
-  * Run
+  * Run (these relative paths assume you are in the test directory with setup as described above)
    ```
-  python3 ../src/data_cleanup.py -run_directory ./ -run_file TEMPLATE_data_cleanup.yml
+  python3 ../src/data_cleanup.py -run_directory ./run_dir -run_file TEMPLATE_data_cleanup.yml
    ```
 
 * * * 
