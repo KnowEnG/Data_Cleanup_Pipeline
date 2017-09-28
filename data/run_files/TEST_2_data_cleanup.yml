@@ -1,4 +1,4 @@
-spreadsheet_name_full_path: ../data/spreadsheets/TEST_2_gene_expression.zip
+spreadsheet_name_full_path: ../data/spreadsheets/TEST_2_gene_expression.binary
 phenotype_name_full_path:   ../data/spreadsheets/TEST_1_phenotype_pearson.tsv
 results_directory:          ./run_dir/results
 correlation_measure:        pearson 
