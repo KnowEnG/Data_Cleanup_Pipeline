@@ -7,4 +7,4 @@ SUCCESS:
 - 'WARNING: Removed 3 duplicate column(s) from user spreadsheet.'
 - 'WARNING: Removed 1 duplicate row(s) from user spreadsheet.'
 - 'INFO: Finished running sanity check for input data.'
-- 'INFO: Cleaned user spreadsheet has 14 row(s), 5 column(s).'
+- 'INFO: Cleaned user spreadsheet has 12 row(s), 4 column(s).'
