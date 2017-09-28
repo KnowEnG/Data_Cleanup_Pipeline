@@ -5,7 +5,7 @@ import numpy.testing as npytest
 import data_cleanup_toolbox as data_cln
 
 
-class TestCheck_ensemble_gene_name(unittest.TestCase):
+class TestMap_ensemble_gene_name(unittest.TestCase):
     def setUp(self):
         self.input_df_good = pd.DataFrame([[1, 0],
                                            [0, 0],
@@ -51,27 +51,32 @@ class TestCheck_ensemble_gene_name(unittest.TestCase):
         del self.input_df_empty_mapped
         del self.run_parameters
         del self.golden_output_good
-        os.remove(self.output_mapping)
-        os.remove(self.output_unmapped)
         del self.output_mapping
         del self.output_unmapped
 
-    def test_check_ensemble_gene_name_good(self):
-        ret_val = data_cln.check_ensemble_gene_name(self.input_df_good, self.run_parameters)
+    def test_map_ensemble_gene_name_good(self):
+        ret_val = data_cln.map_ensemble_gene_name(self.input_df_good, self.run_parameters)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(True, ret_val_boolean)
         npytest.assert_array_equal(self.golden_output_good, ret_val)
 
-    def test_check_ensemble_gene_name_empty_mapped(self):
-        ret_val = data_cln.check_ensemble_gene_name(self.input_df_empty_mapped, self.run_parameters)
+        # clean up files
+        os.remove(self.output_mapping)
+        os.remove(self.output_unmapped)
+
+    def test_map_ensemble_gene_name_empty_mapped(self):
+        ret_val = data_cln.map_ensemble_gene_name(self.input_df_empty_mapped, self.run_parameters)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(False, ret_val_boolean)
 
-    def test_check_ensemble_gene_name_bad(self):
-        ret_val = data_cln.check_ensemble_gene_name(self.input_df_bad, self.run_parameters)
+    def test_map_ensemble_gene_name_bad(self):
+        ret_val = data_cln.map_ensemble_gene_name(self.input_df_bad, self.run_parameters)
         ret_val_boolean = True if ret_val is not None else False
-
         self.assertEqual(True, ret_val_boolean)
+
+        # clean up files
+        os.remove(self.output_mapping)
+        os.remove(self.output_unmapped)
 
 
 if __name__ == '__main__':

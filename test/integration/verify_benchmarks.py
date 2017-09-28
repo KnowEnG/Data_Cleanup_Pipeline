@@ -2,20 +2,22 @@
 lanier4@illinois.edu
 
 """
-import os
 import filecmp
+import os
 import time
 
 DC_options_dict = {
-                'run_pasted_gene_set_conversion'            : 'pasted_gene_set_conversion',
-                'run_samples_clustering_pipeline'           : 'samples_clustering_pipeline',
-                'run_gene_prioritization_pipeline_pearson'  : 'gene_prioritization_pipeline_pearson',
-                'run_gene_prioritization_pipeline_t_test'   : 'gene_prioritization_pipeline_t_test',
-                'run_geneset_characterization_pipeline'     : 'geneset_characterization_pipeline',
-                'run_phenotype_prediction_pipeline'         : 'phenotype_prediction_pipeline'}
+    'run_pasted_gene_set_conversion': 'pasted_gene_set_conversion',
+    'run_samples_clustering_pipeline': 'samples_clustering_pipeline',
+    'run_general_clustering_pipeline': 'general_clustering_pipeline',
+    'run_gene_prioritization_pipeline_pearson': 'gene_prioritization_pipeline_pearson',
+    'run_gene_prioritization_pipeline_t_test': 'gene_prioritization_pipeline_t_test',
+    'run_geneset_characterization_pipeline': 'geneset_characterization_pipeline',
+    'run_phenotype_prediction_pipeline': 'phenotype_prediction_pipeline'}
 
 verify_root_dir = '../data/verification'
 results_dir = './run_dir/results'
+
 
 def run_all_BENCHMARKs_and_TESTs():
     """ run the make file targes for all yaml files and compre the results with their verification files """
@@ -35,30 +37,29 @@ def run_all_BENCHMARKs_and_TESTs():
         for tmp_file_name in os.listdir(results_dir):
             if os.path.isfile(os.path.join(results_dir, tmp_file_name)):
                 os.remove(os.path.join(results_dir, tmp_file_name))
-        # os.system("make clean_dir_recursively create_run_dir copy_run_files")
+                # os.system("make clean_dir_recursively create_run_dir copy_run_files")
 
 
 def python_file_compare(verif_dir, results_dir):
     t0 = time.time()
     nix_dir, pipeline_name = os.path.split(verif_dir)
     match, mismatch, errs = filecmp.cmpfiles(results_dir, verif_dir, os.listdir(verif_dir))
-    tt = '%0.3f'%(time.time() - t0)
+    tt = '%0.3f' % (time.time() - t0)
     if len(errs) > 0:
-        print('\n\t',tt,'\t', pipeline_name, 'test: FAIL')
+        print('\n\t', tt, '\t', pipeline_name, 'test: FAILED')
         print('Errors:')
         for e in errs:
             print(e)
     if len(mismatch) > 0:
-        print('\n\t',tt,'\t', pipeline_name, 'test: not passed')
+        print('\n\t', tt, '\t', pipeline_name, 'test: FAILED')
         print('Mismatch:')
         for mm in mismatch:
             print(mm)
     if len(match) > 0:
-        print('\n\t',tt,'\t', pipeline_name, 'test: PASS')
+        print('\n\t', tt, '\t', pipeline_name, 'test: PASS')
         print('Matched:')
         for m in match:
             print(m)
-
 
 
 def main():
@@ -70,6 +71,7 @@ def main():
 
     run_all_BENCHMARKs_and_TESTs()
     print('\n')
+
 
 if __name__ == "__main__":
     main()

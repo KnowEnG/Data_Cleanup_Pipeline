@@ -1,0 +1,10 @@
+SUCCESS:
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv
+  with 15 row(s) and 5 column(s)'
+- 'WARNING: Removed 1 empty row(s).'
+- 'INFO: Start to run sanity checks for input data.'
+- 'WARNING: Removed 1 row(s) which contains NA in index.'
+- 'WARNING: Removed 3 duplicate column(s) from user spreadsheet.'
+- 'WARNING: Removed 1 duplicate row(s) from user spreadsheet.'
+- 'INFO: Finished running sanity check for input data.'
+- 'INFO: Cleaned user spreadsheet has 14 row(s), 5 column(s).'
