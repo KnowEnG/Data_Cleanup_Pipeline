@@ -6,6 +6,11 @@ import filecmp
 import os
 import time
 
+"""
+the list of verification tests :
+key: Makefile target
+value: target directory under ../data/verification/
+"""
 DC_options_dict = {
     'run_pasted_gene_set_conversion': 'pasted_gene_set_conversion',
     'run_samples_clustering_pipeline': 'samples_clustering_pipeline',
@@ -13,7 +18,8 @@ DC_options_dict = {
     'run_gene_prioritization_pipeline_pearson': 'gene_prioritization_pipeline_pearson',
     'run_gene_prioritization_pipeline_t_test': 'gene_prioritization_pipeline_t_test',
     'run_geneset_characterization_pipeline': 'geneset_characterization_pipeline',
-    'run_phenotype_prediction_pipeline': 'phenotype_prediction_pipeline'}
+    'run_phenotype_prediction_pipeline': 'phenotype_prediction_pipeline',
+    'run_file_format': 'file_format_test'}
 
 verify_root_dir = '../data/verification'
 results_dir = './run_dir/results'
