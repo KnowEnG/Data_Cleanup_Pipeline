@@ -262,8 +262,8 @@ def run_general_clustering_pipeline(run_parameters):
     write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
                   run_parameters['results_directory'], "_ETL.tsv")
     logging.append(
-        "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_val_check.shape[0],
-                                                                             user_spreadsheet_df_val_check.shape[1]))
+        "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                             user_spreadsheet_df_cleaned.shape[1]))
     return True, logging
 
 
