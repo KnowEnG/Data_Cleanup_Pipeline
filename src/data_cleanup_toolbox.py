@@ -268,6 +268,15 @@ def run_general_clustering_pipeline(run_parameters):
 
 
 def run_pasted_gene_set_conversion(run_parameters):
+    """
+    Runs data cleaning for pasted_gene_set_conversion.
+
+    Args:
+        run_parameters:
+
+    Returns:
+
+    """
     # gets redis database instance by its credential
     redis_db = redisutil.get_database(run_parameters['redis_credential'])
 
@@ -317,6 +326,70 @@ def run_pasted_gene_set_conversion(run_parameters):
     logging.append("INFO: Mapped gene list contains {} genes.".format(mapped_small_genes_df.shape[0]))
     return True, logging
 
+
+def run_signature_analysis_pipeline(run_parameters):
+    """
+    Runs data cleaning for signature_analysis_pipeline.
+
+    Args:
+        run_parameters:
+
+    Returns:
+
+    """
+    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+    if user_spreadsheet_df is None:
+        return False, logging
+
+    # dimension: sample x phenotype
+    phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+    if phenotype_df is None:
+        return False, logging
+
+    if 'gg_network_name_full_path' in run_parameters.keys():
+        logging.append("INFO: Start to process network data.")
+        # Loads network dataframe to check number of genes intersected between spreadsheet and network
+        network_df = get_network_df(run_parameters['gg_network_name_full_path'])
+        if network_df.empty:
+            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
+                run_parameters['gg_network_name_full_path']))
+            return False, logging
+
+
+
+def run_feature_prioritization_pipeline(run_parameters):
+    """
+
+    Args:
+        run_parameters:
+
+    Returns:
+
+    """
+    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+    if user_spreadsheet_df is None:
+        return False, logging
+
+    # dimension: sample x phenotype
+    phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+    if phenotype_df is None:
+        return False, logging
+
+    user_spreadsheet_df_val_check = check_not_null_real_value(user_spreadsheet_df)
+    if user_spreadsheet_df_val_check is None:
+        return False, logging
+
+    phenotype_df_val_check = check_data_for_t_test_and_pearson(phenotype_df, run_parameters['correlation_measure'])
+    if phenotype_df_val_check is None:
+        return False, logging
+
+    write_to_file(user_spreadsheet_df, run_parameters['spreadsheet_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+    logging.append("INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df.shape[0],
+                                                                         user_spreadsheet_df.shape[1]))
+    write_to_file(phenotype_df_val_check, run_parameters['phenotype_name_full_path'], run_parameters['results_directory'], "_ETL.tsv")
+    logging.append("INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_val_check.shape[0],
+                                                                                    phenotype_df_val_check.shape[1]))
 
 def remove_empty_row(dataframe):
     """
