@@ -3,11 +3,7 @@
     It validates/cleans the user spreadsheet data and returns a boolean value to
     indicate if the user spreadsheet is valid or not. 
 """
-import os
-
 import pandas
-import redis_utilities as redisutil
-from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names, get_spreadsheet_df
 
 logging = []
 
@@ -62,6 +58,8 @@ def run_samples_clustering_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not.
         message: A message indicates the status of current check.
     """
+    from knpackage.toolbox import get_network_df,extract_network_node_names,find_unique_node_names
+
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
     if user_spreadsheet_df is None:
         return False, logging
@@ -268,6 +266,18 @@ def run_general_clustering_pipeline(run_parameters):
 
 
 def run_pasted_gene_set_conversion(run_parameters):
+    """
+    Runs data cleaning for pasted_gene_set_conversion.
+
+    Args:
+        run_parameters:
+
+    Returns:
+
+    """
+    from knpackage.toolbox import get_spreadsheet_df
+    import redis_utilities as redisutil
+
     # gets redis database instance by its credential
     redis_db = redisutil.get_database(run_parameters['redis_credential'])
 
@@ -315,6 +325,49 @@ def run_pasted_gene_set_conversion(run_parameters):
                   run_parameters['results_directory'], "_ETL.tsv")
     logging.append("INFO: Universal gene list contains {} genes.".format(universal_genes_df.shape[0]))
     logging.append("INFO: Mapped gene list contains {} genes.".format(mapped_small_genes_df.shape[0]))
+    return True, logging
+
+
+def run_feature_prioritization_pipeline(run_parameters):
+    """
+
+    Args:
+        run_parameters:
+
+    Returns:
+
+    """
+    from phenotype_expander_toolbox import phenotype_expander
+
+    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+    if user_spreadsheet_df is None:
+        return False, logging
+
+    # dimension: sample x phenotype
+    phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+    if phenotype_df is None:
+        return False, logging
+
+    user_spreadsheet_df_val_check = check_not_null_real_value(user_spreadsheet_df)
+    if user_spreadsheet_df_val_check is None:
+        return False, logging
+
+    phenotype_df_val_check = check_data_for_t_test_and_pearson(phenotype_df, run_parameters['correlation_measure'])
+    if phenotype_df_val_check is None:
+        return False, logging
+
+    write_to_file(user_spreadsheet_df, run_parameters['spreadsheet_name_full_path'],
+                  run_parameters['results_directory'], "_ETL.tsv")
+    logging.append("INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df.shape[0],
+                                                                                        user_spreadsheet_df.shape[1]))
+
+    if run_parameters['correlation_measure'] == 't_test':
+        phenotype_expander(run_parameters)
+    else:
+        write_to_file(phenotype_df_val_check, run_parameters['phenotype_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+        logging.append("INFO: Cleaned phenotypic data has {} row(s), {} column(s).".format(phenotype_df_val_check.shape[0],
+                                                                                        phenotype_df_val_check.shape[1]))
     return True, logging
 
 
@@ -411,6 +464,8 @@ def write_to_file(target_file, target_path, result_directory, suffix, use_index=
     Returns:
         NA
     """
+    import os
+
     output_file_basename = os.path.splitext(os.path.basename(os.path.normpath(target_path)))[0]
     target_file.to_csv(result_directory + '/' + output_file_basename + suffix,
                        sep='\t', index=use_index, header=use_header)
@@ -728,6 +783,8 @@ def map_ensemble_gene_name(dataframe, run_parameters):
     Returns:
          output_df_mapped_dedup: cleaned DataFrame
     """
+    import redis_utilities as redisutil
+
     redis_db = redisutil.get_database(run_parameters['redis_credential'])
 
     # copy index to new column named with 'original'

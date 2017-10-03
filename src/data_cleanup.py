@@ -69,13 +69,12 @@ def phenotype_prediction_pipeline(run_parameters):
 
 def pasted_gene_set_conversion(run_parameters):
     """
-        Runs pasted_gene_set_conversion
-        Args:
-            run_parameters: input configuration as dictionary
-
-        Returns:
-            validation_flag: Boolean type value indicating if input data is valid or not
-            message: A message indicates the status of current check
+    Runs pasted_gene_set_conversion
+    Args:
+        run_parameters: input configuration as dictionary
+    Returns:
+        validation_flag: Boolean type value indicating if input data is valid or not
+        message: A message indicates the status of current chec
     """
     from data_cleanup_toolbox import run_pasted_gene_set_conversion, generate_logging
     validation_flag, message = run_pasted_gene_set_conversion(run_parameters)
@@ -85,18 +84,32 @@ def pasted_gene_set_conversion(run_parameters):
 
 def general_clustering_pipeline(run_parameters):
     """
-        Runs general_clustering_pipeline
-        Args:
-            run_parameters: input configuration as dictionary
-
-        Returns:
-            validation_flag: Boolean type value indicating if input data is valid or not
-            message: A message indicates the status of current check
+    Runs general_clustering_pipeline
+    Args:
+        run_parameters: input configuration as dictionary
+    Returns:
+        validation_flag: Boolean type value indicating if input data is valid or not
+        message: A message indicates the status of current check
     """
     from data_cleanup_toolbox import run_general_clustering_pipeline, generate_logging
     validation_flag, message = run_general_clustering_pipeline(run_parameters)
     generate_logging(validation_flag, message,
                      run_parameters["results_directory"] + "/log_general_clustering_pipeline.yml")
+
+
+def feature_prioritization_pipeline(run_parameters):
+    """
+    Runs feature_prioritization_pipeline
+    Args:
+        run_parameters: input configuration as dictionary
+    Returns:
+        validation_flag: Boolean type value indicating if input data is valid or not
+        message: A message indicates the status of current check
+    """
+    from data_cleanup_toolbox import run_feature_prioritization_pipeline, generate_logging
+    validation_flag, message = run_feature_prioritization_pipeline(run_parameters)
+    generate_logging(validation_flag, message,
+                     run_parameters["results_directory"] + "/log_feature_prioritization_pipeline.yml")
 
 
 SELECT = {
@@ -105,7 +118,8 @@ SELECT = {
     "geneset_characterization_pipeline": geneset_characterization_pipeline,
     "gene_prioritization_pipeline": gene_prioritization_pipeline,
     "phenotype_prediction_pipeline": phenotype_prediction_pipeline,
-    "pasted_gene_set_conversion": pasted_gene_set_conversion
+    "pasted_gene_set_conversion": pasted_gene_set_conversion,
+    "feature_prioritization_pipeline": feature_prioritization_pipeline
 }
 
 
