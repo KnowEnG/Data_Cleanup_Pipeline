@@ -75,8 +75,9 @@ def phenotype_expander(run_parameters):
                 cur_append_df.loc[cur_df.index, :] = cur_df
                 result_df = pd.concat([result_df, cur_append_df], axis=1)
 
+    result_df.index.name = "sample_id"
+
     file_name = kn.create_timestamped_filename("phenotype_expander_result", "tsv")
     file_path = os.path.join(run_parameters["results_directory"], file_name)
-    result_df.index.name = "sample_id"
     result_df.to_csv(file_path, header=True, index=True, sep='\t', na_rep='NA')
 
