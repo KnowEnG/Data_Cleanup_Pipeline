@@ -112,6 +112,13 @@ def feature_prioritization_pipeline(run_parameters):
                      run_parameters["results_directory"] + "/log_feature_prioritization_pipeline.yml")
 
 
+def signature_analysis_pipeline(run_parameters):
+    from data_cleanup_toolbox import run_signature_analysis_pipeline, generate_logging
+    validation_flag, message = run_signature_analysis_pipeline(run_parameters)
+    generate_logging(validation_flag, message,
+                     run_parameters["results_directory"] + "/log_signature_analysis_pipeline.yml")
+
+
 SELECT = {
     "samples_clustering_pipeline": samples_clustering_pipeline,
     "general_clustering_pipeline": general_clustering_pipeline,
@@ -119,7 +126,8 @@ SELECT = {
     "gene_prioritization_pipeline": gene_prioritization_pipeline,
     "phenotype_prediction_pipeline": phenotype_prediction_pipeline,
     "pasted_gene_set_conversion": pasted_gene_set_conversion,
-    "feature_prioritization_pipeline": feature_prioritization_pipeline
+    "feature_prioritization_pipeline": feature_prioritization_pipeline,
+    "signature_analysis_pipeline": signature_analysis_pipeline
 }
 
 

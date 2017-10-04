@@ -371,6 +371,83 @@ def run_feature_prioritization_pipeline(run_parameters):
     return True, logging
 
 
+def run_signature_analysis_pipeline(run_parameters):
+    """
+       Runs data cleaning for signature_analysis_pipeline.
+
+       Args:
+           run_parameters: configuration dictionary
+
+       Returns:
+           validation_flag: Boolean type value indicating if input data is valid or not.
+           message: A message indicates the status of current check.
+       """
+    from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
+
+    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+    if user_spreadsheet_df is None:
+        return False, logging
+
+    phenotype_df_cleaned = None
+    if 'phenotype_name_full_path' in run_parameters.keys():
+        logging.append("INFO: Start to process phenotype data.")
+        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+        if phenotype_df is None:
+            return False, logging
+        else:
+            phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.columns.values)
+            if phenotype_df_cleaned is None:
+                return False, logging
+
+    logging.append("INFO: Start to process user spreadsheet data.")
+
+    # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
+    user_spreadsheet_val_chked = check_not_null_non_negative_real_value(user_spreadsheet_df)
+
+    if user_spreadsheet_val_chked is None:
+        return False, logging
+
+    # Checks duplication on column and row name
+    user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
+
+    # Checks the validity of gene name to see if it can be ensemble or not
+    user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
+
+    if 'gg_network_name_full_path' in run_parameters.keys():
+        logging.append("INFO: Start to process network data.")
+        # Loads network dataframe to check number of genes intersected between spreadsheet and network
+        network_df = get_network_df(run_parameters['gg_network_name_full_path'])
+        if network_df.empty:
+            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
+                run_parameters['gg_network_name_full_path']))
+            return False, logging
+        node_1_names, node_2_names = extract_network_node_names(network_df)
+        unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
+
+        intersection = find_intersection(unique_gene_names, user_spreadsheet_df_cleaned.index)
+        if intersection is None:
+            logging.append('ERROR: Cannot find intersection between spreadsheet genes and network genes.')
+            return False, logging
+
+    # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
+    if user_spreadsheet_df_cleaned is None:
+        return False, logging
+    else:
+        write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+        logging.append(
+            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                                 user_spreadsheet_df_cleaned.shape[1]))
+    if phenotype_df_cleaned is not None:
+        write_to_file(phenotype_df_cleaned, run_parameters['phenotype_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+        logging.append(
+            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_cleaned.shape[0],
+                                                                               phenotype_df_cleaned.shape[1]))
+    return True, logging
+
+
+
 def remove_empty_row(dataframe):
     """
     Remove empty rows in a dataframe
