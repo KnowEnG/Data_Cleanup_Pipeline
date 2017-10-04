@@ -384,22 +384,21 @@ def run_signature_analysis_pipeline(run_parameters):
        """
     from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
 
+    logging.append("INFO: Start to process signature data.")
+    signature_df = load_data_file(run_parameters['signature_name_full_path'])
+    if signature_df is None:
+        return False, logging
+
+    logging.append("INFO: Start to process user spreadsheet data.")
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
     if user_spreadsheet_df is None:
         return False, logging
 
-    phenotype_df_cleaned = None
-    if 'phenotype_name_full_path' in run_parameters.keys():
-        logging.append("INFO: Start to process phenotype data.")
-        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
-        if phenotype_df is None:
-            return False, logging
-        else:
-            phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.columns.values)
-            if phenotype_df_cleaned is None:
-                return False, logging
+    intersection_signature_spreadsheet = find_intersection(signature_df.index, user_spreadsheet_df.index)
+    if intersection_signature_spreadsheet is None:
+        logging.append('ERROR: Cannot find intersection between spreadsheet genes and signature genes.')
+        return False, logging
 
-    logging.append("INFO: Start to process user spreadsheet data.")
 
     # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
     user_spreadsheet_val_chked = check_not_null_non_negative_real_value(user_spreadsheet_df)
@@ -438,14 +437,13 @@ def run_signature_analysis_pipeline(run_parameters):
         logging.append(
             "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
                                                                                  user_spreadsheet_df_cleaned.shape[1]))
-    if phenotype_df_cleaned is not None:
-        write_to_file(phenotype_df_cleaned, run_parameters['phenotype_name_full_path'],
+    if signature_df is not None:
+        write_to_file(signature_df, run_parameters['signature_name_full_path'],
                       run_parameters['results_directory'], "_ETL.tsv")
         logging.append(
-            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_cleaned.shape[0],
-                                                                               phenotype_df_cleaned.shape[1]))
+            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(signature_df.shape[0],
+                                                                               signature_df.shape[1]))
     return True, logging
-
 
 
 def remove_empty_row(dataframe):
