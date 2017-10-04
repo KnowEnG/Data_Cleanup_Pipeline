@@ -399,7 +399,6 @@ def run_signature_analysis_pipeline(run_parameters):
         logging.append('ERROR: Cannot find intersection between spreadsheet genes and signature genes.')
         return False, logging
 
-
     # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
     user_spreadsheet_val_chked = check_not_null_non_negative_real_value(user_spreadsheet_df)
 
@@ -423,9 +422,9 @@ def run_signature_analysis_pipeline(run_parameters):
         node_1_names, node_2_names = extract_network_node_names(network_df)
         unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
 
-        intersection = find_intersection(unique_gene_names, user_spreadsheet_df_cleaned.index)
+        intersection = find_intersection(unique_gene_names, intersection_signature_spreadsheet)
         if intersection is None:
-            logging.append('ERROR: Cannot find intersection between spreadsheet genes and network genes.')
+            logging.append('ERROR: Cannot find intersection among spreadsheet genes, signature genes and network genes.')
             return False, logging
 
     # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
