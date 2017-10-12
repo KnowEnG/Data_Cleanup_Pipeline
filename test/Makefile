@@ -58,7 +58,13 @@ run_phenotype_prediction_pipeline:
 run_general_clustering_pipeline:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_general_clustering_pipeline.yml
 
-run_file_format:
+run_feature_prioritization_pipeline:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_feature_prioritization_pipeline.yml
+
+run_signature_analysis_pipeline:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_signature_analysis_pipeline.yml
+
+run_file_format_test:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_2_data_cleanup.yml
 
 # ----------------------------------------------------------------
