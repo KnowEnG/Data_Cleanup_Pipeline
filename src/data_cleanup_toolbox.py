@@ -66,14 +66,11 @@ def run_samples_clustering_pipeline(run_parameters):
 
     phenotype_df_cleaned = None
     if 'phenotype_name_full_path' in run_parameters.keys():
-        logging.append("INFO: Start to process phenotype data.")
-        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
-        if phenotype_df is None:
+        phenotype_df_cleaned = load_optional_phenotype_data(run_parameters['phenotype_name_full_path'],
+                                                            user_spreadsheet_df)
+        if phenotype_df_cleaned is None:
+            logging.append("ERROR: Phenotype is emtpy. Please provide a valid phenotype data.")
             return False, logging
-        else:
-            phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.columns.values)
-            if phenotype_df_cleaned is None:
-                return False, logging
 
     logging.append("INFO: Start to process user spreadsheet data.")
 
@@ -245,6 +242,15 @@ def run_general_clustering_pipeline(run_parameters):
     if user_spreadsheet_df is None:
         return False, logging
 
+    phenotype_df_cleaned = None
+    if 'phenotype_name_full_path' in run_parameters.keys():
+        phenotype_df_cleaned = load_optional_phenotype_data(run_parameters['phenotype_name_full_path'], user_spreadsheet_df)
+        if phenotype_df_cleaned is None:
+            logging.append("ERROR: Phenotype is emtpy. Please provide a valid phenotype data.")
+            return False, logging
+
+    logging.append("INFO: Start to process user spreadsheet data.")
+
     user_spreadsheet_df_val_check = check_not_null_real_value(user_spreadsheet_df)
     if user_spreadsheet_df_val_check is None:
         return False, logging
@@ -262,6 +268,13 @@ def run_general_clustering_pipeline(run_parameters):
     logging.append(
         "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
                                                                              user_spreadsheet_df_cleaned.shape[1]))
+
+    if phenotype_df_cleaned is not None:
+        write_to_file(phenotype_df_cleaned, run_parameters['phenotype_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+        logging.append(
+            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_cleaned.shape[0],
+                                                                               phenotype_df_cleaned.shape[1]))
     return True, logging
 
 
@@ -581,6 +594,15 @@ def load_data_file(file_path):
     except Exception as err:
         logging.append("ERROR: {}".format(str(err)))
         return None
+
+
+def load_optional_phenotype_data(phenotype_name_full_path, user_spreadsheet_df):
+    phenotype_df_cleaned = None
+    logging.append("INFO: Start to process phenotype data.")
+    phenotype_df = load_data_file(phenotype_name_full_path)
+    if phenotype_df is not None:
+        phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.columns.values)
+    return phenotype_df_cleaned
 
 
 def check_duplicate_column_name(dataframe):
