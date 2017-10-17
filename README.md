@@ -5,7 +5,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 ## Detailed cleanup steps for each pipeline
 
 ### geneset_characterization_pipeline
-  *After removing empty rows and columns, check if a speadsheet:*
+  *After removing empty rows and columns, check if a spreadsheet:*
   1. is empty. 
   2. contains NA value/s. 
   3. contains value 0 and 1.
@@ -15,7 +15,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   7. gene names can be mapped to ensemble gene name.
   
 ### samples_clustering_pipeline
-  *After removing empty rows and columns, check if a speadsheet:*
+  *After removing empty rows and columns, check if a spreadsheet:*
   1. contains NA value.
   2. contains real values (then replace with their absolute value)
   3. gene name contains NA value.
@@ -26,13 +26,17 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 
   *If the user provides with the phenotype data:*
   *After removing empty rows and columns, check if a phenotypic spreadsheet:*
-  *If the user provides with the network data:* 
   1. contains duplicate column name. 
   2. contains duplicate row name. 
   3. intersects with the genomic spreadsheet.
 
+  *If the user provides with the network data:* 
+  1. is empty.
+  2. intersects with genomic spreadsheet.
+  
+  
 ### gene_prioritization_pipeline
-  *After removing empty rows and columns, check if a speadsheet:*
+  *After removing empty rows and columns, check if a spreadsheet:*
   1. genomic or phenotypic data is empty. 
   2. column contains NA.
   3. contains real value.
@@ -41,30 +45,30 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   7. contains duplicate row name. 
   8. gene name can be mapped to ensemble gene name.
   
-  *If the user provides with the phenotype data:*
+  *If the user provides with the phenotypic spreadsheet:*
   1. for every single drug:
     1. drops NA.
     2. intersects header with spreadsheet header, number of intersection >= 2.
   2. for t_test, contains only value 0, 1 or NAN.
   3. for pearson test, contains only real value or NAN
   
-* pasted_gene_list
-  *After removing empty rows and columns, This data cleaning section will check if a speadsheet*
+### pasted_gene_list
+  *After removing empty rows and columns, check if a spreadsheet:*
   1. input genes contains NA.
   2. casts index of input genes dataframe to string type
   3. intersects with universal genes list from redis database
 
-* general_clustering_pipeline
-  After removing empty rows and columns, This data cleaning section will check if a speadsheet
-  2. contains NA value.
-  3. contains real value. 
-  4. contains NA value in gene name.
-  5. contains NA value in header.
-  6. contains duplicate row names. 
-  7. contains duplicate column names. 
+### general_clustering_pipeline
+  *After removing empty rows and columns, check if a spreadsheet:*
+  1. contains NA value.
+  2. contains real value. 
+  3. contains NA value in gene name.
+  4. contains NA value in header.
+  5. contains duplicate row names. 
+  6. contains duplicate column names. 
   
-  If the user provides with the phenotype data:
-  After removing empty rows and columns, This data cleaning section will check if a phenotypic spreadsheet
+  *If the user provides with the phenotype data:*
+  *After removing empty rows and columns, check if a phenotypic spreadsheet:*
   1. contains duplicate column name. 
   2. contains duplicate row name. 
   3. intersects with the genomic spreadsheet.
