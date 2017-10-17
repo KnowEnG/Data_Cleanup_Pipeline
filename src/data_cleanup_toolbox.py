@@ -597,6 +597,16 @@ def load_data_file(file_path):
 
 
 def load_optional_phenotype_data(phenotype_name_full_path, user_spreadsheet_df):
+    """
+    Load the optional phenotype data for clustering functions.
+
+    Args:
+        phenotype_name_full_path: full path of phenotype data
+        user_spreadsheet_df: input user spreadsheet dataframe
+
+    Returns:
+        phenotype_df_cleaned: a cleaned phenotype DataFrame
+    """
     phenotype_df_cleaned = None
     logging.append("INFO: Start to process phenotype data.")
     phenotype_df = load_data_file(phenotype_name_full_path)
