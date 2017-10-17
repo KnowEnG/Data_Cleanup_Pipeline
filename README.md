@@ -5,64 +5,71 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 
 ## Detailed cleanup steps for each pipeline
 * geneset_characterization_pipeline
-  Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
+  After removing empty rows and columns, This data cleaning section will check if a speadsheet
   1. is empty. 
   2. contains NA value/s. 
   3. contains value 0 and 1.
   4. gene name has NA value. 
   5. contains duplicate column names. 
-  6. contains duplicate row    names. 
+  6. contains duplicate row names. 
   7. gene names can be mapped to ensemble gene name.
   
 * samples_clustering_pipeline
-  Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
-  2. contains NA value.
-  3. contains real values (then replace with their absolute value)
-  5. gene name contains NA value.
-  6. contains duplicate column name.
-  7. contains duplicate row name.
-  8. gene name can be mapped to ensemble gene name.
-  9. intersects  gene-gene network data (network option only) 
+  After removing empty rows and columns, This data cleaning section will check if a speadsheet
+  1. contains NA value.
+  2. contains real values (then replace with their absolute value)
+  3. gene name contains NA value.
+  4. contains duplicate column name.
+  5. contains duplicate row name.
+  6. gene name can be mapped to ensemble gene name.
 
   If the user provides with the phenotype data:
-  Afrer removing empty rows and columns, This data cleaning section will check if a phenotypic spreadsheet
-  2. contains duplicate column name. 
-  3. contains duplicate row name. 
-  4. intersects with the genomic spreadsheet.
+  After removing empty rows and columns, This data cleaning section will check if a phenotypic spreadsheet
+  1. contains duplicate column name. 
+  2. contains duplicate row name. 
+  3. intersects with the genomic spreadsheet.
 
-  If the user provides with the phenotype data: (ask Jing)
-  1. checks if the network data is empty. If so, rejects it.
-  2. checks if there is no intersection between two columns in network data. If so, rejects it. 
+  If the user provides with the network data: 
+  1. is empty. 
+  2. intersects gene-gene network data (network option only) 
 
 * gene_prioritization_pipeline
-  Afrer removing empty rows and columns, This data cleaning section will check if a speadsheet
-  2. genomic or phenotypic data is empty. 
-  3. column contains NA.
-  4. contains real value.
-  5. phenotype data check:
-    1. for every single drug, drops NA in phenotype data and intersects its header with the header spreadsheet to check 
-    if there is common columns (>=2) left. If not, removes this drug from phenotype data.
-    2. for t_test, checks if the phenotype contains only value 0, 1 or NAN.
-    3. for pearson test, checks if the phenotype contains only real value or NAN.
-  6. checks if the gene name in user spreadsheet contains NA value. If so, removes the row.
-  7. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
-  8. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
-  9. checks if the gene name in user spreadsheet can be mapped to ensemble gene name. If no one could be mapped, rejects the spreadshset.
+  After removing empty rows and columns, This data cleaning section will check if a speadsheet
+  1. genomic or phenotypic data is empty. 
+  2. column contains NA.
+  3. contains real value.
+  5. contains NA gene name in user spreadsheet.
+  6. contains duplicate column name. 
+  7. contains duplicate row name. 
+  8. gene name can be mapped to ensemble gene name.
+  
+  If the user provides with the phenotype data: 
+  1. for every single drug:
+    1. drops NA.
+    2. intersects header with spreadsheet header, number of intersection >= 2.
+  2. for t_test, contains only value 0, 1 or NAN.
+  3. for pearson test, contains only real value or NAN
   
 * pasted_gene_list
-  1. removes NA from input genes dataframe.
+  After removing empty rows and columns, This data cleaning section will check if a speadsheet
+  1. input genes contains NA.
   2. casts index of input genes dataframe to string type
-  3. if input genes dataframe is empty, the program exits. If input genes dataframe is not empty, checks the intersection 
-  between universal genes list and input genes dataframe. Returns the universal genes list with intersected genes set to value 1 and not intersected genes to 0.
-
+  3. intersects with universal genes list from redis database
+  
 * general_clustering_pipeline
-  1. removes empty rows in user spreasheet and checks if the user spreadsheet is empty. If so, rejects it.  
-  2. checks if the user spreadsheet contins NA value. If so, rejects it.  
-  3. checks if the user spreadsheet only contains real value. If not, rejects it.
-  4. checks if the gene name in user spreasheet contains NA value. If so, removes the row.
-  5. checks if the header in user spreasheet contains NA value. If so, removes the row.
-  6. checks if the user spreadsheet contains duplicate row name. If so, removes the duplicates.
-  7. checks if the user spreadsheet contains duplicate column name. If so, removes the duplicates.
+  After removing empty rows and columns, This data cleaning section will check if a speadsheet
+  2. contains NA value.
+  3. contains real value. 
+  4. contains NA value in gene name.
+  5. contains NA value in header.
+  6. contains duplicate row names. 
+  7. contains duplicate column names. 
+  
+  If the user provides with the phenotype data:
+  After removing empty rows and columns, This data cleaning section will check if a phenotypic spreadsheet
+  1. contains duplicate column name. 
+  2. contains duplicate row name. 
+  3. intersects with the genomic spreadsheet.
 
 * * * 
 ## How to run this pipeline with our data
