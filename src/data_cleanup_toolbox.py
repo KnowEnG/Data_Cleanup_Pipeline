@@ -252,8 +252,7 @@ def run_general_clustering_pipeline(run_parameters):
     logging.append("INFO: Start to process user spreadsheet data.")
 
     # Check if user spreadsheet contains na value and only real number
-    user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True)
-
+    user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, dropna_colwise=True, check_real_number=True)
     if user_spreadsheet_df_val_check is None:
         return False, logging
 
