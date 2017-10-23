@@ -797,8 +797,21 @@ def check_data_for_t_test_and_pearson(phenotype_df_pxs, correlation_measure):
 
 
 def check_input_data_value(dataframe, check_na=False, dropna_colwise=False, check_real_number=False, check_positive_number=False):
+    """
+    Customized checks for input data (contains NA value, contains all real number, contains all positive number)
+    Args:
+        dataframe: input DataFrame to be checked
+        check_na: check NA in DataFrame
+        dropna_colwise: drop column which contains NA
+        check_real_number: check only real number exists in DataFrame
+        check_positive_number: check only positive number exists in DataFrame
+
+    Returns:
+        dataframe: cleaned DataFrame
+    """
+    # drop NA column wise in dataframe
     if dropna_colwise is True:
-        # drops column which check NA in dataframe to reduce phenotype dimension
+        # drops column which check NA in dataframe
         org_column_count = dataframe.shape[1]
         dataframe = dataframe.dropna(axis=1)
         diff_count = org_column_count - dataframe.shape[1]
@@ -809,19 +822,20 @@ def check_input_data_value(dataframe, check_na=False, dropna_colwise=False, chec
             logging.append("ERROR: User spreadsheet is empty after removing NA.")
             return None
 
+    # checks if dataframe contains NA value
     if check_na is True:
         if dataframe.isnull().values.any():
             logging.append("ERROR: This user spreadsheet contains NaN value.")
             return None
 
+    # checks real number negative to positive infinite
     if check_real_number is True:
-        # checks real number negative to positive infinite
         if False in dataframe.applymap(lambda x: isinstance(x, (int, float))).values:
             logging.append("ERROR: Found non-numeric value in user spreadsheet.")
             return None
 
+    # checks if dataframe contains only non-negative number
     if check_positive_number is True:
-        # checks if user spreadsheet check only non-negative number
         if False in dataframe.applymap(lambda x: x >= 0).values:
             logging.append("ERROR: Found negative value in user spreadsheet.")
             return None
