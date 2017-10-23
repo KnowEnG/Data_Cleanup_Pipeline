@@ -24,7 +24,7 @@ def run_geneset_characterization_pipeline(run_parameters):
     if user_spreadsheet_df is None:
         return False, logging
 
-    # Checks only non-negative real value appears in user spreadsheet, drop na column wise
+    # Checks only non-negative real number appears in user spreadsheet, drop na column wise
     user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True, check_positive_number=True)
 
     if user_spreadsheet_val_chked is None:
@@ -195,7 +195,7 @@ def run_phenotype_prediction_pipeline(run_parameters):
     if phenotype_df is None:
         return False, logging
 
-    # Check if user spreadsheet contains only real value and drop na column wise
+    # Check if user spreadsheet contains only real number and drop na column wise
     user_spreadsheet_dropna = check_input_data_value(user_spreadsheet_df, dropna_colwise=True, check_real_number=True)
 
     if user_spreadsheet_dropna is None or user_spreadsheet_dropna.empty:
@@ -251,7 +251,7 @@ def run_general_clustering_pipeline(run_parameters):
 
     logging.append("INFO: Start to process user spreadsheet data.")
 
-    # Check if user spreadsheet contains only real value and na value
+    # Check if user spreadsheet contains na value and only real number
     user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True)
 
     if user_spreadsheet_df_val_check is None:
@@ -363,7 +363,7 @@ def run_feature_prioritization_pipeline(run_parameters):
     if phenotype_df is None:
         return False, logging
 
-    # Check if user spreadsheet contains only real value and na value
+    # Check if user spreadsheet contains na value and only real number
     user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True)
     if user_spreadsheet_df_val_check is None:
         return False, logging
