@@ -7,7 +7,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 ### geneset_characterization_pipeline
   *After removing empty rows and columns, check if a spreadsheet:*
   1. is empty. 
-  2. contains NaN value/s. 
+  2. contains NaN value/s column wise. 
   3. contains value 0 and 1.
   4. gene name has NaN value. 
   5. contains duplicate column names. 
@@ -16,7 +16,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   
 ### samples_clustering_pipeline
   *After removing empty rows and columns, check if a spreadsheet:*
-  1. contains NaN value/s.
+  1. contains NaN value/s column wise.
   2. contains real values (then replace with their absolute value)
   3. gene name contains NaN value.
   4. contains duplicate column name.
@@ -59,7 +59,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 
 ### general_clustering_pipeline
   *After removing empty rows and columns, check if a spreadsheet:*
-  1. contains NaN value/s.
+  1. contains NaN value/s column wise.
   2. contains real value. 
   3. contains NaN value in gene name.
   4. contains NaN value in header.
@@ -74,7 +74,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 
 ### signatuer_analysis_pipeline
   *After removing empty rows and columns, check if a spreadsheet:*
-  1. contains NaN value/s.
+  1. contains NaN value/s column wise.
   2. contains positive real value. 
   3. contains NaN value in gene name.
   4. contains NaN value in header.
@@ -91,11 +91,25 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 
 ### feature_prioritization_pipeline
   *After removing empty rows and columns, check if a spreadsheet:*
-  1. contains NaN value/s.
+  1. contains NaN value/s column wise.
   2. contains real value. 
  
   *After removing empty rows and columns, check if a phenotypic spreadsheet:*
   1. for t_test, contains only value 0, 1 or NaN.
+  2. for pearson test, contains only real value or NaN.
+
+### phenotype_prediction_pipeline
+  *After removing empty rows and columns, check if a spreadsheet:*
+  1. contains NaN value/s column wise.
+  2. contains real value. 
+  3. contains NaN value in gene name.
+  4. contains NaN value in header.
+  5. contains duplicate row names. 
+  6. contains duplicate column names. 
+  7. gene name can be mapped to ensemble gene name.
+ 
+  *After removing empty rows and columns, check if a phenotypic spreadsheet:*
+  1. intersects with spreadsheet on phenotype.
   2. for pearson test, contains only real value or NaN.
 
 
