@@ -11,5 +11,6 @@ SUCCESS:
 - 'INFO: Mapped 8 gene(s) to ensemble name.'
 - 'INFO: Unable to map 4 gene(s) to ensemble name.'
 - 'INFO: Start to process network data.'
+- 'INFO: Successfully loaded input data: ../data/networks/TEST_1_gene_gene.edge'
 - 'INFO: Found 8 intersected gene(s) between phenotype and spreadsheet data.'
 - 'INFO: Cleaned user spreadsheet has 8 row(s), 4 column(s).'
