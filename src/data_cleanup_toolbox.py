@@ -828,7 +828,7 @@ def check_input_data_value(dataframe, check_na=False, dropna_colwise=False, chec
             logging.append("INFO: Remove {} column(s) which contains NA.".format(diff_count))
 
         if dataframe.empty:
-            logging.append("ERROR: User spreadsheet is empty after removing NA.")
+            logging.append("ERROR: User spreadsheet is empty after removing NA column wise.")
             return None
 
     # checks if dataframe contains NA value
