@@ -2,7 +2,7 @@ SUCCESS:
 - 'INFO: Successfully load spreadsheet data: ../data/spreadsheets/TEST_pasted_gene_list.tsv
   with 385 gene(s).'
 - 'WARNING: Removed 1 row(s) which contains NA in index.'
-- 'INFO: Found 327 common gene(s) that shared between pasted gene list and universal
+- 'INFO: Found 324 common gene(s) that shared between pasted gene list and universal
   gene list.'
 - 'INFO: Universal gene list contains 21055 genes.'
-- 'INFO: Mapped gene list contains 352 genes.'
+- 'INFO: Mapped gene list contains 348 genes.'

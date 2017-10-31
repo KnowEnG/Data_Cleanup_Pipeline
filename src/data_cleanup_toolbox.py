@@ -24,8 +24,9 @@ def run_geneset_characterization_pipeline(run_parameters):
     if user_spreadsheet_df is None:
         return False, logging
 
-    # Value check logic a: checks if only non-negative value appears in user spreadsheet
-    user_spreadsheet_val_chked = check_not_null_non_negative_real_value(user_spreadsheet_df)
+    # Checks only non-negative real number appears in user spreadsheet, drop na column wise
+    user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True,
+                                                        check_positive_number=True)
 
     if user_spreadsheet_val_chked is None:
         return False, logging
@@ -58,7 +59,7 @@ def run_samples_clustering_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not.
         message: A message indicates the status of current check.
     """
-    from knpackage.toolbox import get_network_df,extract_network_node_names,find_unique_node_names
+    from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
 
     user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
     if user_spreadsheet_df is None:
@@ -66,20 +67,17 @@ def run_samples_clustering_pipeline(run_parameters):
 
     phenotype_df_cleaned = None
     if 'phenotype_name_full_path' in run_parameters.keys():
-        logging.append("INFO: Start to process phenotype data.")
-        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
-        if phenotype_df is None:
+        phenotype_df_cleaned = load_optional_phenotype_data(run_parameters['phenotype_name_full_path'],
+                                                            user_spreadsheet_df)
+        if phenotype_df_cleaned is None:
+            logging.append("ERROR: Phenotype is emtpy. Please provide a valid phenotype data.")
             return False, logging
-        else:
-            phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.columns.values)
-            if phenotype_df_cleaned is None:
-                return False, logging
 
     logging.append("INFO: Start to process user spreadsheet data.")
 
-    # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
-    user_spreadsheet_val_chked = check_not_null_non_negative_real_value(user_spreadsheet_df)
-
+    # Checks if only non-negative real number appears in user spreadsheet and drop na column wise
+    user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, dropna_colwise=True,
+                                                        check_real_number=True, check_positive_number=True)
     if user_spreadsheet_val_chked is None:
         return False, logging
 
@@ -97,6 +95,7 @@ def run_samples_clustering_pipeline(run_parameters):
             logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
                 run_parameters['gg_network_name_full_path']))
             return False, logging
+        logging.append("INFO: Successfully loaded input data: {}".format(run_parameters['gg_network_name_full_path']))
         node_1_names, node_2_names = extract_network_node_names(network_df)
         unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
 
@@ -199,7 +198,8 @@ def run_phenotype_prediction_pipeline(run_parameters):
     if phenotype_df is None:
         return False, logging
 
-    user_spreadsheet_dropna = check_real_value_dropna_colwise(user_spreadsheet_df)
+    # Check if user spreadsheet contains only real number and drop na column wise
+    user_spreadsheet_dropna = check_input_data_value(user_spreadsheet_df, dropna_colwise=True, check_real_number=True)
 
     if user_spreadsheet_dropna is None or user_spreadsheet_dropna.empty:
         logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
@@ -245,7 +245,19 @@ def run_general_clustering_pipeline(run_parameters):
     if user_spreadsheet_df is None:
         return False, logging
 
-    user_spreadsheet_df_val_check = check_not_null_real_value(user_spreadsheet_df)
+    phenotype_df_cleaned = None
+    if 'phenotype_name_full_path' in run_parameters.keys():
+        phenotype_df_cleaned = load_optional_phenotype_data(run_parameters['phenotype_name_full_path'],
+                                                            user_spreadsheet_df)
+        if phenotype_df_cleaned is None:
+            logging.append("ERROR: Phenotype is emtpy. Please provide a valid phenotype data.")
+            return False, logging
+
+    logging.append("INFO: Start to process user spreadsheet data.")
+
+    # Check if user spreadsheet contains na value and only real number
+    user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, dropna_colwise=True,
+                                                           check_real_number=True)
     if user_spreadsheet_df_val_check is None:
         return False, logging
 
@@ -262,6 +274,13 @@ def run_general_clustering_pipeline(run_parameters):
     logging.append(
         "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
                                                                              user_spreadsheet_df_cleaned.shape[1]))
+
+    if phenotype_df_cleaned is not None:
+        write_to_file(phenotype_df_cleaned, run_parameters['phenotype_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+        logging.append(
+            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_cleaned.shape[0],
+                                                                               phenotype_df_cleaned.shape[1]))
     return True, logging
 
 
@@ -348,7 +367,8 @@ def run_feature_prioritization_pipeline(run_parameters):
     if phenotype_df is None:
         return False, logging
 
-    user_spreadsheet_df_val_check = check_not_null_real_value(user_spreadsheet_df)
+    # Check if user spreadsheet contains na value and only real number
+    user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True)
     if user_spreadsheet_df_val_check is None:
         return False, logging
 
@@ -366,8 +386,9 @@ def run_feature_prioritization_pipeline(run_parameters):
     else:
         write_to_file(phenotype_df_val_check, run_parameters['phenotype_name_full_path'],
                       run_parameters['results_directory'], "_ETL.tsv")
-        logging.append("INFO: Cleaned phenotypic data has {} row(s), {} column(s).".format(phenotype_df_val_check.shape[0],
-                                                                                        phenotype_df_val_check.shape[1]))
+        logging.append(
+            "INFO: Cleaned phenotypic data has {} row(s), {} column(s).".format(phenotype_df_val_check.shape[0],
+                                                                                phenotype_df_val_check.shape[1]))
     return True, logging
 
 
@@ -400,7 +421,8 @@ def run_signature_analysis_pipeline(run_parameters):
         return False, logging
 
     # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
-    user_spreadsheet_val_chked = check_not_null_non_negative_real_value(user_spreadsheet_df)
+    user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True,
+                                                        check_positive_number=True)
 
     if user_spreadsheet_val_chked is None:
         return False, logging
@@ -424,7 +446,8 @@ def run_signature_analysis_pipeline(run_parameters):
 
         intersection = find_intersection(unique_gene_names, intersection_signature_spreadsheet)
         if intersection is None:
-            logging.append('ERROR: Cannot find intersection among spreadsheet genes, signature genes and network genes.')
+            logging.append(
+                'ERROR: Cannot find intersection among spreadsheet genes, signature genes and network genes.')
             return False, logging
 
     # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
@@ -583,6 +606,25 @@ def load_data_file(file_path):
         return None
 
 
+def load_optional_phenotype_data(phenotype_name_full_path, user_spreadsheet_df):
+    """
+    Load the optional phenotype data for clustering functions.
+
+    Args:
+        phenotype_name_full_path: full path of phenotype data
+        user_spreadsheet_df: input user spreadsheet dataframe
+
+    Returns:
+        phenotype_df_cleaned: a cleaned phenotype DataFrame
+    """
+    phenotype_df_cleaned = None
+    logging.append("INFO: Start to process phenotype data.")
+    phenotype_df = load_data_file(phenotype_name_full_path)
+    if phenotype_df is not None:
+        phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.columns.values)
+    return phenotype_df_cleaned
+
+
 def check_duplicate_column_name(dataframe):
     """
     Checks duplicate column names and rejects it if it exists
@@ -643,6 +685,45 @@ def check_duplicate_row_name(dataframe):
     if row_count_diff < 0:
         logging.append("ERROR: An unexpected error occurred during checking duplicate row name.")
         return None
+
+
+def check_input_value_for_gene_prioritization(user_spreadsheet_df, phenotype_df, correlation_measure):
+    """
+    Input data check for Gene_Prioritization_Pipeline.
+
+    Args:
+        dataframe: original DataFrame generated by user spreadsheet
+        phenotype_df: original phenotype data
+        correlation_measure: correlation measure : pearson or t-test
+
+    Returns:
+        dataframe_dropna: cleaned user spreadsheet
+        phenotype_df_pxs: phenotype data
+
+    """
+
+    user_spreadsheet_df_dropna = check_input_data_value(user_spreadsheet_df, dropna_colwise=True,
+                                                        check_real_number=True)
+
+    logging.append("INFO: Start to run checks for phenotypic data.")
+
+    if user_spreadsheet_df_dropna is None or user_spreadsheet_df_dropna.empty:
+        logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
+        return None, None
+
+    # output dimension: sample x phenotype
+    user_spreadsheet_df_header = list(user_spreadsheet_df_dropna.columns.values)
+
+    phenotype_df_pxs_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(user_spreadsheet_df_header,
+                                                                                     phenotype_df)
+
+    if phenotype_df_pxs_trimmed is None or phenotype_df_pxs_trimmed.empty:
+        logging.append("ERROR: After drop NA, phenotype data becomes empty.")
+        return None, None
+    phenotype_df_pxs = check_data_for_t_test_and_pearson(phenotype_df_pxs_trimmed, correlation_measure)
+    logging.append("INFO: Finished running checks for phenotypic data.")
+
+    return user_spreadsheet_df_dropna, phenotype_df_pxs
 
 
 def check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df_pxs):
@@ -723,125 +804,50 @@ def check_data_for_t_test_and_pearson(phenotype_df_pxs, correlation_measure):
     return phenotype_df_pxs
 
 
-def check_real_value_dropna_colwise(dataframe):
+def check_input_data_value(dataframe, check_na=False, dropna_colwise=False, check_real_number=False,
+                           check_positive_number=False):
     """
-    User spreadsheet data check :
-        1. remove na in column wise
-        2. check if DataFrame is empty
-        3. check if DataFrame contains only real value
-
+    Customized checks for input data (contains NA value, contains all real number, contains all positive number)
     Args:
-        dataframe: the original DataFrame to be cleaned
+        dataframe: input DataFrame to be checked
+        check_na: check NA in DataFrame
+        dropna_colwise: drop column which contains NA
+        check_real_number: check only real number exists in DataFrame
+        check_positive_number: check only positive number exists in DataFrame
 
     Returns:
-        dataframe_dropna: a cleaned DataFrame
-
+        dataframe: cleaned DataFrame
     """
-    # drops column which contains NA in dataframe to reduce phenotype dimension
-    dataframe_dropna = dataframe.dropna(axis=1)
-    if dataframe.shape[1] - dataframe_dropna.shape[1] > 0:
-        logging.append(
-            "INFO: Remove {} column(s) which contains NA.".format(dataframe.shape[1] - dataframe_dropna.shape[1]))
+    # drop NA column wise in dataframe
+    if dropna_colwise is True:
+        # drops column which check NA in dataframe
+        org_column_count = dataframe.shape[1]
+        dataframe = dataframe.dropna(axis=1)
+        diff_count = org_column_count - dataframe.shape[1]
+        if diff_count > 0:
+            logging.append("INFO: Remove {} column(s) which contains NA.".format(diff_count))
 
-    if dataframe_dropna.empty:
-        logging.append("ERROR: User spreadsheet is empty after removing NA.")
-        return None
+        if dataframe.empty:
+            logging.append("ERROR: User spreadsheet is empty after removing NA column wise.")
+            return None
+
+    # checks if dataframe contains NA value
+    if check_na is True:
+        if dataframe.isnull().values.any():
+            logging.append("ERROR: This user spreadsheet contains NaN value.")
+            return None
 
     # checks real number negative to positive infinite
-    if False in dataframe_dropna.applymap(lambda x: isinstance(x, (int, float))).values:
-        logging.append("ERROR: Found non-numeric value in user spreadsheet.")
-        return None
+    if check_real_number is True:
+        if False in dataframe.applymap(lambda x: isinstance(x, (int, float))).values:
+            logging.append("ERROR: Found non-numeric value in user spreadsheet.")
+            return None
 
-    return dataframe_dropna
-
-
-def check_input_value_for_gene_prioritization(user_spreadsheet_df, phenotype_df, correlation_measure):
-    """
-    Input data check for Gene_Prioritization_Pipeline.
-
-    Args:
-        dataframe: original DataFrame generated by user spreadsheet
-        phenotype_df: original phenotype data
-        correlation_measure: correlation measure : pearson or t-test
-
-    Returns:
-        dataframe_dropna: cleaned user spreadsheet
-        phenotype_df_pxs: phenotype data
-
-    """
-
-    user_spreadsheet_df_dropna = check_real_value_dropna_colwise(user_spreadsheet_df)
-    logging.append("INFO: Start to run checks for phenotypic data.")
-
-    if user_spreadsheet_df_dropna is None or user_spreadsheet_df_dropna.empty:
-        logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
-        return None, None
-
-    # output dimension: sample x phenotype
-    user_spreadsheet_df_header = list(user_spreadsheet_df_dropna.columns.values)
-
-    phenotype_df_pxs_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(user_spreadsheet_df_header,
-                                                                                     phenotype_df)
-
-    if phenotype_df_pxs_trimmed is None or phenotype_df_pxs_trimmed.empty:
-        logging.append("ERROR: After drop NA, phenotype data becomes empty.")
-        return None, None
-    phenotype_df_pxs = check_data_for_t_test_and_pearson(phenotype_df_pxs_trimmed, correlation_measure)
-    logging.append("INFO: Finished running checks for phenotypic data.")
-
-    return user_spreadsheet_df_dropna, phenotype_df_pxs
-
-
-def check_not_null_real_value(dataframe):
-    """
-    Checks if the values in user spreadsheet passed the following criteria:
-       1. no None value
-       2. only real number is allowed
-
-    Args:
-        dataframe: input DataFrame
-
-    Returns:
-        dataframe: processed dataframe
-       """
-    if dataframe.isnull().values.any():
-        logging.append("ERROR: This user spreadsheet contains invalid NaN value.")
-        return None
-
-    # checks if user spreadsheet contains only real number
-    if False in dataframe.applymap(lambda x: isinstance(x, (int, float))).values:
-        logging.append("ERROR: Found non-numeric value in user spreadsheet.")
-        return None
-
-    return dataframe
-
-
-def check_not_null_non_negative_real_value(dataframe):
-    """
-    Checks if the values in user spreadsheet passed the following criteria:
-        1. no None value
-        2. only real number is allowed
-        3. no negative value
-
-    Args:
-        dataframe: input DataFrame
-
-    Returns:
-        dataframe: processed dataframe
-    """
-    if dataframe.isnull().values.any():
-        logging.append("ERROR: This user spreadsheet contains invalid NaN value.")
-        return None
-
-    # checks if user spreadsheet contains only real number
-    if False in dataframe.applymap(lambda x: isinstance(x, (int, float))).values:
-        logging.append("ERROR: Found non-numeric value in user spreadsheet.")
-        return None
-
-    # checks if user spreadsheet contains only non-negative number
-    if False in dataframe.applymap(lambda x: x >= 0).values:
-        logging.append("ERROR: Found negative value in user spreadsheet.")
-        return None
+    # checks if dataframe contains only non-negative number
+    if check_positive_number is True:
+        if False in dataframe.applymap(lambda x: x >= 0).values:
+            logging.append("ERROR: Found negative value in user spreadsheet.")
+            return None
 
     return dataframe
 
