@@ -19,33 +19,38 @@ def run_geneset_characterization_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not.
         message: A message indicates the status of current check.
     """
-    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+    try:
+        user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
-    if user_spreadsheet_df is None:
+        if user_spreadsheet_df is None:
+            return False, logging
+
+        # Checks only non-negative real number appears in user spreadsheet, drop na column wise
+        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True,
+                                                            check_positive_number=True)
+
+        if user_spreadsheet_val_chked is None:
+            return False, logging
+
+        # Checks duplication on column and row name
+        user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
+
+        # Checks the validity of gene name to see if it can be ensemble or not
+        user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
+
+        if user_spreadsheet_df_cleaned is None:
+            return False, logging
+
+        write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+        logging.append(
+            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                                 user_spreadsheet_df_cleaned.shape[1]))
+        return True, logging
+
+    except Exception as err:
+        logging.append("ERROR: {}".format(str(err)))
         return False, logging
-
-    # Checks only non-negative real number appears in user spreadsheet, drop na column wise
-    user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True,
-                                                        check_positive_number=True)
-
-    if user_spreadsheet_val_chked is None:
-        return False, logging
-
-    # Checks duplication on column and row name
-    user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
-
-    # Checks the validity of gene name to see if it can be ensemble or not
-    user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
-
-    if user_spreadsheet_df_cleaned is None:
-        return False, logging
-
-    write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
-                  run_parameters['results_directory'], "_ETL.tsv")
-    logging.append(
-        "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                             user_spreadsheet_df_cleaned.shape[1]))
-    return True, logging
 
 
 def run_samples_clustering_pipeline(run_parameters):
@@ -59,67 +64,72 @@ def run_samples_clustering_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not.
         message: A message indicates the status of current check.
     """
-    from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
+    try:
+        from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
 
-    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
-    if user_spreadsheet_df is None:
-        return False, logging
-
-    phenotype_df_cleaned = None
-    if 'phenotype_name_full_path' in run_parameters.keys():
-        phenotype_df_cleaned = load_optional_phenotype_data(run_parameters['phenotype_name_full_path'],
-                                                            user_spreadsheet_df)
-        if phenotype_df_cleaned is None:
-            logging.append("ERROR: Phenotype is emtpy. Please provide a valid phenotype data.")
+        user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+        if user_spreadsheet_df is None:
             return False, logging
 
-    logging.append("INFO: Start to process user spreadsheet data.")
+        phenotype_df_cleaned = None
+        if 'phenotype_name_full_path' in run_parameters.keys():
+            phenotype_df_cleaned = load_optional_phenotype_data(run_parameters['phenotype_name_full_path'],
+                                                                user_spreadsheet_df)
+            if phenotype_df_cleaned is None:
+                logging.append("ERROR: Phenotype is emtpy. Please provide a valid phenotype data.")
+                return False, logging
 
-    # Checks if only non-negative real number appears in user spreadsheet and drop na column wise
-    user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, dropna_colwise=True,
-                                                        check_real_number=True, check_positive_number=True)
-    if user_spreadsheet_val_chked is None:
-        return False, logging
+        logging.append("INFO: Start to process user spreadsheet data.")
 
-    # Checks duplication on column and row name
-    user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
-
-    # Checks the validity of gene name to see if it can be ensemble or not
-    user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
-
-    if 'gg_network_name_full_path' in run_parameters.keys():
-        logging.append("INFO: Start to process network data.")
-        # Loads network dataframe to check number of genes intersected between spreadsheet and network
-        network_df = get_network_df(run_parameters['gg_network_name_full_path'])
-        if network_df.empty:
-            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
-                run_parameters['gg_network_name_full_path']))
-            return False, logging
-        logging.append("INFO: Successfully loaded input data: {}".format(run_parameters['gg_network_name_full_path']))
-        node_1_names, node_2_names = extract_network_node_names(network_df)
-        unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
-
-        intersection = find_intersection(unique_gene_names, user_spreadsheet_df_cleaned.index)
-        if intersection is None:
-            logging.append('ERROR: Cannot find intersection between spreadsheet genes and network genes.')
+        # Checks if only non-negative real number appears in user spreadsheet and drop na column wise
+        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, dropna_colwise=True,
+                                                            check_real_number=True, check_positive_number=True)
+        if user_spreadsheet_val_chked is None:
             return False, logging
 
-    # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
-    if user_spreadsheet_df_cleaned is None:
+        # Checks duplication on column and row name
+        user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
+
+        # Checks the validity of gene name to see if it can be ensemble or not
+        user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
+
+        if 'gg_network_name_full_path' in run_parameters.keys():
+            logging.append("INFO: Start to process network data.")
+            # Loads network dataframe to check number of genes intersected between spreadsheet and network
+            network_df = get_network_df(run_parameters['gg_network_name_full_path'])
+            if network_df.empty:
+                logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
+                    run_parameters['gg_network_name_full_path']))
+                return False, logging
+            logging.append("INFO: Successfully loaded input data: {}".format(run_parameters['gg_network_name_full_path']))
+            node_1_names, node_2_names = extract_network_node_names(network_df)
+            unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
+
+            intersection = find_intersection(unique_gene_names, user_spreadsheet_df_cleaned.index)
+            if intersection is None:
+                logging.append('ERROR: Cannot find intersection between spreadsheet genes and network genes.')
+                return False, logging
+
+        # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
+        if user_spreadsheet_df_cleaned is None:
+            return False, logging
+        else:
+            write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
+                          run_parameters['results_directory'], "_ETL.tsv")
+            logging.append(
+                "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                                     user_spreadsheet_df_cleaned.shape[1]))
+        if phenotype_df_cleaned is not None:
+            write_to_file(phenotype_df_cleaned, run_parameters['phenotype_name_full_path'],
+                          run_parameters['results_directory'], "_ETL.tsv")
+            logging.append(
+                "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_cleaned.shape[0],
+                                                                                   phenotype_df_cleaned.shape[1]))
+        return True, logging
+
+    except Exception as err:
+        logging.append("ERROR: {}".format(str(err)))
         return False, logging
-    else:
-        write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
-                      run_parameters['results_directory'], "_ETL.tsv")
-        logging.append(
-            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                                 user_spreadsheet_df_cleaned.shape[1]))
-    if phenotype_df_cleaned is not None:
-        write_to_file(phenotype_df_cleaned, run_parameters['phenotype_name_full_path'],
-                      run_parameters['results_directory'], "_ETL.tsv")
-        logging.append(
-            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_cleaned.shape[0],
-                                                                               phenotype_df_cleaned.shape[1]))
-    return True, logging
 
 
 def run_gene_prioritization_pipeline(run_parameters):
@@ -133,47 +143,52 @@ def run_gene_prioritization_pipeline(run_parameters):
         validation_flag: Boolean type value indicating if input data is valid or not.
         message: A message indicates the status of current check.
     """
-    # dimension: sample x phenotype
-    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+    try:
+        # dimension: sample x phenotype
+        user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
-    if user_spreadsheet_df is None:
+        if user_spreadsheet_df is None:
+            return False, logging
+
+        # dimension: sample x phenotype
+        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+
+        if phenotype_df is None:
+            return False, logging
+
+        # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
+        user_spreadsheet_val_chked  , phenotype_val_checked = check_input_value_for_gene_prioritization(
+            user_spreadsheet_df, phenotype_df, run_parameters['correlation_measure'])
+
+        if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
+            return False, logging
+
+        # Checks duplication on column and row name
+        user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
+
+        # Checks the validity of gene name to see if it can be ensemble or not
+        user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
+
+        if user_spreadsheet_df_cleaned is None or phenotype_val_checked is None:
+            return False, logging
+
+        # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
+        write_to_file(phenotype_val_checked, run_parameters['phenotype_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+        write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+
+        logging.append(
+            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                                 user_spreadsheet_df_cleaned.shape[1]))
+        logging.append(
+            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_val_checked.shape[0],
+                                                                               phenotype_val_checked.shape[1]))
+        return True, logging
+
+    except Exception as err:
+        logging.append("ERROR: {}".format(str(err)))
         return False, logging
-
-    # dimension: sample x phenotype
-    phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
-
-    if phenotype_df is None:
-        return False, logging
-
-    # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
-    user_spreadsheet_val_chked, phenotype_val_checked = check_input_value_for_gene_prioritization(
-        user_spreadsheet_df, phenotype_df, run_parameters['correlation_measure'])
-
-    if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
-        return False, logging
-
-    # Checks duplication on column and row name
-    user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
-
-    # Checks the validity of gene name to see if it can be ensemble or not
-    user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
-
-    if user_spreadsheet_df_cleaned is None or phenotype_val_checked is None:
-        return False, logging
-
-    # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
-    write_to_file(phenotype_val_checked, run_parameters['phenotype_name_full_path'],
-                  run_parameters['results_directory'], "_ETL.tsv")
-    write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
-                  run_parameters['results_directory'], "_ETL.tsv")
-
-    logging.append(
-        "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                             user_spreadsheet_df_cleaned.shape[1]))
-    logging.append(
-        "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_val_checked.shape[0],
-                                                                           phenotype_val_checked.shape[1]))
-    return True, logging
 
 
 def run_phenotype_prediction_pipeline(run_parameters):
@@ -187,46 +202,51 @@ def run_phenotype_prediction_pipeline(run_parameters):
             validation_flag: Boolean type value indicating if input data is valid or not.
             message: A message indicates the status of current check.
     """
-    # dimension: sample x phenotype
-    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
-    if user_spreadsheet_df is None:
+    try:
+        # dimension: sample x phenotype
+        user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+        if user_spreadsheet_df is None:
+            return False, logging
+
+        # dimension: sample x phenotype
+        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+
+        if phenotype_df is None:
+            return False, logging
+
+        # Check if user spreadsheet contains only real number and drop na column wise
+        user_spreadsheet_dropna = check_input_data_value(user_spreadsheet_df, dropna_colwise=True, check_real_number=True)
+
+        if user_spreadsheet_dropna is None or user_spreadsheet_dropna.empty:
+            logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
+            return None, None
+
+        # Checks if there is valid intersection between phenotype data and user spreadsheet data
+        dataframe_header = list(user_spreadsheet_dropna.columns.values)
+        phenotype_df_pxs_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df)
+
+        # Checks duplication on column and row name
+        user_spreadsheet_df_cleaned = sanity_check_input_data(user_spreadsheet_dropna)
+        if user_spreadsheet_df_cleaned is None or phenotype_df_pxs_trimmed is None:
+            return False, logging
+
+        # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
+        write_to_file(phenotype_df_pxs_trimmed, run_parameters['phenotype_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+        write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+
+        logging.append(
+            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                                 user_spreadsheet_df_cleaned.shape[1]))
+        logging.append(
+            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_pxs_trimmed.shape[0],
+                                                                               phenotype_df_pxs_trimmed.shape[1]))
+        return True, logging
+
+    except Exception as err:
+        logging.append("ERROR: {}".format(str(err)))
         return False, logging
-
-    # dimension: sample x phenotype
-    phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
-
-    if phenotype_df is None:
-        return False, logging
-
-    # Check if user spreadsheet contains only real number and drop na column wise
-    user_spreadsheet_dropna = check_input_data_value(user_spreadsheet_df, dropna_colwise=True, check_real_number=True)
-
-    if user_spreadsheet_dropna is None or user_spreadsheet_dropna.empty:
-        logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
-        return None, None
-
-    # Checks if there is valid intersection between phenotype data and user spreadsheet data
-    dataframe_header = list(user_spreadsheet_dropna.columns.values)
-    phenotype_df_pxs_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df)
-
-    # Checks duplication on column and row name
-    user_spreadsheet_df_cleaned = sanity_check_input_data(user_spreadsheet_dropna)
-    if user_spreadsheet_df_cleaned is None or phenotype_df_pxs_trimmed is None:
-        return False, logging
-
-    # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
-    write_to_file(phenotype_df_pxs_trimmed, run_parameters['phenotype_name_full_path'],
-                  run_parameters['results_directory'], "_ETL.tsv")
-    write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
-                  run_parameters['results_directory'], "_ETL.tsv")
-
-    logging.append(
-        "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                             user_spreadsheet_df_cleaned.shape[1]))
-    logging.append(
-        "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_pxs_trimmed.shape[0],
-                                                                           phenotype_df_pxs_trimmed.shape[1]))
-    return True, logging
 
 
 def run_general_clustering_pipeline(run_parameters):
@@ -240,48 +260,53 @@ def run_general_clustering_pipeline(run_parameters):
             validation_flag: Boolean type value indicating if input data is valid or not.
             message: A message indicates the status of current check.
     """
-    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+    try:
+        user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
-    if user_spreadsheet_df is None:
-        return False, logging
-
-    phenotype_df_cleaned = None
-    if 'phenotype_name_full_path' in run_parameters.keys():
-        phenotype_df_cleaned = load_optional_phenotype_data(run_parameters['phenotype_name_full_path'],
-                                                            user_spreadsheet_df)
-        if phenotype_df_cleaned is None:
-            logging.append("ERROR: Phenotype is emtpy. Please provide a valid phenotype data.")
+        if user_spreadsheet_df is None:
             return False, logging
 
-    logging.append("INFO: Start to process user spreadsheet data.")
+        phenotype_df_cleaned = None
+        if 'phenotype_name_full_path' in run_parameters.keys():
+            phenotype_df_cleaned = load_optional_phenotype_data(run_parameters['phenotype_name_full_path'],
+                                                                user_spreadsheet_df)
+            if phenotype_df_cleaned is None:
+                logging.append("ERROR: Phenotype is emtpy. Please provide a valid phenotype data.")
+                return False, logging
 
-    # Check if user spreadsheet contains na value and only real number
-    user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, dropna_colwise=True,
-                                                           check_real_number=True)
-    if user_spreadsheet_df_val_check is None:
-        return False, logging
+        logging.append("INFO: Start to process user spreadsheet data.")
 
-    user_spreadsheet_df_rm_na_header = remove_na_header(user_spreadsheet_df_val_check)
-    if user_spreadsheet_df_rm_na_header is None:
-        return False, logging
+        # Check if user spreadsheet contains na value and only real number
+        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, dropna_colwise=True,
+                                                               check_real_number=True)
+        if user_spreadsheet_df_val_check is None:
+            return False, logging
 
-    user_spreadsheet_df_cleaned = sanity_check_input_data(user_spreadsheet_df_rm_na_header)
-    if user_spreadsheet_df_cleaned is None:
-        return False, logging
+        user_spreadsheet_df_rm_na_header = remove_na_header(user_spreadsheet_df_val_check)
+        if user_spreadsheet_df_rm_na_header is None:
+            return False, logging
 
-    write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
-                  run_parameters['results_directory'], "_ETL.tsv")
-    logging.append(
-        "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                             user_spreadsheet_df_cleaned.shape[1]))
+        user_spreadsheet_df_cleaned = sanity_check_input_data(user_spreadsheet_df_rm_na_header)
+        if user_spreadsheet_df_cleaned is None:
+            return False, logging
 
-    if phenotype_df_cleaned is not None:
-        write_to_file(phenotype_df_cleaned, run_parameters['phenotype_name_full_path'],
+        write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
                       run_parameters['results_directory'], "_ETL.tsv")
         logging.append(
-            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_cleaned.shape[0],
-                                                                               phenotype_df_cleaned.shape[1]))
-    return True, logging
+            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                                 user_spreadsheet_df_cleaned.shape[1]))
+
+        if phenotype_df_cleaned is not None:
+            write_to_file(phenotype_df_cleaned, run_parameters['phenotype_name_full_path'],
+                          run_parameters['results_directory'], "_ETL.tsv")
+            logging.append(
+                "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_cleaned.shape[0],
+                                                                                   phenotype_df_cleaned.shape[1]))
+        return True, logging
+
+    except Exception as err:
+        logging.append("ERROR: {}".format(str(err)))
+        return False, logging
 
 
 def run_pasted_gene_set_conversion(run_parameters):
@@ -289,107 +314,126 @@ def run_pasted_gene_set_conversion(run_parameters):
     Runs data cleaning for pasted_gene_set_conversion.
 
     Args:
-        run_parameters:
+        run_parameters: configuration dictionary
 
     Returns:
+        validation_flag: Boolean type value indicating if input data is valid or not.
+        message: A message indicates the status of current check.
 
     """
-    from knpackage.toolbox import get_spreadsheet_df
-    import redis_utilities as redisutil
+    try:
+        import redis_utilities as redisutil
 
-    # gets redis database instance by its credential
-    redis_db = redisutil.get_database(run_parameters['redis_credential'])
+        # gets redis database instance by its credential
+        redis_db = redisutil.get_database(run_parameters['redis_credential'])
 
-    # reads pasted_gene_list as a dataframe
-    input_small_genes_df = get_spreadsheet_df(run_parameters['pasted_gene_list_full_path'])
-    logging.append("INFO: Successfully load spreadsheet data: {} with {} gene(s).".format(
-        run_parameters['pasted_gene_list_full_path'], input_small_genes_df.shape[0]))
+        # reads pasted_gene_list as a dataframe
+        input_small_genes_df = load_pasted_gene_list(run_parameters['pasted_gene_list_full_path'])
+        if input_small_genes_df is None:
+            return False, logging
 
-    # removes nan index rows
-    input_small_genes_df = remove_na_index(input_small_genes_df)
+        logging.append("INFO: Successfully load spreadsheet data: {} with {} gene(s).".format(
+            run_parameters['pasted_gene_list_full_path'], input_small_genes_df.shape[0]))
 
-    # casting index to String type
-    input_small_genes_df.index = input_small_genes_df.index.map(str)
+        # removes nan index rows
+        input_small_genes_df = remove_na_index(input_small_genes_df)
 
-    if input_small_genes_df is None or len(input_small_genes_df.index) == 0:
-        logging.append("ERROR: Input data is empty. Please upload valid input data.")
+        # casting index to String type
+        input_small_genes_df.index = input_small_genes_df.index.map(str)
+
+        if input_small_genes_df is None or len(input_small_genes_df.index) == 0:
+            logging.append("ERROR: Input data is empty. Please upload valid input data.")
+            return False, logging
+
+        input_small_genes_df["original_gene_name"] = input_small_genes_df.index
+        # converts pasted_gene_list to ensemble name
+        redis_ret = redisutil.get_node_info(redis_db, input_small_genes_df.index, "Gene", run_parameters['source_hint'],
+                                            run_parameters['taxonid'])
+        ensemble_names = [x[1] for x in redis_ret]
+        input_small_genes_df.index = pandas.Series(ensemble_names)
+        # filters out the unmapped genes
+        mapped_small_genes_df = input_small_genes_df[~input_small_genes_df.index.str.contains(r'^unmapped.*$')]
+        # reads the univeral_gene_list
+        universal_genes_df = load_pasted_gene_list(run_parameters['temp_redis_vector'])
+        if universal_genes_df is None:
+            return False, logging
+
+        # inserts a column with value 0
+        universal_genes_df.insert(0, 'value', 0)
+        # finds the intersection between pasted_gene_list and universal_gene_list
+        common_idx = universal_genes_df.index.intersection(mapped_small_genes_df.index)
+        logging.append("INFO: Found {} common gene(s) that shared between pasted gene list and universal gene list.".format(
+            len(common_idx)))
+        # inserts a column with value 1
+        universal_genes_df.loc[common_idx] = 1
+        # names the column of universal_genes_df to be 'uploaded_gene_set'
+        universal_genes_df.columns = ["uploaded_gene_set"]
+        del universal_genes_df.index.name
+
+        # outputs final results
+        write_to_file(mapped_small_genes_df, run_parameters['pasted_gene_list_full_path'],
+                      run_parameters['results_directory'], "_MAP.tsv")
+        write_to_file(universal_genes_df, run_parameters['pasted_gene_list_full_path'],
+                      run_parameters['results_directory'], "_ETL.tsv")
+        logging.append("INFO: Universal gene list contains {} genes.".format(universal_genes_df.shape[0]))
+        logging.append("INFO: Mapped gene list contains {} genes.".format(mapped_small_genes_df.shape[0]))
+        return True, logging
+
+    except Exception as err:
+        logging.append("ERROR: {}".format(str(err)))
         return False, logging
-
-    input_small_genes_df["original_gene_name"] = input_small_genes_df.index
-    # converts pasted_gene_list to ensemble name
-    redis_ret = redisutil.get_node_info(redis_db, input_small_genes_df.index, "Gene", run_parameters['source_hint'],
-                                        run_parameters['taxonid'])
-    ensemble_names = [x[1] for x in redis_ret]
-    input_small_genes_df.index = pandas.Series(ensemble_names)
-    # filters out the unmapped genes
-    mapped_small_genes_df = input_small_genes_df[~input_small_genes_df.index.str.contains(r'^unmapped.*$')]
-    # reads the univeral_gene_list
-    universal_genes_df = get_spreadsheet_df(run_parameters['temp_redis_vector'])
-    # inserts a column with value 0
-    universal_genes_df.insert(0, 'value', 0)
-    # finds the intersection between pasted_gene_list and universal_gene_list
-    common_idx = universal_genes_df.index.intersection(mapped_small_genes_df.index)
-    logging.append("INFO: Found {} common gene(s) that shared between pasted gene list and universal gene list.".format(
-        len(common_idx)))
-    # inserts a column with value 1
-    universal_genes_df.loc[common_idx] = 1
-    # names the column of universal_genes_df to be 'uploaded_gene_set'
-    universal_genes_df.columns = ["uploaded_gene_set"]
-    del universal_genes_df.index.name
-
-    # outputs final results
-    write_to_file(mapped_small_genes_df, run_parameters['pasted_gene_list_full_path'],
-                  run_parameters['results_directory'], "_MAP.tsv")
-    write_to_file(universal_genes_df, run_parameters['pasted_gene_list_full_path'],
-                  run_parameters['results_directory'], "_ETL.tsv")
-    logging.append("INFO: Universal gene list contains {} genes.".format(universal_genes_df.shape[0]))
-    logging.append("INFO: Mapped gene list contains {} genes.".format(mapped_small_genes_df.shape[0]))
-    return True, logging
 
 
 def run_feature_prioritization_pipeline(run_parameters):
     """
+    Run data cleaning for feature prioritization pipeline.
 
     Args:
-        run_parameters:
+        run_parameters: configuration dictionary
 
     Returns:
-
+        validation_flag: Boolean type value indicating if input data is valid or not.
+        message: A message indicates the status of current check.
     """
-    from phenotype_expander_toolbox import phenotype_expander
+    try:
+        from phenotype_expander_toolbox import phenotype_expander
 
-    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
-    if user_spreadsheet_df is None:
-        return False, logging
+        user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+        if user_spreadsheet_df is None:
+            return False, logging
 
-    # dimension: sample x phenotype
-    phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
-    if phenotype_df is None:
-        return False, logging
+        # dimension: sample x phenotype
+        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+        if phenotype_df is None:
+            return False, logging
 
-    # Check if user spreadsheet contains na value and only real number
-    user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True)
-    if user_spreadsheet_df_val_check is None:
-        return False, logging
+        # Check if user spreadsheet contains na value and only real number
+        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True)
+        if user_spreadsheet_df_val_check is None:
+            return False, logging
 
-    phenotype_df_val_check = check_data_for_t_test_and_pearson(phenotype_df, run_parameters['correlation_measure'])
-    if phenotype_df_val_check is None:
-        return False, logging
+        phenotype_df_val_check = check_data_for_t_test_and_pearson(phenotype_df, run_parameters['correlation_measure'])
+        if phenotype_df_val_check is None:
+            return False, logging
 
-    write_to_file(user_spreadsheet_df, run_parameters['spreadsheet_name_full_path'],
-                  run_parameters['results_directory'], "_ETL.tsv")
-    logging.append("INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df.shape[0],
-                                                                                        user_spreadsheet_df.shape[1]))
-
-    if run_parameters['correlation_measure'] == 't_test':
-        phenotype_expander(run_parameters)
-    else:
-        write_to_file(phenotype_df_val_check, run_parameters['phenotype_name_full_path'],
+        write_to_file(user_spreadsheet_df, run_parameters['spreadsheet_name_full_path'],
                       run_parameters['results_directory'], "_ETL.tsv")
-        logging.append(
-            "INFO: Cleaned phenotypic data has {} row(s), {} column(s).".format(phenotype_df_val_check.shape[0],
-                                                                                phenotype_df_val_check.shape[1]))
-    return True, logging
+        logging.append("INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df.shape[0],
+                                                                                            user_spreadsheet_df.shape[1]))
+
+        if run_parameters['correlation_measure'] == 't_test':
+            phenotype_expander(run_parameters)
+        else:
+            write_to_file(phenotype_df_val_check, run_parameters['phenotype_name_full_path'],
+                          run_parameters['results_directory'], "_ETL.tsv")
+            logging.append(
+                "INFO: Cleaned phenotypic data has {} row(s), {} column(s).".format(phenotype_df_val_check.shape[0],
+                                                                                    phenotype_df_val_check.shape[1]))
+        return True, logging
+
+    except Exception as err:
+        logging.append("ERROR: {}".format(str(err)))
+        return False, logging
 
 
 def run_signature_analysis_pipeline(run_parameters):
@@ -403,69 +447,74 @@ def run_signature_analysis_pipeline(run_parameters):
            validation_flag: Boolean type value indicating if input data is valid or not.
            message: A message indicates the status of current check.
        """
-    from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
+    try:
+        from knpackage.toolbox import get_network_df, extract_network_node_names, find_unique_node_names
 
-    logging.append("INFO: Start to process signature data.")
-    signature_df = load_data_file(run_parameters['signature_name_full_path'])
-    if signature_df is None:
-        return False, logging
-
-    logging.append("INFO: Start to process user spreadsheet data.")
-    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
-    if user_spreadsheet_df is None:
-        return False, logging
-
-    intersection_signature_spreadsheet = find_intersection(signature_df.index, user_spreadsheet_df.index)
-    if intersection_signature_spreadsheet is None:
-        logging.append('ERROR: Cannot find intersection between spreadsheet genes and signature genes.')
-        return False, logging
-
-    # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
-    user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True,
-                                                        check_positive_number=True)
-
-    if user_spreadsheet_val_chked is None:
-        return False, logging
-
-    # Checks duplication on column and row name
-    user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
-
-    # Checks the validity of gene name to see if it can be ensemble or not
-    user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
-
-    if 'gg_network_name_full_path' in run_parameters.keys():
-        logging.append("INFO: Start to process network data.")
-        # Loads network dataframe to check number of genes intersected between spreadsheet and network
-        network_df = get_network_df(run_parameters['gg_network_name_full_path'])
-        if network_df.empty:
-            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
-                run_parameters['gg_network_name_full_path']))
+        logging.append("INFO: Start to process signature data.")
+        signature_df = load_data_file(run_parameters['signature_name_full_path'])
+        if signature_df is None:
             return False, logging
-        node_1_names, node_2_names = extract_network_node_names(network_df)
-        unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
 
-        intersection = find_intersection(unique_gene_names, intersection_signature_spreadsheet)
-        if intersection is None:
+        logging.append("INFO: Start to process user spreadsheet data.")
+        user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+        if user_spreadsheet_df is None:
+            return False, logging
+
+        intersection_signature_spreadsheet = find_intersection(signature_df.index, user_spreadsheet_df.index)
+        if intersection_signature_spreadsheet is None:
+            logging.append('ERROR: Cannot find intersection between spreadsheet genes and signature genes.')
+            return False, logging
+
+        # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
+        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True,
+                                                            check_positive_number=True)
+
+        if user_spreadsheet_val_chked is None:
+            return False, logging
+
+        # Checks duplication on column and row name
+        user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
+
+        # Checks the validity of gene name to see if it can be ensemble or not
+        user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
+
+        if 'gg_network_name_full_path' in run_parameters.keys():
+            logging.append("INFO: Start to process network data.")
+            # Loads network dataframe to check number of genes intersected between spreadsheet and network
+            network_df = get_network_df(run_parameters['gg_network_name_full_path'])
+            if network_df.empty:
+                logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
+                    run_parameters['gg_network_name_full_path']))
+                return False, logging
+            node_1_names, node_2_names = extract_network_node_names(network_df)
+            unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
+
+            intersection = find_intersection(unique_gene_names, intersection_signature_spreadsheet)
+            if intersection is None:
+                logging.append(
+                    'ERROR: Cannot find intersection among spreadsheet genes, signature genes and network genes.')
+                return False, logging
+
+        # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
+        if user_spreadsheet_df_cleaned is None:
+            return False, logging
+        else:
+            write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
+                          run_parameters['results_directory'], "_ETL.tsv")
             logging.append(
-                'ERROR: Cannot find intersection among spreadsheet genes, signature genes and network genes.')
-            return False, logging
+                "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
+                                                                                     user_spreadsheet_df_cleaned.shape[1]))
+        if signature_df is not None:
+            write_to_file(signature_df, run_parameters['signature_name_full_path'],
+                          run_parameters['results_directory'], "_ETL.tsv")
+            logging.append(
+                "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(signature_df.shape[0],
+                                                                                   signature_df.shape[1]))
+        return True, logging
 
-    # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
-    if user_spreadsheet_df_cleaned is None:
+    except Exception as err:
+        logging.append("ERROR: {}".format(str(err)))
         return False, logging
-    else:
-        write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
-                      run_parameters['results_directory'], "_ETL.tsv")
-        logging.append(
-            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                                 user_spreadsheet_df_cleaned.shape[1]))
-    if signature_df is not None:
-        write_to_file(signature_df, run_parameters['signature_name_full_path'],
-                      run_parameters['results_directory'], "_ETL.tsv")
-        logging.append(
-            "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(signature_df.shape[0],
-                                                                               signature_df.shape[1]))
-    return True, logging
 
 
 def remove_empty_row(dataframe):
@@ -596,13 +645,48 @@ def load_data_file(file_path):
 
         # removes empty rows
         input_df_wo_empty_ln = remove_empty_row(input_df)
+
         if input_df_wo_empty_ln is None or input_df_wo_empty_ln.empty:
-            logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(file_path))
+            logging.append(
+                "ERROR: Input data {} becomes empty after removing empty row. Please provide a valid input data.".format(
+                    file_path))
             return None
 
         return input_df_wo_empty_ln
     except Exception as err:
         logging.append("ERROR: {}".format(str(err)))
+        return None
+
+
+def load_pasted_gene_list(file_path):
+    """
+    Loads user uploaded pasted gene list file as a DataFrame object.
+
+    Args:
+        file_path: input file, which is uploaded from frontend
+
+    Returns:
+        input_df: user input as a DataFrame, which doesn't have empty line
+    """
+    if not file_path or not file_path.strip():
+        logging.append("ERROR: Input file path is empty: {}. Please provide a valid input path.".format(file_path))
+        return None
+
+    try:
+        # loads input data
+        input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, error_bad_lines=False,
+                                   warn_bad_lines=True)
+
+        # casting index and columns to String type
+        input_df.index = input_df.index.map(str)
+        input_df.columns = input_df.columns.map(str)
+
+        logging.append("INFO: Successfully loaded input data: {} with {} row(s) and {} "
+                       "column(s)".format(file_path, input_df.shape[0], input_df.shape[1]))
+
+        return input_df
+    except Exception as err:
+        logging.append("ERROR: {} {}".format(str(err), file_path))
         return None
 
 
@@ -619,9 +703,12 @@ def load_optional_phenotype_data(phenotype_name_full_path, user_spreadsheet_df):
     """
     phenotype_df_cleaned = None
     logging.append("INFO: Start to process phenotype data.")
+
     phenotype_df = load_data_file(phenotype_name_full_path)
+
     if phenotype_df is not None:
         phenotype_df_cleaned = run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df.columns.values)
+
     return phenotype_df_cleaned
 
 
