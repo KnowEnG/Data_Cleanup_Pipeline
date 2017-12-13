@@ -1,7 +1,11 @@
 SUCCESS:
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_pasted_gene_list.tsv
+  with 385 row(s) and 0 column(s)'
 - 'INFO: Successfully load spreadsheet data: ../data/spreadsheets/TEST_pasted_gene_list.tsv
   with 385 gene(s).'
 - 'WARNING: Removed 1 row(s) which contains NA in index.'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_redis_retrived_universal_data.tsv
+  with 21055 row(s) and 0 column(s)'
 - 'INFO: Found 324 common gene(s) that shared between pasted gene list and universal
   gene list.'
 - 'INFO: Universal gene list contains 21055 genes.'

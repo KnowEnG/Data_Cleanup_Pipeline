@@ -119,7 +119,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 
 ### 1. Clone the Data_Cleanup_Pipeline Repo
 ```
- git clone https://github.com/KnowEnG-Research/Data_Cleanup_Pipeline.git
+ git clone https://github.com/KnowEnG/Data_Cleanup_Pipeline.git
 ```
  
 ### 2. Install the following (Ubuntu or Linux)
@@ -167,6 +167,9 @@ make env_setup
 | make run_geneset_characterization_pipeline | geneset characterization test  |
 | make run_general_clustering_pipeline          | general clustering test                                       |
 | make run_pasted_gene_list          | pasted gene list test                                      |
+| make run_phenotype_prediction_pipeline  | phenotype prediction pipeline test                                      |
+| make run_feature_prioritization_pipeline          | feature prioritization pipeline test                                      |
+| make run_signature_analysis_pipeline          | signature analysis pipeline test                                      |
 
 * * * 
 ## How to run this pipeline with Your data
