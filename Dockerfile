@@ -6,7 +6,7 @@ ENV SRC_LOC /home
 # Install the latest knpackage
 RUN pip3 install -I knpackage redis
 
-# Clone from github
+# Copy source code to docker container
 COPY src ${SRC_LOC}/src
 COPY test ${SRC_LOC}/test
 COPY data ${SRC_LOC}/data
