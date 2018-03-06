@@ -25,10 +25,13 @@ def run_geneset_characterization_pipeline(run_parameters):
         if user_spreadsheet_df is None:
             return False, logging
 
-        # Checks only non-negative real number appears in user spreadsheet, drop na column wise
-        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True,
-                                                            check_positive_number=True)
+        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        if user_spreadsheet_df_imputed is None:
+            return False, logging
 
+        # Checks only non-negative real number appears in user spreadsheet, drop na column wise
+        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df_imputed, check_na=False, check_real_number=True,
+                                                            check_positive_number=True)
         if user_spreadsheet_val_chked is None:
             return False, logging
 
@@ -636,7 +639,7 @@ def load_data_file(file_path):
         input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False,
                                    error_bad_lines=False, warn_bad_lines=True)
 
-        # casting index and columns to String type
+        # casting index and headers to String type
         input_df.index = input_df.index.map(str)
         input_df.columns = input_df.columns.map(str)
 
@@ -889,6 +892,37 @@ def check_data_for_t_test_and_pearson(phenotype_df_pxs, correlation_measure):
             return None
 
     return phenotype_df_pxs
+
+
+def impute_na(dataframe, option):
+    '''
+    Impute NA value based on options user selected
+    Args:
+        dataframe: the dataframe to be imputed
+        option:
+            1. reject: reject spreadsheet if we found NA
+            2. remove: remove Nan row
+            3. average: replace Nan value with row mean
+
+    Returns:
+        dataframe
+    '''
+    if option == "reject":
+        if dataframe.isnull().values.any():
+            logging.append("ERROR: User spreadsheet contains NaN value. Reject this spreadsheet.")
+            return None
+        logging.append("INFO: There is no NA value in spreadsheet.")
+        return dataframe
+    elif option == "remove":
+        dataframe_dropna = dataframe.dropna(axis=0)
+        logging.append("INFO: Remove {} row(s) containing NA value.".format(dataframe.shape[0] - dataframe_dropna.shape[0]))
+        return dataframe_dropna
+    elif option == 'average':
+        logging.append("INFO: Filled NA with mean value of its corresponding row.")
+        return dataframe.apply(lambda x: x.fillna(x.mean()), axis=0)
+
+    logging.append("Error: Found invalid option to operate on NA value. ")
+    return None
 
 
 def check_input_data_value(dataframe, check_na=False, dropna_colwise=False, check_real_number=False,
