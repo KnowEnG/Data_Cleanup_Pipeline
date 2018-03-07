@@ -1,6 +1,7 @@
 SUCCESS:
 - 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_binary.tsv
   with 13 row(s) and 5 column(s)'
+- 'INFO: Filled NA with mean value of its corresponding row.'
 - 'INFO: Start to run sanity checks for input data.'
 - 'WARNING: Removed 1 duplicate column(s) from user spreadsheet.'
 - 'WARNING: Removed 1 duplicate row(s) from user spreadsheet.'
