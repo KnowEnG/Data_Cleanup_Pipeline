@@ -24,6 +24,8 @@ DC_options_dict = {
 
 verify_root_dir = '../data/verification'
 results_dir = './run_dir/results'
+NUM_FAIL = 0
+NUM_SUCCESS = 0
 
 
 def run_all_BENCHMARKs_and_TESTs():
@@ -33,18 +35,18 @@ def run_all_BENCHMARKs_and_TESTs():
     verification_directory_list = sorted(directory_methods_dict.keys())
 
     for test_directory in verification_directory_list:
-        t0 = time.time()
         verification_directory = os.path.join(verify_root_dir, test_directory)
         verification_method = 'make' + ' ' + directory_methods_dict[test_directory]
         print('\n\n\n\tRun Method:', verification_method, '\n', verification_directory)
 
         os.system(verification_method)
         python_file_compare(verification_directory, results_dir)
-        print('remove result files:')
         for tmp_file_name in os.listdir(results_dir):
             if os.path.isfile(os.path.join(results_dir, tmp_file_name)):
                 os.remove(os.path.join(results_dir, tmp_file_name))
-                # os.system("make clean_dir_recursively create_run_dir copy_run_files")
+
+    print("\nVerification status:\n\tFinished running {} tests, succeeded {} tests and failed {} tests".format(len(verification_directory_list),
+                                                                                     NUM_SUCCESS, NUM_FAIL))
 
 
 def python_file_compare(verif_dir, results_dir):
@@ -52,17 +54,21 @@ def python_file_compare(verif_dir, results_dir):
     nix_dir, pipeline_name = os.path.split(verif_dir)
     match, mismatch, errs = filecmp.cmpfiles(results_dir, verif_dir, os.listdir(verif_dir))
     tt = '%0.3f' % (time.time() - t0)
+    global NUM_FAIL, NUM_SUCCESS
     if len(errs) > 0:
+        NUM_FAIL = NUM_FAIL + 1
         print('\n\t', tt, '\t', pipeline_name, 'test: FAILED')
         print('Errors:')
         for e in errs:
             print(e)
     if len(mismatch) > 0:
+        NUM_FAIL = NUM_FAIL + 1
         print('\n\t', tt, '\t', pipeline_name, 'test: FAILED')
         print('Mismatch:')
         for mm in mismatch:
             print(mm)
     if len(match) > 0:
+        NUM_SUCCESS = NUM_SUCCESS + 1
         print('\n\t', tt, '\t', pipeline_name, 'test: PASS')
         print('Matched:')
         for m in match:
@@ -76,7 +82,10 @@ def main():
     except:
         pass
 
+    t0 = time.time()
     run_all_BENCHMARKs_and_TESTs()
+    t1 = time.time()
+    print("\tRunning tests in {} seconds.".format(t1- t0))
     print('\n')
 
 

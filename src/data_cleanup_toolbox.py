@@ -726,6 +726,7 @@ def check_duplicate_column_name(dataframe):
         user_spreadsheet_df_genename_dedup.T: a DataFrame in original format
         ret_msg: error message
     """
+
     dataframe_transpose = dataframe.T
     dataframe_row_dedup = dataframe_transpose[~dataframe_transpose.index.duplicated()]
     if dataframe_row_dedup.empty:
@@ -1012,28 +1013,39 @@ def map_ensemble_gene_name(dataframe, run_parameters):
     if dup_cnt > 0:
         logging.append("INFO: Found {} duplicate Ensembl gene name.".format(dup_cnt))
 
-    # dedup on gene name mapping dictionary
+    # the following is to generate UNMAPPED/MAP file
+    # extract two columns, index is ensembl name and column 'original' is user supplied gene
     mapping = dataframe[['original']]
 
-    mapping_filtered = mapping[~mapping.index.str.contains(r'^unmapped.*$')]
+    # filter the mapped gene
+    map_filtered = mapping[~mapping.index.str.contains(r'^unmapped.*$')]
+    logging.append("INFO: Mapped {} gene(s) to ensemble name.".format(map_filtered.shape[0]))
 
-    logging.append("INFO: Mapped {} gene(s) to ensemble name.".format(mapping_filtered.shape[0]))
+    map_filtered_dedup = map_filtered[~map_filtered.index.duplicated()]
 
-    unmapped_filtered = mapping[mapping.index.str.contains(r'^unmapped.*$')].sort_index(axis=0, ascending=False)
-    unmapped_filtered['ensemble'] = unmapped_filtered.index
+    # writes duplicate gene name along with return value from Redis database to a file
+    map_filtered_dup = map_filtered[map_filtered.index.duplicated()]
+    if(map_filtered_dup.shape[0] > 0):
+        map_filtered_dup['ensemble'] = output_df_mapped_dedup.index
+        write_to_file(map_filtered_dup, run_parameters['spreadsheet_name_full_path'],
+                      run_parameters['results_directory'],
+                      "_DUPLICATE.tsv", use_index=False, use_header=False)
 
-    if unmapped_filtered.shape[0] > 0:
-        logging.append("INFO: Unable to map {} gene(s) to ensemble name.".format(unmapped_filtered.shape[0]))
+    # filter the unmapped gene
+    unmap_filtered = mapping[mapping.index.str.contains(r'^unmapped.*$')].sort_index(axis=0, ascending=False)
+    unmap_filtered['ensemble'] = unmap_filtered.index
 
-    mapping_dedup_df = mapping_filtered[~mapping_filtered.index.duplicated()]
+    if unmap_filtered.shape[0] > 0:
+        logging.append("INFO: Unable to map {} gene(s) to ensemble name.".format(unmap_filtered.shape[0]))
+
 
     # writes unmapped gene name along with return value from Redis database to a file
-    write_to_file(unmapped_filtered, run_parameters['spreadsheet_name_full_path'], run_parameters['results_directory'],
+    write_to_file(unmap_filtered, run_parameters['spreadsheet_name_full_path'], run_parameters['results_directory'],
                   "_UNMAPPED.tsv", use_index=False, use_header=False)
 
     # writes dedupped mapping between original gene name and ensemble name to a file
-    write_to_file(mapping_dedup_df, run_parameters['spreadsheet_name_full_path'], run_parameters['results_directory'],
-                  "_MAP.tsv", use_header=False)
+    write_to_file(map_filtered_dedup, run_parameters['spreadsheet_name_full_path'], run_parameters['results_directory'],
+                  "_MAP.tsv", use_index=True, use_header=False)
 
     return output_df_mapped_dedup
 
