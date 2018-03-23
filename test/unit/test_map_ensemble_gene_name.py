@@ -28,8 +28,8 @@ class TestMap_ensemble_gene_name(unittest.TestCase):
             "spreadsheet_name_full_path": "../data/spreadsheets/example.tsv",
             "results_directory": "./",
             "redis_credential": {
-                "host": "knowredis.knowhub.org",
-                "port": 6380,
+                "host": "knowredis.knoweng.org",
+                "port": 6379,
                 "password": "KnowEnG"
             },
             "source_hint": "",
@@ -37,7 +37,7 @@ class TestMap_ensemble_gene_name(unittest.TestCase):
         }
 
         self.output_mapping = "./example_MAP.tsv"
-        self.output_unmapped = "./example_UNMAPPED.tsv"
+        self.output_unmapped = "./example_User_To_Ensembl.tsv"
 
         self.golden_output_good = pd.DataFrame([[1, 0],
                                                 [0, 0],
