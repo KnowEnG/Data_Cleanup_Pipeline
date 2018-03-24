@@ -9,8 +9,8 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
             "gg_network_name_full_path":  "../../data/networks/TEST_1_gene_gene.edge",
             "results_directory": "./",
             "redis_credential": {
-                "host": "knowredis.knowhub.org",
-                "port": 6380,
+                "host": "knowredis.knoweng.org",
+                "port": 6379,
                 "password": "KnowEnG"
             },
             "source_hint": "",
@@ -24,8 +24,8 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
             "phenotype_name_full_path": "",
             "results_directory": "./",
             "redis_credential": {
-                "host": "knowredis.knowhub.org",
-                "port": 6380,
+                "host": "knowredis.knoweng.org",
+                "port": 6379,
                 "password": "KnowEnG"
             },
             "source_hint": "",
@@ -35,7 +35,7 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
 
         self.file_ETL = "TEST_1_gene_expression_real_value_ETL.tsv"
         self.file_MAP = "TEST_1_gene_expression_real_value_MAP.tsv"
-        self.file_UNMAPPED = "TEST_1_gene_expression_real_value_UNMAPPED.tsv"
+        self.file_UNMAPPED = "TEST_1_gene_expression_real_value_User_To_Ensembl.tsv"
 
     def tearDown(self):
         del self.run_parameters

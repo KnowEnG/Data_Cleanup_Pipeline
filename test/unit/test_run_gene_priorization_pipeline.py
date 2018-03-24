@@ -13,14 +13,14 @@ class TestRun_gene_prioritization_pipeline(unittest.TestCase):
             "pipeline_type": "samples_clustering_pipeline",
             "correlation_measure": 'pearson',
             "redis_credential": {
-                "host": "knowredis.knowhub.org",
-                "port": 6380,
+                "host": "knowredis.knoweng.org",
+                "port": 6379,
                 "password": "KnowEnG"
             }
         }
         self.file_ETL = "TEST_1_gene_expression_real_value_ETL.tsv"
         self.file_MAP = "TEST_1_gene_expression_real_value_MAP.tsv"
-        self.file_UNMAPPED = "TEST_1_gene_expression_real_value_UNMAPPED.tsv"
+        self.file_UNMAPPED = "TEST_1_gene_expression_real_value_User_To_Ensembl.tsv"
         self.phenotype_ETL = "TEST_1_phenotype_pearson_ETL.tsv"
 
 
