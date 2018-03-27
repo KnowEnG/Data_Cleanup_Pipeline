@@ -1,4 +1,4 @@
-spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv
+spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_real_number.tsv
 signature_name_full_path:   ../data/spreadsheets/TEST_1_gene_signature.tsv
 results_directory:          ./run_dir/results
 

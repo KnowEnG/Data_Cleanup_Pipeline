@@ -30,7 +30,7 @@ class Testcheck_check_input_data_value(unittest.TestCase):
         del self.input_df
         del self.input_df_nan
 
-    def test_check_not_null_non_negative_real_value(self):
+    def test_check_not_null_non_negative_real_number(self):
         ret_df = data_cln.check_input_data_value(self.input_df, check_na=True, dropna_colwise=False,
                                                  check_real_number=True,
                                                  check_positive_number=True)

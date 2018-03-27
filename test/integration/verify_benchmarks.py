@@ -45,7 +45,7 @@ def run_all_BENCHMARKs_and_TESTs():
             if os.path.isfile(os.path.join(results_dir, tmp_file_name)):
                 os.remove(os.path.join(results_dir, tmp_file_name))
 
-    print("\nVerification Status:\n\tFinished running {} tests, succeeded {} tests and failed {} tests".format(len(verification_directory_list),
+    print("\nVerification Status:\n\tNumber of tests ran {}.\n\tSucceeded tests: {}. \n\tFailed tests: {}.".format(len(verification_directory_list),
                                                                                      NUM_SUCCESS, NUM_FAIL))
 
 
@@ -85,7 +85,7 @@ def main():
     t0 = time.time()
     run_all_BENCHMARKs_and_TESTs()
     t1 = time.time()
-    print("\tRunning tests in {} seconds.".format(t1- t0))
+    print("\tTotal running time: {} seconds.".format(t1- t0))
     print('\n')
 
 
