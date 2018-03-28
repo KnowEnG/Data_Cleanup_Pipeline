@@ -1,5 +1,5 @@
 SUCCESS:
-- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_positive_real_number.tsv
   with 15 row(s) and 5 column(s)'
 - 'WARNING: Removed 1 empty row(s).'
 - 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_prediction.tsv

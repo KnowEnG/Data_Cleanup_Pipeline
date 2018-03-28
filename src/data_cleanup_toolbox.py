@@ -353,11 +353,13 @@ def run_pasted_gene_set_conversion(run_parameters):
             return False, logging
 
         input_small_genes_df["original_gene_name"] = input_small_genes_df.index
+
         # converts pasted_gene_list to ensemble name
         redis_ret = redisutil.get_node_info(redis_db, input_small_genes_df.index, "Gene", run_parameters['source_hint'],
                                             run_parameters['taxonid'])
         ensemble_names = [x[1] for x in redis_ret]
         input_small_genes_df.index = pandas.Series(ensemble_names)
+
         # filters out the unmapped genes
         mapped_small_genes_df = input_small_genes_df[~input_small_genes_df.index.str.contains(r'^unmapped.*$')]
         # reads the univeral_gene_list
@@ -477,7 +479,7 @@ def run_signature_analysis_pipeline(run_parameters):
 
         # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
         user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True,
-                                                            check_positive_number=True)
+                                                            check_positive_number=False)
 
         if user_spreadsheet_val_chked is None:
             return False, logging

@@ -1,4 +1,4 @@
-spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv
+spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_positive_real_number.tsv
 gg_network_name_full_path:  ../data/networks/TEST_1_gene_gene.edge
 results_directory:          ./run_dir/results
 
