@@ -352,7 +352,7 @@ def run_pasted_gene_set_conversion(run_parameters):
             logging.append("ERROR: Input data is empty. Please upload valid input data.")
             return False, logging
 
-        input_small_genes_df["original_gene_name"] = input_small_genes_df.index
+        input_small_genes_df["user_supplied_gene_name"] = input_small_genes_df.index
 
         # converts pasted_gene_list to ensemble name
         redis_ret = redisutil.get_node_info(redis_db, input_small_genes_df.index, "Gene", run_parameters['source_hint'],
@@ -362,6 +362,17 @@ def run_pasted_gene_set_conversion(run_parameters):
 
         # filters out the unmapped genes
         mapped_small_genes_df = input_small_genes_df[~input_small_genes_df.index.str.contains(r'^unmapped.*$')]
+
+        # filter the duplicate gene name and write them along with their corresponding user supplied gene name to a file
+        mapped_small_genes_df[(~mapped_small_genes_df.index.str.contains(
+            r'^unmapped.*$') & mapped_small_genes_df.index.duplicated())]['user_supplied_gene_name'] = 'duplicate ensembl name'
+
+        input_small_genes_df['status'] = input_small_genes_df.index
+        print(input_small_genes_df.columns)
+
+        write_to_file(input_small_genes_df, run_parameters['pasted_gene_list_full_path'],
+                      run_parameters['results_directory'], "_User_To_Ensembl.tsv", use_index=False, use_header=True)
+
         # reads the univeral_gene_list
         universal_genes_df = load_pasted_gene_list(run_parameters['temp_redis_vector'])
         if universal_genes_df is None:
@@ -385,6 +396,7 @@ def run_pasted_gene_set_conversion(run_parameters):
                       run_parameters['results_directory'], "_MAP.tsv")
         write_to_file(universal_genes_df, run_parameters['pasted_gene_list_full_path'],
                       run_parameters['results_directory'], "_ETL.tsv")
+
         logging.append("INFO: Universal gene list contains {} genes.".format(universal_genes_df.shape[0]))
         logging.append("INFO: Mapped gene list contains {} genes.".format(mapped_small_genes_df.shape[0]))
         return True, logging
@@ -1047,7 +1059,7 @@ def map_ensemble_gene_name(dataframe, run_parameters):
 
     # filter the duplicate gene name and write them along with their corresponding user supplied gene name to a file
     mapping.loc[(~dataframe.index.str.contains(
-        r'^unmapped.*$') & mapping.index.duplicated()), 'status'] = 'Duplicate Ensembl Name'
+        r'^unmapped.*$') & mapping.index.duplicated()), 'status'] = 'duplicate ensembl name'
 
     # writes user supplied gene name along with its mapping status to a file
     write_to_file(mapping, run_parameters['spreadsheet_name_full_path'], run_parameters['results_directory'],
