@@ -498,9 +498,6 @@ def run_signature_analysis_pipeline(run_parameters):
         # Checks duplication on column and row name
         user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
 
-        # Checks the validity of gene name to see if it can be ensemble or not
-        user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
-
         if 'gg_network_name_full_path' in run_parameters.keys():
             logging.append("INFO: Start to process network data.")
             # Loads network dataframe to check number of genes intersected between spreadsheet and network
@@ -519,15 +516,15 @@ def run_signature_analysis_pipeline(run_parameters):
                 return False, logging
 
         # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
-        if user_spreadsheet_df_cleaned is None:
+        if user_spreadsheet_df_checked is None:
             return False, logging
         else:
-            write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
+            write_to_file(user_spreadsheet_df_checked, run_parameters['spreadsheet_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
             logging.append(
                 "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(
-                    user_spreadsheet_df_cleaned.shape[0],
-                    user_spreadsheet_df_cleaned.shape[1]))
+                    user_spreadsheet_df_checked.shape[0],
+                    user_spreadsheet_df_checked.shape[1]))
         if signature_df is not None:
             write_to_file(signature_df, run_parameters['signature_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
