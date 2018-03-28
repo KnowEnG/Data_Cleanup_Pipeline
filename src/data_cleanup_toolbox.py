@@ -368,7 +368,6 @@ def run_pasted_gene_set_conversion(run_parameters):
             r'^unmapped.*$') & mapped_small_genes_df.index.duplicated())]['user_supplied_gene_name'] = 'duplicate ensembl name'
 
         input_small_genes_df['status'] = input_small_genes_df.index
-        print(input_small_genes_df.columns)
 
         write_to_file(input_small_genes_df, run_parameters['pasted_gene_list_full_path'],
                       run_parameters['results_directory'], "_User_To_Ensembl.tsv", use_index=False, use_header=True)
