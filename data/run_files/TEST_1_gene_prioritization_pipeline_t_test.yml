@@ -7,7 +7,7 @@ correlation_measure:        t_test
 taxonid:                    '9606'                      # taxon id of a given gene name
 source_hint:                ''                          # hint of looking up ensembl name in Redis database
 pipeline_type:              gene_prioritization_pipeline  # pipeline name
-
+impute:                     average
 redis_credential:                                       # knoweng Redis database credentials
                             host: knowredis.knoweng.org
                             password: KnowEnG

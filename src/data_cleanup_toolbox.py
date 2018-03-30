@@ -156,6 +156,10 @@ def run_gene_prioritization_pipeline(run_parameters):
         if user_spreadsheet_df is None:
             return False, logging
 
+        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        if user_spreadsheet_df_imputed is None:
+            return False, logging
+
         # dimension: sample x phenotype
         phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
 
@@ -164,7 +168,7 @@ def run_gene_prioritization_pipeline(run_parameters):
 
         # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
         user_spreadsheet_val_chked, phenotype_val_checked = check_input_value_for_gene_prioritization(
-            user_spreadsheet_df, phenotype_df, run_parameters['correlation_measure'])
+            user_spreadsheet_df_imputed, phenotype_df, run_parameters['correlation_measure'])
 
         if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
             return False, logging
@@ -928,7 +932,7 @@ def impute_na(dataframe, option):
     '''
     if option == "reject":
         if dataframe.isnull().values.any():
-            logging.append("ERROR: User spreadsheet contains NaN value. Reject this spreadsheet.")
+            logging.append("ERROR: User spreadsheet contains NaN value. Rejecting this spreadsheet.")
             return None
         logging.append("INFO: There is no NA value in spreadsheet.")
         return dataframe
