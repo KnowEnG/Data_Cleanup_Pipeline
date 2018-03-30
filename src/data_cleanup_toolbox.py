@@ -156,6 +156,10 @@ def run_gene_prioritization_pipeline(run_parameters):
         if user_spreadsheet_df is None:
             return False, logging
 
+        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        if user_spreadsheet_df_imputed is None:
+            return False, logging
+
         # dimension: sample x phenotype
         phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
 
@@ -164,7 +168,7 @@ def run_gene_prioritization_pipeline(run_parameters):
 
         # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
         user_spreadsheet_val_chked, phenotype_val_checked = check_input_value_for_gene_prioritization(
-            user_spreadsheet_df, phenotype_df, run_parameters['correlation_measure'])
+            user_spreadsheet_df_imputed, phenotype_df, run_parameters['correlation_measure'])
 
         if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
             return False, logging
@@ -498,9 +502,6 @@ def run_signature_analysis_pipeline(run_parameters):
         # Checks duplication on column and row name
         user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
 
-        # Checks the validity of gene name to see if it can be ensemble or not
-        user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
-
         if 'gg_network_name_full_path' in run_parameters.keys():
             logging.append("INFO: Start to process network data.")
             # Loads network dataframe to check number of genes intersected between spreadsheet and network
@@ -519,15 +520,15 @@ def run_signature_analysis_pipeline(run_parameters):
                 return False, logging
 
         # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
-        if user_spreadsheet_df_cleaned is None:
+        if user_spreadsheet_df_checked is None:
             return False, logging
         else:
-            write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
+            write_to_file(user_spreadsheet_df_checked, run_parameters['spreadsheet_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
             logging.append(
                 "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(
-                    user_spreadsheet_df_cleaned.shape[0],
-                    user_spreadsheet_df_cleaned.shape[1]))
+                    user_spreadsheet_df_checked.shape[0],
+                    user_spreadsheet_df_checked.shape[1]))
         if signature_df is not None:
             write_to_file(signature_df, run_parameters['signature_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
@@ -931,7 +932,7 @@ def impute_na(dataframe, option):
     '''
     if option == "reject":
         if dataframe.isnull().values.any():
-            logging.append("ERROR: User spreadsheet contains NaN value. Reject this spreadsheet.")
+            logging.append("ERROR: User spreadsheet contains NaN value. Rejecting this spreadsheet.")
             return None
         logging.append("INFO: There is no NA value in spreadsheet.")
         return dataframe

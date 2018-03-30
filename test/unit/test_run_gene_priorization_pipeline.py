@@ -10,6 +10,7 @@ class TestRun_gene_prioritization_pipeline(unittest.TestCase):
             "results_directory": "./",
             "source_hint": "",
             "taxonid": '9606',
+            "impute": "average",
             "pipeline_type": "samples_clustering_pipeline",
             "correlation_measure": 'pearson',
             "redis_credential": {
