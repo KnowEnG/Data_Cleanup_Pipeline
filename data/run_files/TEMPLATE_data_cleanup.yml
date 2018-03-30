@@ -25,6 +25,12 @@ pipeline_type:              gene_priorization_pipeline  # valid pipeline names:
                                                         # gene_prioritization
 
 # --------------------------------------------------------------------
+# - Three options to handle NA value: reject, average, remove        -
+# - Currently available on GSC and GP pipeline 
+# --------------------------------------------------------------------
+impute:                     average 
+
+# --------------------------------------------------------------------
 # - Redis database credentials                                       -
 # --------------------------------------------------------------------
 redis_credential:                                       # knoweng Redis database credentials
