@@ -20,7 +20,8 @@ DC_options_dict = {
     'run_geneset_characterization_pipeline': 'geneset_characterization_pipeline',
     'run_phenotype_prediction_pipeline': 'phenotype_prediction_pipeline',
     'run_signature_analysis_pipeline': 'signature_analysis_pipeline',
-    'run_feature_prioritization_pipeline': 'feature_prioritization_pipeline',
+    'run_feature_prioritization_pipeline_pearson': 'feature_prioritization_pipeline_pearson',
+    'run_feature_prioritization_pipeline_t_test': 'feature_prioritization_pipeline_t_test',
     'run_file_format_test': 'file_format_test'}
 
 verify_root_dir = '../data/verification'

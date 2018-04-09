@@ -433,7 +433,7 @@ def run_feature_prioritization_pipeline(run_parameters):
             return False, logging
 
         # Check if user spreadsheet contains na value and only real number
-        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df_imputed, check_na=True,
+        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df_imputed, check_na=False,
                                                                check_real_number=True)
         if user_spreadsheet_df_val_check is None:
             return False, logging
@@ -449,7 +449,9 @@ def run_feature_prioritization_pipeline(run_parameters):
                                                                                  user_spreadsheet_df.shape[1]))
 
         if run_parameters['correlation_measure'] == 't_test':
-            phenotype_expander(run_parameters)
+            result_df = phenotype_expander(run_parameters)
+            write_to_file(result_df, "phenotype_expander_result",
+                          run_parameters['results_directory'], "_ETL.tsv")
         else:
             write_to_file(phenotype_df_val_check, run_parameters['phenotype_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
