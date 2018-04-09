@@ -1,4 +1,4 @@
-spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv
+spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_positive_real_number.tsv
 phenotype_name_full_path:   ../data/spreadsheets/TEST_1_phenotype_pearson.tsv
 results_directory:          ./run_dir/results
 
@@ -7,7 +7,7 @@ correlation_measure:        pearson
 taxonid:                    '9606'                      # taxon id of a given gene name
 source_hint:                ''                          # hint of looking up ensembl name in Redis database
 pipeline_type:              gene_prioritization_pipeline # pipeline name
-
+impute:                     average
 redis_credential:                                       # knoweng Redis database credentials
                             host: knowredis.knoweng.org
                             password: KnowEnG

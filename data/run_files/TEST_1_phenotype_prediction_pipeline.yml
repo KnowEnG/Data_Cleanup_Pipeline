@@ -1,4 +1,4 @@
-spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_real_value.tsv
+spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_positive_real_number.tsv
 phenotype_name_full_path:   ../data/spreadsheets/TEST_1_phenotype_prediction.tsv
 results_directory:          ./run_dir/results
 pipeline_type:              phenotype_prediction_pipeline          # pipeline name

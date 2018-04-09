@@ -30,7 +30,8 @@ def run_geneset_characterization_pipeline(run_parameters):
             return False, logging
 
         # Checks only non-negative real number appears in user spreadsheet, drop na column wise
-        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df_imputed, check_na=False, check_real_number=True,
+        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df_imputed, check_na=False,
+                                                            check_real_number=True,
                                                             check_positive_number=True)
         if user_spreadsheet_val_chked is None:
             return False, logging
@@ -104,7 +105,8 @@ def run_samples_clustering_pipeline(run_parameters):
                 logging.append("ERROR: Input data {} is empty. Please provide a valid input data.".format(
                     run_parameters['gg_network_name_full_path']))
                 return False, logging
-            logging.append("INFO: Successfully loaded input data: {}".format(run_parameters['gg_network_name_full_path']))
+            logging.append(
+                "INFO: Successfully loaded input data: {}".format(run_parameters['gg_network_name_full_path']))
             node_1_names, node_2_names = extract_network_node_names(network_df)
             unique_gene_names = find_unique_node_names(node_1_names, node_2_names)
 
@@ -120,8 +122,9 @@ def run_samples_clustering_pipeline(run_parameters):
             write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
             logging.append(
-                "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                                     user_spreadsheet_df_cleaned.shape[1]))
+                "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(
+                    user_spreadsheet_df_cleaned.shape[0],
+                    user_spreadsheet_df_cleaned.shape[1]))
         if phenotype_df_cleaned is not None:
             write_to_file(phenotype_df_cleaned, run_parameters['phenotype_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
@@ -153,6 +156,10 @@ def run_gene_prioritization_pipeline(run_parameters):
         if user_spreadsheet_df is None:
             return False, logging
 
+        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        if user_spreadsheet_df_imputed is None:
+            return False, logging
+
         # dimension: sample x phenotype
         phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
 
@@ -160,8 +167,8 @@ def run_gene_prioritization_pipeline(run_parameters):
             return False, logging
 
         # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
-        user_spreadsheet_val_chked  , phenotype_val_checked = check_input_value_for_gene_prioritization(
-            user_spreadsheet_df, phenotype_df, run_parameters['correlation_measure'])
+        user_spreadsheet_val_chked, phenotype_val_checked = check_input_value_for_gene_prioritization(
+            user_spreadsheet_df_imputed, phenotype_df, run_parameters['correlation_measure'])
 
         if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
             return False, logging
@@ -218,7 +225,8 @@ def run_phenotype_prediction_pipeline(run_parameters):
             return False, logging
 
         # Check if user spreadsheet contains only real number and drop na column wise
-        user_spreadsheet_dropna = check_input_data_value(user_spreadsheet_df, dropna_colwise=True, check_real_number=True)
+        user_spreadsheet_dropna = check_input_data_value(user_spreadsheet_df, dropna_colwise=True,
+                                                         check_real_number=True)
 
         if user_spreadsheet_dropna is None or user_spreadsheet_dropna.empty:
             logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
@@ -348,14 +356,26 @@ def run_pasted_gene_set_conversion(run_parameters):
             logging.append("ERROR: Input data is empty. Please upload valid input data.")
             return False, logging
 
-        input_small_genes_df["original_gene_name"] = input_small_genes_df.index
+        input_small_genes_df["user_supplied_gene_name"] = input_small_genes_df.index
+
         # converts pasted_gene_list to ensemble name
         redis_ret = redisutil.get_node_info(redis_db, input_small_genes_df.index, "Gene", run_parameters['source_hint'],
                                             run_parameters['taxonid'])
         ensemble_names = [x[1] for x in redis_ret]
         input_small_genes_df.index = pandas.Series(ensemble_names)
+
         # filters out the unmapped genes
         mapped_small_genes_df = input_small_genes_df[~input_small_genes_df.index.str.contains(r'^unmapped.*$')]
+
+        # filter the duplicate gene name and write them along with their corresponding user supplied gene name to a file
+        mapped_small_genes_df[(~mapped_small_genes_df.index.str.contains(
+            r'^unmapped.*$') & mapped_small_genes_df.index.duplicated())]['user_supplied_gene_name'] = 'duplicate ensembl name'
+
+        input_small_genes_df['status'] = input_small_genes_df.index
+
+        write_to_file(input_small_genes_df, run_parameters['pasted_gene_list_full_path'],
+                      run_parameters['results_directory'], "_User_To_Ensembl.tsv", use_index=False, use_header=True)
+
         # reads the univeral_gene_list
         universal_genes_df = load_pasted_gene_list(run_parameters['temp_redis_vector'])
         if universal_genes_df is None:
@@ -365,8 +385,9 @@ def run_pasted_gene_set_conversion(run_parameters):
         universal_genes_df.insert(0, 'value', 0)
         # finds the intersection between pasted_gene_list and universal_gene_list
         common_idx = universal_genes_df.index.intersection(mapped_small_genes_df.index)
-        logging.append("INFO: Found {} common gene(s) that shared between pasted gene list and universal gene list.".format(
-            len(common_idx)))
+        logging.append(
+            "INFO: Found {} common gene(s) that shared between pasted gene list and universal gene list.".format(
+                len(common_idx)))
         # inserts a column with value 1
         universal_genes_df.loc[common_idx] = 1
         # names the column of universal_genes_df to be 'uploaded_gene_set'
@@ -378,6 +399,7 @@ def run_pasted_gene_set_conversion(run_parameters):
                       run_parameters['results_directory'], "_MAP.tsv")
         write_to_file(universal_genes_df, run_parameters['pasted_gene_list_full_path'],
                       run_parameters['results_directory'], "_ETL.tsv")
+
         logging.append("INFO: Universal gene list contains {} genes.".format(universal_genes_df.shape[0]))
         logging.append("INFO: Mapped gene list contains {} genes.".format(mapped_small_genes_df.shape[0]))
         return True, logging
@@ -411,7 +433,8 @@ def run_feature_prioritization_pipeline(run_parameters):
             return False, logging
 
         # Check if user spreadsheet contains na value and only real number
-        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True)
+        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True,
+                                                               check_real_number=True)
         if user_spreadsheet_df_val_check is None:
             return False, logging
 
@@ -421,8 +444,9 @@ def run_feature_prioritization_pipeline(run_parameters):
 
         write_to_file(user_spreadsheet_df, run_parameters['spreadsheet_name_full_path'],
                       run_parameters['results_directory'], "_ETL.tsv")
-        logging.append("INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df.shape[0],
-                                                                                            user_spreadsheet_df.shape[1]))
+        logging.append(
+            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df.shape[0],
+                                                                                 user_spreadsheet_df.shape[1]))
 
         if run_parameters['correlation_measure'] == 't_test':
             phenotype_expander(run_parameters)
@@ -470,16 +494,13 @@ def run_signature_analysis_pipeline(run_parameters):
 
         # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
         user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True,
-                                                            check_positive_number=True)
+                                                            check_positive_number=False)
 
         if user_spreadsheet_val_chked is None:
             return False, logging
 
         # Checks duplication on column and row name
         user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
-
-        # Checks the validity of gene name to see if it can be ensemble or not
-        user_spreadsheet_df_cleaned = map_ensemble_gene_name(user_spreadsheet_df_checked, run_parameters)
 
         if 'gg_network_name_full_path' in run_parameters.keys():
             logging.append("INFO: Start to process network data.")
@@ -499,14 +520,15 @@ def run_signature_analysis_pipeline(run_parameters):
                 return False, logging
 
         # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
-        if user_spreadsheet_df_cleaned is None:
+        if user_spreadsheet_df_checked is None:
             return False, logging
         else:
-            write_to_file(user_spreadsheet_df_cleaned, run_parameters['spreadsheet_name_full_path'],
+            write_to_file(user_spreadsheet_df_checked, run_parameters['spreadsheet_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
             logging.append(
-                "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df_cleaned.shape[0],
-                                                                                     user_spreadsheet_df_cleaned.shape[1]))
+                "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(
+                    user_spreadsheet_df_checked.shape[0],
+                    user_spreadsheet_df_checked.shape[1]))
         if signature_df is not None:
             write_to_file(signature_df, run_parameters['signature_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
@@ -726,6 +748,7 @@ def check_duplicate_column_name(dataframe):
         user_spreadsheet_df_genename_dedup.T: a DataFrame in original format
         ret_msg: error message
     """
+
     dataframe_transpose = dataframe.T
     dataframe_row_dedup = dataframe_transpose[~dataframe_transpose.index.duplicated()]
     if dataframe_row_dedup.empty:
@@ -909,13 +932,14 @@ def impute_na(dataframe, option):
     '''
     if option == "reject":
         if dataframe.isnull().values.any():
-            logging.append("ERROR: User spreadsheet contains NaN value. Reject this spreadsheet.")
+            logging.append("ERROR: User spreadsheet contains NaN value. Rejecting this spreadsheet.")
             return None
         logging.append("INFO: There is no NA value in spreadsheet.")
         return dataframe
     elif option == "remove":
         dataframe_dropna = dataframe.dropna(axis=0)
-        logging.append("INFO: Remove {} row(s) containing NA value.".format(dataframe.shape[0] - dataframe_dropna.shape[0]))
+        logging.append(
+            "INFO: Remove {} row(s) containing NA value.".format(dataframe.shape[0] - dataframe_dropna.shape[0]))
         return dataframe_dropna
     elif option == 'average':
         logging.append("INFO: Filled NA with mean value of its corresponding row.")
@@ -987,53 +1011,59 @@ def map_ensemble_gene_name(dataframe, run_parameters):
     import redis_utilities as redisutil
 
     redis_db = redisutil.get_database(run_parameters['redis_credential'])
-
-    # copy index to new column named with 'original'
-    dataframe = dataframe.assign(original=dataframe.index)
+    # copy index to new column named with 'user_supplied_gene_name'
+    dataframe = dataframe.assign(user_supplied_gene_name=dataframe.index)
     redis_ret = redisutil.get_node_info(redis_db, dataframe.index, "Gene", run_parameters['source_hint'],
                                         run_parameters['taxonid'])
-
     # extract ensemble names as a list from a call to redis database
     ensemble_names = [x[1] for x in redis_ret]
 
     # resets dataframe's index with ensembel name
     dataframe.index = pandas.Series(ensemble_names)
-
     # extracts all mapped rows in dataframe
     output_df_mapped = dataframe[~dataframe.index.str.contains(r'^unmapped.*$')]
     if output_df_mapped.empty:
         logging.append("ERROR: No valid ensemble name can be found.")
         return None
 
-    output_df_mapped = output_df_mapped.drop('original', axis=1)
+    # removes the temporary added column to keep original shape
+    output_df_mapped = output_df_mapped.drop('user_supplied_gene_name', axis=1)
     output_df_mapped_dedup = output_df_mapped[~output_df_mapped.index.duplicated()]
 
     dup_cnt = output_df_mapped.shape[0] - output_df_mapped_dedup.shape[0]
     if dup_cnt > 0:
         logging.append("INFO: Found {} duplicate Ensembl gene name.".format(dup_cnt))
 
-    # dedup on gene name mapping dictionary
-    mapping = dataframe[['original']]
+    # The following logic is to generate UNMAPPED/MAP file with two columns
+    # extract two columns, index is ensembl name and column 'user_supplied_gene_name' is user supplied gene
+    mapping = dataframe[['user_supplied_gene_name']]
 
-    mapping_filtered = mapping[~mapping.index.str.contains(r'^unmapped.*$')]
+    # filter the mapped gene
+    map_filtered = mapping[~mapping.index.str.contains(r'^unmapped.*$')]
+    logging.append("INFO: Mapped {} gene(s) to ensemble name.".format(map_filtered.shape[0]))
 
-    logging.append("INFO: Mapped {} gene(s) to ensemble name.".format(mapping_filtered.shape[0]))
+    # filter the unmapped gene
+    unmap_filtered = mapping[mapping.index.str.contains(r'^unmapped.*$')]
+    if unmap_filtered.shape[0] > 0:
+        logging.append("INFO: Unable to map {} gene(s) to ensemble name.".format(unmap_filtered.shape[0]))
 
-    unmapped_filtered = mapping[mapping.index.str.contains(r'^unmapped.*$')].sort_index(axis=0, ascending=False)
-    unmapped_filtered['ensemble'] = unmapped_filtered.index
+    # filter out the duplicated ensemble gene name
+    map_filtered_dedup = map_filtered[~map_filtered.index.duplicated()]
 
-    if unmapped_filtered.shape[0] > 0:
-        logging.append("INFO: Unable to map {} gene(s) to ensemble name.".format(unmapped_filtered.shape[0]))
+    # writes dedupped mapping between user_supplied_gene_name and ensemble name to a file
+    write_to_file(map_filtered_dedup, run_parameters['spreadsheet_name_full_path'], run_parameters['results_directory'],
+                  "_MAP.tsv", use_index=True, use_header=False)
 
-    mapping_dedup_df = mapping_filtered[~mapping_filtered.index.duplicated()]
+    # adds a status column
+    mapping = mapping.assign(status=dataframe.index)
 
-    # writes unmapped gene name along with return value from Redis database to a file
-    write_to_file(unmapped_filtered, run_parameters['spreadsheet_name_full_path'], run_parameters['results_directory'],
-                  "_UNMAPPED.tsv", use_index=False, use_header=False)
+    # filter the duplicate gene name and write them along with their corresponding user supplied gene name to a file
+    mapping.loc[(~dataframe.index.str.contains(
+        r'^unmapped.*$') & mapping.index.duplicated()), 'status'] = 'duplicate ensembl name'
 
-    # writes dedupped mapping between original gene name and ensemble name to a file
-    write_to_file(mapping_dedup_df, run_parameters['spreadsheet_name_full_path'], run_parameters['results_directory'],
-                  "_MAP.tsv", use_header=False)
+    # writes user supplied gene name along with its mapping status to a file
+    write_to_file(mapping, run_parameters['spreadsheet_name_full_path'], run_parameters['results_directory'],
+                  "_User_To_Ensembl.tsv", use_index=False, use_header=True)
 
     return output_df_mapped_dedup
 

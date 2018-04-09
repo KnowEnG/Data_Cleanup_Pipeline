@@ -25,8 +25,8 @@ class TestSanity_check_input_data(unittest.TestCase):
             "phenotype_name_full_path": ".. /data/spreadsheets/phenotype.tsv",
             "results_directory": "./",
             "redis_credential": {
-                "host": "knowredis.knowhub.org",
-                "port": 6380,
+                "host": "knowredis.knoweng.org",
+                "port": 6379,
                 "password": "KnowEnG"
             },
             "source_hint": "",
