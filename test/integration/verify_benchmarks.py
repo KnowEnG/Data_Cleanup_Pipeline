@@ -20,6 +20,7 @@ DC_options_dict = {
     'run_geneset_characterization_pipeline': 'geneset_characterization_pipeline',
     'run_phenotype_prediction_pipeline': 'phenotype_prediction_pipeline',
     'run_signature_analysis_pipeline': 'signature_analysis_pipeline',
+    'run_feature_prioritization_pipeline': 'feature_prioritization_pipeline',
     'run_file_format_test': 'file_format_test'}
 
 verify_root_dir = '../data/verification'
@@ -45,7 +46,7 @@ def run_all_BENCHMARKs_and_TESTs():
             if os.path.isfile(os.path.join(results_dir, tmp_file_name)):
                 os.remove(os.path.join(results_dir, tmp_file_name))
 
-    print("\nVerification Status:\n\tNumber of tests ran {}.\n\tSucceeded tests: {}. \n\tFailed tests: {}.".format(len(verification_directory_list),
+    print("\nVerification Status:\n\tNumber of tests ran {}.\n\tSucceeded tests: {}. \n\tFailed tests: {}.".format((len(verification_directory_list)),
                                                                                      NUM_SUCCESS, NUM_FAIL))
 
 
@@ -56,23 +57,26 @@ def python_file_compare(verif_dir, results_dir):
     tt = '%0.3f' % (time.time() - t0)
     global NUM_FAIL, NUM_SUCCESS
     if len(errs) > 0:
-        NUM_FAIL = NUM_FAIL + 1
         print('\n\t', tt, '\t', pipeline_name, 'test: FAILED')
         print('Errors:')
         for e in errs:
             print(e)
     if len(mismatch) > 0:
-        NUM_FAIL = NUM_FAIL + 1
         print('\n\t', tt, '\t', pipeline_name, 'test: FAILED')
         print('Mismatch:')
         for mm in mismatch:
             print(mm)
+
     if len(match) > 0:
-        NUM_SUCCESS = NUM_SUCCESS + 1
         print('\n\t', tt, '\t', pipeline_name, 'test: PASS')
         print('Matched:')
         for m in match:
             print(m)
+
+    if len(errs) > 0 or len(mismatch) > 0:
+        NUM_FAIL += 1
+    if len(errs) == 0 and len(mismatch) == 0 and len(match) > 0:
+        NUM_SUCCESS += 1
 
 
 def main():

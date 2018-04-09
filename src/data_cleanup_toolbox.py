@@ -25,12 +25,8 @@ def run_geneset_characterization_pipeline(run_parameters):
         if user_spreadsheet_df is None:
             return False, logging
 
-        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
-        if user_spreadsheet_df_imputed is None:
-            return False, logging
-
         # Checks only non-negative real number appears in user spreadsheet, drop na column wise
-        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df_imputed, check_na=False,
+        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True,
                                                             check_real_number=True,
                                                             check_positive_number=True)
         if user_spreadsheet_val_chked is None:
@@ -432,8 +428,12 @@ def run_feature_prioritization_pipeline(run_parameters):
         if phenotype_df is None:
             return False, logging
 
+        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        if user_spreadsheet_df_imputed is None:
+            return False, logging
+
         # Check if user spreadsheet contains na value and only real number
-        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True,
+        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df_imputed, check_na=True,
                                                                check_real_number=True)
         if user_spreadsheet_df_val_check is None:
             return False, logging

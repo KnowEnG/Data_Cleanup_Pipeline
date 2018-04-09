@@ -77,7 +77,7 @@ def phenotype_expander(run_parameters):
 
     result_df.index.name = "sample_id"
 
-    file_name = kn.create_timestamped_filename("phenotype_expander_result", "tsv")
+    file_name = kn.create_timestamped_filename("phenotype_expander_result_ETL", "tsv")
     file_path = os.path.join(run_parameters["results_directory"], file_name)
     result_df.to_csv(file_path, header=True, index=True, sep='\t', na_rep='NA')
 
