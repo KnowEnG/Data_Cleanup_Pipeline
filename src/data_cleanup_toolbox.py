@@ -451,7 +451,7 @@ def run_feature_prioritization_pipeline(run_parameters):
         if run_parameters['correlation_measure'] == 't_test':
             result_df = phenotype_expander(run_parameters)
             write_to_file(result_df, "phenotype_expander_result",
-                          run_parameters['results_directory'], "_ETL.tsv")
+                          run_parameters['results_directory'], "_ETL.tsv", na_rep="NA")
         else:
             write_to_file(phenotype_df_val_check, run_parameters['phenotype_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
@@ -624,7 +624,7 @@ def remove_na_header(dataframe):
     return dataframe_rm_na_header
 
 
-def write_to_file(target_file, target_path, result_directory, suffix, use_index=True, use_header=True):
+def write_to_file(target_file, target_path, result_directory, suffix, use_index=True, use_header=True, na_rep=""):
     """
     Write to a csv file.
 
@@ -641,7 +641,7 @@ def write_to_file(target_file, target_path, result_directory, suffix, use_index=
 
     output_file_basename = os.path.splitext(os.path.basename(os.path.normpath(target_path)))[0]
     target_file.to_csv(result_directory + '/' + output_file_basename + suffix,
-                       sep='\t', index=use_index, header=use_header)
+                       sep='\t', index=use_index, header=use_header, na_rep=na_rep)
 
 
 def load_data_file(file_path):
