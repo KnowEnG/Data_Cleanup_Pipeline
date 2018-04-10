@@ -149,10 +149,11 @@ def run_gene_prioritization_pipeline(run_parameters):
         # dimension: sample x phenotype
         user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
-        if user_spreadsheet_df is None:
-            return False, logging
+        if run_parameters["correlation_measure"] == "pearson":
+            user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        else:
+            user_spreadsheet_df_imputed = user_spreadsheet_df
 
-        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
         if user_spreadsheet_df_imputed is None:
             return False, logging
 
