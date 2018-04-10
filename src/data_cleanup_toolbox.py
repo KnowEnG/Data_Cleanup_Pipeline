@@ -25,12 +25,8 @@ def run_geneset_characterization_pipeline(run_parameters):
         if user_spreadsheet_df is None:
             return False, logging
 
-        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
-        if user_spreadsheet_df_imputed is None:
-            return False, logging
-
         # Checks only non-negative real number appears in user spreadsheet, drop na column wise
-        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df_imputed, check_na=False,
+        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True,
                                                             check_real_number=True,
                                                             check_positive_number=True)
         if user_spreadsheet_val_chked is None:
@@ -153,10 +149,11 @@ def run_gene_prioritization_pipeline(run_parameters):
         # dimension: sample x phenotype
         user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
-        if user_spreadsheet_df is None:
-            return False, logging
+        if run_parameters["correlation_measure"] == "pearson":
+            user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        else:
+            user_spreadsheet_df_imputed = user_spreadsheet_df
 
-        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
         if user_spreadsheet_df_imputed is None:
             return False, logging
 
@@ -432,8 +429,12 @@ def run_feature_prioritization_pipeline(run_parameters):
         if phenotype_df is None:
             return False, logging
 
+        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        if user_spreadsheet_df_imputed is None:
+            return False, logging
+
         # Check if user spreadsheet contains na value and only real number
-        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True,
+        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df_imputed, check_na=False,
                                                                check_real_number=True)
         if user_spreadsheet_df_val_check is None:
             return False, logging
@@ -449,7 +450,9 @@ def run_feature_prioritization_pipeline(run_parameters):
                                                                                  user_spreadsheet_df.shape[1]))
 
         if run_parameters['correlation_measure'] == 't_test':
-            phenotype_expander(run_parameters)
+            result_df = phenotype_expander(run_parameters)
+            write_to_file(result_df, "phenotype_expander_result",
+                          run_parameters['results_directory'], "_ETL.tsv", na_rep="NA")
         else:
             write_to_file(phenotype_df_val_check, run_parameters['phenotype_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
@@ -622,7 +625,7 @@ def remove_na_header(dataframe):
     return dataframe_rm_na_header
 
 
-def write_to_file(target_file, target_path, result_directory, suffix, use_index=True, use_header=True):
+def write_to_file(target_file, target_path, result_directory, suffix, use_index=True, use_header=True, na_rep=""):
     """
     Write to a csv file.
 
@@ -639,7 +642,7 @@ def write_to_file(target_file, target_path, result_directory, suffix, use_index=
 
     output_file_basename = os.path.splitext(os.path.basename(os.path.normpath(target_path)))[0]
     target_file.to_csv(result_directory + '/' + output_file_basename + suffix,
-                       sep='\t', index=use_index, header=use_header)
+                       sep='\t', index=use_index, header=use_header, na_rep=na_rep)
 
 
 def load_data_file(file_path):

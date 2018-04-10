@@ -1,0 +1,7 @@
+spreadsheet_name_full_path: ../data/spreadsheets/TEST_1_gene_expression_binary.tsv
+phenotype_name_full_path:   ../data/spreadsheets/TEST_1_phenotype_t_test.tsv
+results_directory:          ./run_dir/results
+correlation_measure:        t_test
+impute:                     average
+threshold:                  2 
+pipeline_type:              feature_prioritization_pipeline # pipeline name
