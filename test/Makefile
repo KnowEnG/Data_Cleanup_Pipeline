@@ -58,8 +58,11 @@ run_phenotype_prediction_pipeline:
 run_general_clustering_pipeline:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_general_clustering_pipeline.yml
 
-run_feature_prioritization_pipeline:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_feature_prioritization_pipeline.yml
+run_feature_prioritization_pipeline_pearson:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_feature_prioritization_pipeline_pearson.yml
+
+run_feature_prioritization_pipeline_t_test:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_feature_prioritization_pipeline_t_test.yml
 
 run_signature_analysis_pipeline:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_signature_analysis_pipeline.yml
