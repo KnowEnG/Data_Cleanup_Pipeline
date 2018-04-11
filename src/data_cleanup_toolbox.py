@@ -429,7 +429,10 @@ def run_feature_prioritization_pipeline(run_parameters):
         if phenotype_df is None:
             return False, logging
 
-        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        if run_parameters["correlation_measure"] == "pearson":
+            user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        else:
+            user_spreadsheet_df_imputed = user_spreadsheet_df
         if user_spreadsheet_df_imputed is None:
             return False, logging
 
@@ -451,7 +454,7 @@ def run_feature_prioritization_pipeline(run_parameters):
 
         if run_parameters['correlation_measure'] == 't_test':
             result_df = phenotype_expander(run_parameters)
-            write_to_file(result_df, "phenotype_expander_result",
+            write_to_file(result_df, run_parameters['phenotype_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv", na_rep="NA")
         else:
             write_to_file(phenotype_df_val_check, run_parameters['phenotype_name_full_path'],
@@ -920,13 +923,13 @@ def check_data_for_t_test_and_pearson(phenotype_df_pxs, correlation_measure):
     return phenotype_df_pxs
 
 
-def impute_na(dataframe, option):
+def impute_na(dataframe, option="reject"):
     '''
     Impute NA value based on options user selected
     Args:
         dataframe: the dataframe to be imputed
         option:
-            1. reject: reject spreadsheet if we found NA
+            1. reject(defaul value): reject spreadsheet if we found NA
             2. remove: remove Nan row
             3. average: replace Nan value with row mean
 
