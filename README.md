@@ -53,10 +53,10 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
     1. drops NA.
     2. intersects header with spreadsheet header, number of intersection >= 2.
   2. for t_test:
-    a. check number of categories >= 2 then pass (otherwise fail)
-    b. check number of elements per category >= 2 then pass (otherwise fail)
+    a. number of categories >= 2 
+    b. number of elements per category >= 2 
     c. expand and keep the original NAs 
-  3. for pearson test, contains only real value or NaN
+  3. for pearson t only real value or NaN
   
 ### pasted_gene_list
   *After removing empty rows and columns, check if a spreadsheet:*
@@ -107,8 +107,8 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
  
   *After removing empty rows and columns, check if a phenotypic spreadsheet:*
   1. for t_test:
-    a. check number of categories >= 2 then pass (otherwise fail)
-    b. check number of elements per category >= 2 then pass (otherwise fail)
+    a. number of categories >= 2 
+    b. number of elements per category >= 2 
     c. expand and keep the original NAs 
   2. for pearson test, contains only real value or NaN.
 
