@@ -32,3 +32,7 @@ class TestImpute_na(unittest.TestCase):
     def test_impute_na_remove(self):
         ret = data_cln.impute_na(self.input_df, "remove")
         npytest.assert_array_equal(self.golden_output_remove, ret)
+
+    def test_impute_na_bad_option(self):
+        ret = data_cln.impute_na(self.input_df, "bad")
+        npytest.assert_array_equal(self.input_df, ret)

@@ -2,7 +2,6 @@ SUCCESS:
 - 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_positive_real_number.tsv
   with 15 row(s) and 5 column(s)'
 - 'WARNING: Removed 1 empty row(s).'
-- 'INFO: Filled NA with mean value of its corresponding row.'
 - 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_pearson.tsv
   with 6 row(s) and 2 column(s)'
 - 'INFO: Start to run checks for phenotypic data.'

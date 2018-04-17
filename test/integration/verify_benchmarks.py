@@ -68,11 +68,8 @@ def python_file_compare(verif_dir, results_dir):
         for mm in mismatch:
             print(mm)
 
-    if len(match) > 0:
+    if len(match) > 0 and len(errs) == 0 and len(mismatch) == 0:
         print('\n\t', tt, '\t', pipeline_name, 'test: PASS')
-        print('Matched:')
-        for m in match:
-            print(m)
 
     if len(errs) > 0 or len(mismatch) > 0:
         NUM_FAIL += 1
