@@ -7,14 +7,7 @@ import numpy as np
 import knpackage.toolbox as kn
 
 
-class ColumnType(Enum):
-    """Two categories of phenotype traits.
-    """
-    CONTINUOUS = "continuous"
-    CATEGORICAL = "categorical"
-
-
-def run_pre_processing_phenotype_expander(phenotype_df, threshold):
+def uniform_phenotype_data(phenotype_df):
     """This is the preprocessing step to expand phenotype
     Parameters:
         phenotype_df: phenotype dataframe.
@@ -23,9 +16,8 @@ def run_pre_processing_phenotype_expander(phenotype_df, threshold):
         output_dict: dictionary with keys to be categories of phenotype data and values
         to be a list of related dataframes.
     """
-    from collections import defaultdict
 
-    output_dict = defaultdict(list)
+    output_list = []
 
     for column in phenotype_df:
         cur_df = phenotype_df[[column]].dropna(axis=0)
@@ -36,20 +28,9 @@ def run_pre_processing_phenotype_expander(phenotype_df, threshold):
             else:
                 cur_df_lowercase = cur_df
 
-            num_uniq_value = len(cur_df_lowercase[column].dropna().unique())
+            output_list.append(cur_df_lowercase)
 
-            if num_uniq_value == 1:
-                continue
-            if cur_df_lowercase[column].dtype == object and num_uniq_value > threshold:
-                continue
-            if num_uniq_value > threshold:
-                classification = ColumnType.CONTINUOUS
-            else:
-                classification = ColumnType.CATEGORICAL
-            output_dict[classification].append(cur_df_lowercase)
-
-    print(output_dict)
-    return output_dict
+    return output_list
 
 
 def phenotype_expander(run_parameters):
@@ -57,26 +38,22 @@ def phenotype_expander(run_parameters):
     Save the results to tsv file.
     """
     phenotype_df = kn.get_spreadsheet_df(run_parameters['phenotype_name_full_path'])
-    output_dict = run_pre_processing_phenotype_expander(phenotype_df, run_parameters['threshold'])
-
+    output_list = uniform_phenotype_data(phenotype_df)
     result_df = pd.DataFrame(index=phenotype_df.index)
 
-    for key, df_list in output_dict.items():
-        if key == ColumnType.CATEGORICAL:
-            for item in df_list:
-                col_df = phenotype_df.loc[:, item.columns[0]].dropna()
-                uniq_array = np.unique(col_df.values)
-                col_names = [item.columns[0] + '_' + str(i) for i in uniq_array]
-                cur_df = pd.DataFrame(columns=col_names, index=col_df.index)
-                cur_append_df = pd.DataFrame(columns=col_names, index=phenotype_df.index)
-                print(uniq_array)
-                for i, val in enumerate(uniq_array):
-
-                    print("i = {}, val = {}".format(i, val))
-                    cur_df.loc[col_df == val, col_names[i]] = 1
-                    cur_df.loc[col_df != val, col_names[i]] = 0
-                cur_append_df.loc[cur_df.index, :] = cur_df
-                result_df = pd.concat([result_df, cur_append_df], axis=1)
+    for item in output_list:
+        col_df = phenotype_df.loc[:, item.columns[0]].dropna()
+        uniq_array = np.unique(col_df.values)
+        col_names = [item.columns[0] + '_' + str(i) for i in uniq_array]
+        cur_df = pd.DataFrame(columns=col_names, index=col_df.index)
+        cur_append_df = pd.DataFrame(columns=col_names, index=phenotype_df.index)
+        print(uniq_array)
+        for i, val in enumerate(uniq_array):
+            print("i = {}, val = {}".format(i, val))
+            cur_df.loc[col_df == val, col_names[i]] = 1
+            cur_df.loc[col_df != val, col_names[i]] = 0
+        cur_append_df.loc[cur_df.index, :] = cur_df
+        result_df = pd.concat([result_df, cur_append_df], axis=1)
 
     result_df.index.name = "sample_id"
 

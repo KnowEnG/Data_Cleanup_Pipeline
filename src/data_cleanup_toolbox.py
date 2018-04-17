@@ -882,15 +882,25 @@ def check_phenotype_data(phenotype_df_pxs, correlation_measure):
         list_values = pandas.unique(phenotype_df_pxs.values.ravel())
         if len(list_values) < 2:
             logging.append(
-                "ERROR: t_test requests at least two unique values in your dataset. "
+                "ERROR: t_test requests at least two categories in your phenotype dataset. "
                 "Please revise your phenotype data and reupload.")
             return None
-        '''
+
         for column in phenotype_df_pxs:
-            if phenotype_df_pxs[column].dtype != "int64":
-                logging.append("ERROR: t_test requests input dataset only contains int64 value.")
-            return None
-        '''
+            cur_col = phenotype_df_pxs[[column]].dropna(axis=0)
+
+            if not cur_col.empty:
+                if cur_col[column].dtype == object:
+                    cur_df_lowercase = cur_col.apply(lambda x: x.astype(str).str.lower())
+                else:
+                    cur_df_lowercase = cur_col
+
+                num_uniq_value = len(cur_df_lowercase[column].dropna().unique())
+
+                if num_uniq_value < 2:
+                    logging.append("ERROR: t_test requires at least two unique values per category in phenotype data.")
+                    return None
+
     if correlation_measure == 'pearson':
         if False in phenotype_df_pxs.applymap(lambda x: isinstance(x, (int, float))):
             logging.append(
