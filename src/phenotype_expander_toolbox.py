@@ -47,6 +47,8 @@ def run_pre_processing_phenotype_expander(phenotype_df, threshold):
             else:
                 classification = ColumnType.CATEGORICAL
             output_dict[classification].append(cur_df_lowercase)
+
+    print(output_dict)
     return output_dict
 
 
@@ -67,8 +69,10 @@ def phenotype_expander(run_parameters):
                 col_names = [item.columns[0] + '_' + str(i) for i in uniq_array]
                 cur_df = pd.DataFrame(columns=col_names, index=col_df.index)
                 cur_append_df = pd.DataFrame(columns=col_names, index=phenotype_df.index)
-
+                print(uniq_array)
                 for i, val in enumerate(uniq_array):
+
+                    print("i = {}, val = {}".format(i, val))
                     cur_df.loc[col_df == val, col_names[i]] = 1
                     cur_df.loc[col_df != val, col_names[i]] = 0
                 cur_append_df.loc[cur_df.index, :] = cur_df

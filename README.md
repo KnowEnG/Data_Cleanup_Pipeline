@@ -36,6 +36,10 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   
 ### gene_prioritization_pipeline
   *After removing empty rows and columns, check if a spreadsheet:*
+  1. based on impute option user selected:
+     a. reject: reject user spreadsheet if there is NA.
+     b. average: replace NA value with mean of that row.
+     c. remove: drop entire column which contains NA value
   1. genomic or phenotypic data is empty. 
   2. column contains NaN value/s.
   3. contains real value.

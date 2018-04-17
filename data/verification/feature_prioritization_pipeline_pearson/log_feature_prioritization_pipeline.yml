@@ -4,6 +4,7 @@ SUCCESS:
 - 'WARNING: Removed 1 empty row(s).'
 - 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_pearson.tsv
   with 6 row(s) and 2 column(s)'
-- 'INFO: Filled NA with mean value of its corresponding row.'
+- 'INFO: Start to run checks for phenotypic data.'
+- 'INFO: Finished running checks for phenotypic data.'
 - 'INFO: Cleaned user spreadsheet has 14 row(s), 5 column(s).'
 - 'INFO: Cleaned phenotypic data has 6 row(s), 2 column(s).'
