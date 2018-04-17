@@ -39,10 +39,10 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   1. based on impute option user selected:
      a. reject: reject user spreadsheet if there is NA.
      b. average: replace NA value with mean of that row.
-     c. remove: drop entire column which contains NA value
-  1. genomic or phenotypic data is empty. 
-  2. column contains NaN value/s.
-  3. contains real value.
+     c. remove: drop entire column which contains NA value.
+  2. genomic or phenotypic data is empty. 
+  3. column contains NaN value/s.
+  4. contains real value.
   5. contains NaN gene name in user spreadsheet.
   6. contains duplicate column name. 
   7. contains duplicate row name. 
@@ -52,7 +52,10 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   1. for every single drug:
     1. drops NA.
     2. intersects header with spreadsheet header, number of intersection >= 2.
-  2. for t_test, contains only value 0, 1 or NaN.
+  2. for t_test:
+    a. check number of categories >= 2 then pass (otherwise fail)
+    b. check number of elements per category >= 2 then pass (otherwise fail)
+    c. expand and keep the original NAs 
   3. for pearson test, contains only real value or NaN
   
 ### pasted_gene_list
@@ -95,11 +98,18 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 
 ### feature_prioritization_pipeline
   *After removing empty rows and columns, check if a spreadsheet:*
-  1. contains NaN value/s column wise.
-  2. contains real value. 
+  1. based on impute option user selected:
+     a. reject: reject user spreadsheet if there is NA.
+     b. average: replace NA value with mean of that row.
+     c. remove: drop entire column which contains NA value.
+  2. contains NaN value/s column wise.
+  3. contains real value. 
  
   *After removing empty rows and columns, check if a phenotypic spreadsheet:*
-  1. for t_test, contains only value 0, 1 or NaN.
+  1. for t_test:
+    a. check number of categories >= 2 then pass (otherwise fail)
+    b. check number of elements per category >= 2 then pass (otherwise fail)
+    c. expand and keep the original NAs 
   2. for pearson test, contains only real value or NaN.
 
 ### phenotype_prediction_pipeline
