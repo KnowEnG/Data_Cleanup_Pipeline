@@ -1,7 +1,7 @@
 SUCCESS:
 - 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_binary.tsv
   with 13 row(s) and 5 column(s)'
-- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_2_phenotype_t_test_inplace_replace.tsv
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_2_phenotype_t_test_replace.tsv
   with 6 row(s) and 1 column(s)'
 - 'WARNING: Removed 1 empty row(s).'
 - 'INFO: Start to run checks for phenotypic data.'
