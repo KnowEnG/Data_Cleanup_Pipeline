@@ -147,8 +147,22 @@ def run_gene_prioritization_pipeline(run_parameters):
     """
     try:
 
-        # Checks if value of inputs satisfy certain criteria: see details in function load_and_validate_inputs_gp_fp
-        user_spreadsheet_val_chked, phenotype_val_checked = load_and_validate_inputs_gp_fp(run_parameters)
+        # Loads user spreadsheet data
+        user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+
+        # Imputes na value on user spreadsheet data
+        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        if user_spreadsheet_df_imputed is None:
+            return False, logging
+
+        # Loads phenotype data
+        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+        if phenotype_df is None:
+            return False, logging
+
+        # Checks if value of inputs satisfy certain criteria: see details in function validate_inputs_for_gp_fp
+        user_spreadsheet_val_chked, phenotype_val_checked = validate_inputs_for_gp_fp(user_spreadsheet_df_imputed,
+                                                                                      phenotype_df, run_parameters["correlation_measure"])
         if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
             return False, logging
 
@@ -404,8 +418,23 @@ def run_feature_prioritization_pipeline(run_parameters):
     try:
         from phenotype_expander_toolbox import phenotype_expander
 
+        # Loads user spreadsheet data
+        user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
+
+        # Imputes na value on user spreadsheet data
+        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        if user_spreadsheet_df_imputed is None:
+            return False, logging
+
+        # Loads phenotype data
+        phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
+        if phenotype_df is None:
+            return False, logging
+
         # Checks if value of inputs satisfy certain criteria
-        user_spreadsheet_val_chked, phenotype_val_chked = load_and_validate_inputs_gp_fp(run_parameters)
+        user_spreadsheet_val_chked, phenotype_val_chked = validate_inputs_for_gp_fp(user_spreadsheet_df_imputed,
+                                                                                    phenotype_df, run_parameters[
+                                                                                        'correlation_measure'])
         if user_spreadsheet_val_chked is None or phenotype_val_chked is None:
             return False, logging
 
@@ -414,16 +443,18 @@ def run_feature_prioritization_pipeline(run_parameters):
         logging.append(
             "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_val_chked.shape[0],
                                                                                  user_spreadsheet_val_chked.shape[1]))
-
+        na_represent = ""
         if run_parameters['correlation_measure'] == 't_test':
-            result_df = phenotype_expander(run_parameters)
-            write_to_file(result_df, run_parameters['phenotype_name_full_path'],
-                          run_parameters['results_directory'], "_ETL.tsv", na_rep="NA")
+            phenotype_output = phenotype_expander(phenotype_df)
+            na_represent="NA"
         else:
-            write_to_file(phenotype_val_chked, run_parameters['phenotype_name_full_path'],
-                          run_parameters['results_directory'], "_ETL.tsv")
+            phenotype_output = phenotype_val_chked
+
+        write_to_file(phenotype_output, run_parameters['phenotype_name_full_path'],
+                          run_parameters['results_directory'], "_ETL.tsv", na_rep=na_represent)
         logging.append("INFO: Cleaned phenotypic data has {} row(s), {} column(s).".format(phenotype_val_chked.shape[0],
-                                                                                           phenotype_val_chked.shape[1]))
+                                                                                           phenotype_val_chked.shape[
+                                                                                               1]))
         return True, logging
 
     except Exception as err:
@@ -769,7 +800,7 @@ def check_duplicate_row_name(dataframe):
         return None
 
 
-def load_and_validate_inputs_gp_fp(run_parameters):
+def validate_inputs_for_gp_fp(user_spreadsheet_df, phenotype_df, correlation_measure):
     """
     Input data check for Gene_Prioritization_Pipeline/Feature_Prioritization_Pipeline.
 
@@ -781,43 +812,30 @@ def load_and_validate_inputs_gp_fp(run_parameters):
         phenotype_df_pxs: phenotype data
 
     """
-    # Loads user spreadsheet data
-    user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
-
-    # Imputes na value on user spreadsheet data
-    user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
-    if user_spreadsheet_df_imputed is None:
-        return False, logging
-
-    # Loads phenotype data
-    phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
-    if phenotype_df is None:
-        return False, logging
-
     # Checks na, real number in user spreadsheet
-    user_spreadsheet_df_chk = check_user_spreadsheet_data(user_spreadsheet_df_imputed, dropna_colwise=True,
-                                                             check_real_number=True)
+    user_spreadsheet_df_chk = check_user_spreadsheet_data(user_spreadsheet_df, dropna_colwise=True,
+                                                          check_real_number=True)
     if user_spreadsheet_df_chk is None or user_spreadsheet_df_chk.empty:
         logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
         return None, None
 
     # Checks value of phenotype dataframe for t-test and pearson
     logging.append("INFO: Start to run checks for phenotypic data.")
-    phenotype_df_chk = check_phenotype_data(phenotype_df, run_parameters["correlation_measure"])
+    phenotype_df_chk = check_phenotype_data(phenotype_df, correlation_measure)
     if phenotype_df_chk is None:
         return None, None
 
     # Checks intersection between user_spreadsheet_df and phenotype data
     user_spreadsheet_df_header = list(user_spreadsheet_df_chk.columns.values)
-    phenotype_df_pxs = check_intersection_for_phenotype_and_user_spreadsheet(user_spreadsheet_df_header,
+    phenotype_df_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(user_spreadsheet_df_header,
                                                                              phenotype_df_chk)
-    if phenotype_df_pxs is None or phenotype_df_pxs.empty:
+    if phenotype_df_trimmed is None or phenotype_df_trimmed.empty:
         logging.append("ERROR: After drop NA, phenotype data becomes empty.")
         return None, None
 
     logging.append("INFO: Finished running checks for phenotypic data.")
 
-    return user_spreadsheet_df_chk, phenotype_df_pxs
+    return user_spreadsheet_df_chk, phenotype_df_trimmed
 
 
 def check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df_pxs):
