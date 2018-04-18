@@ -417,7 +417,7 @@ def run_feature_prioritization_pipeline(run_parameters):
     """
     try:
         from phenotype_expander_toolbox import phenotype_expander
-
+        from knpackage.toolbox import get_spreadsheet_df
         # Loads user spreadsheet data
         user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
@@ -443,15 +443,15 @@ def run_feature_prioritization_pipeline(run_parameters):
         logging.append(
             "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_val_chked.shape[0],
                                                                                  user_spreadsheet_val_chked.shape[1]))
-        na_represent = ""
+
         if run_parameters['correlation_measure'] == 't_test':
+            phenotype_df = get_spreadsheet_df(run_parameters['phenotype_name_full_path'])
             phenotype_output = phenotype_expander(phenotype_df)
-            na_represent="NA"
         else:
             phenotype_output = phenotype_val_chked
 
         write_to_file(phenotype_output, run_parameters['phenotype_name_full_path'],
-                          run_parameters['results_directory'], "_ETL.tsv", na_rep=na_represent)
+                          run_parameters['results_directory'], "_ETL.tsv")
         logging.append("INFO: Cleaned phenotypic data has {} row(s), {} column(s).".format(phenotype_val_chked.shape[0],
                                                                                            phenotype_val_chked.shape[
                                                                                                1]))
@@ -670,13 +670,11 @@ def load_data_file(file_path):
 
         # removes empty rows
         input_df_wo_empty_ln = remove_empty_row(input_df)
-
         if input_df_wo_empty_ln is None or input_df_wo_empty_ln.empty:
             logging.append(
                 "ERROR: Input data {} becomes empty after removing empty row. Please provide a valid input data.".format(
                     file_path))
             return None
-
         return input_df_wo_empty_ln
     except Exception as err:
         logging.append("ERROR: {}".format(str(err)))

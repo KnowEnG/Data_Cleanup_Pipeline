@@ -23,18 +23,23 @@ def phenotype_expander(phenotype_df):
 
     # Removes Nan value from list and gets the unique value set
     phenotype_value_set = set(filter(lambda x: x == x, list_values))
-
+    print("before" + str(phenotype_value_set))
     # case 1: phenotype data is binary data set
     if binary_data_set == phenotype_value_set:
+        print("first")
+        phenotype_df.fillna(2).astype(int)
+        print(phenotype_df)
         return phenotype_df.apply(np.int64)
-    elif len(phenotype_value_set) == 2:
+
+    if len(phenotype_value_set) == 2:
+        print("second")
         # case 2: phenotype data has two unqiue value/categories(excluding NaN)
-        i = 0
-        for item in phenotype_value_set:
-            phenotype_df.replace(to_replace=item, value=i, inplace=True)
-            i += 1
+        phenotype_value_list = list(phenotype_value_set)
+        phenotype_df.fillna(2).apply({phenotype_value_list[0]: 1, phenotype_value_list[1]: 0}.get)
+
         return phenotype_df
     else:
+        print("hit")
         # case 3: phenotype data has more than two unique value/categories
         # standardizes data to be all lower case if there is any data with String type
         output_list = uniform_phenotype_data(phenotype_df)
