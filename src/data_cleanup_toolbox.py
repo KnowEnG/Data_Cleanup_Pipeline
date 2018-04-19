@@ -162,7 +162,8 @@ def run_gene_prioritization_pipeline(run_parameters):
 
         # Checks if value of inputs satisfy certain criteria: see details in function validate_inputs_for_gp_fp
         user_spreadsheet_val_chked, phenotype_val_checked = validate_inputs_for_gp_fp(user_spreadsheet_df_imputed,
-                                                                                      phenotype_df, run_parameters["correlation_measure"])
+                                                                                      phenotype_df, run_parameters[
+                                                                                          "correlation_measure"])
         if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
             return False, logging
 
@@ -451,7 +452,7 @@ def run_feature_prioritization_pipeline(run_parameters):
             phenotype_output = phenotype_val_chked
 
         write_to_file(phenotype_output, run_parameters['phenotype_name_full_path'],
-                          run_parameters['results_directory'], "_ETL.tsv")
+                      run_parameters['results_directory'], "_ETL.tsv")
         logging.append("INFO: Cleaned phenotypic data has {} row(s), {} column(s).".format(phenotype_val_chked.shape[0],
                                                                                            phenotype_val_chked.shape[
                                                                                                1]))
@@ -826,7 +827,7 @@ def validate_inputs_for_gp_fp(user_spreadsheet_df, phenotype_df, correlation_mea
     # Checks intersection between user_spreadsheet_df and phenotype data
     user_spreadsheet_df_header = list(user_spreadsheet_df_chk.columns.values)
     phenotype_df_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(user_spreadsheet_df_header,
-                                                                             phenotype_df_chk)
+                                                                                 phenotype_df_chk)
     if phenotype_df_trimmed is None or phenotype_df_trimmed.empty:
         logging.append("ERROR: After drop NA, phenotype data becomes empty.")
         return None, None
@@ -911,9 +912,8 @@ def check_phenotype_data(phenotype_df_pxs, correlation_measure):
                 else:
                     cur_df_lowercase = cur_col
 
-                num_uniq_value = len(cur_df_lowercase[column].dropna().unique())
-
-                if num_uniq_value < 2:
+                count_values = cur_df_lowercase[column].value_counts()
+                if count_values[count_values < 2].size > 0:
                     logging.append("ERROR: t_test requires at least two unique values per category in phenotype data.")
                     return None
 
