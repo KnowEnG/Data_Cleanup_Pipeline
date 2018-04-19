@@ -639,7 +639,7 @@ def write_to_file(target_file, target_path, result_directory, suffix, use_index=
 
     output_file_basename = os.path.splitext(os.path.basename(os.path.normpath(target_path)))[0]
     target_file.to_csv(result_directory + '/' + output_file_basename + suffix,
-                       sep='\t', index=use_index, header=use_header, na_rep=na_rep, float_fomat='%g')
+                       sep='\t', index=use_index, header=use_header, na_rep=na_rep)
 
 
 def load_data_file(file_path):
