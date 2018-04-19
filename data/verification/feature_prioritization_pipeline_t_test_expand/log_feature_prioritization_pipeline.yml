@@ -1,0 +1,10 @@
+SUCCESS:
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_binary.tsv
+  with 13 row(s) and 5 column(s)'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_3_phenotype_t_test_expand.tsv
+  with 6 row(s) and 1 column(s)'
+- 'WARNING: Removed 1 empty row(s).'
+- 'INFO: Start to run checks for phenotypic data.'
+- 'INFO: Finished running checks for phenotypic data.'
+- 'INFO: Cleaned user spreadsheet has 13 row(s), 5 column(s).'
+- 'INFO: Cleaned phenotypic data has 5 row(s), 1 column(s).'

@@ -21,7 +21,9 @@ DC_options_dict = {
     'run_phenotype_prediction_pipeline': 'phenotype_prediction_pipeline',
     'run_signature_analysis_pipeline': 'signature_analysis_pipeline',
     'run_feature_prioritization_pipeline_pearson': 'feature_prioritization_pipeline_pearson',
-    'run_feature_prioritization_pipeline_t_test': 'feature_prioritization_pipeline_t_test',
+    'run_feature_prioritization_pipeline_t_test_binary': 'feature_prioritization_pipeline_t_test_binary',
+    'run_feature_prioritization_pipeline_t_test_replace': 'feature_prioritization_pipeline_t_test_replace',
+    'run_feature_prioritization_pipeline_t_test_expand': 'feature_prioritization_pipeline_t_test_expand',
     'run_file_format_test': 'file_format_test'}
 
 verify_root_dir = '../data/verification'
@@ -68,11 +70,8 @@ def python_file_compare(verif_dir, results_dir):
         for mm in mismatch:
             print(mm)
 
-    if len(match) > 0:
+    if len(match) > 0 and len(errs) == 0 and len(mismatch) == 0:
         print('\n\t', tt, '\t', pipeline_name, 'test: PASS')
-        print('Matched:')
-        for m in match:
-            print(m)
 
     if len(errs) > 0 or len(mismatch) > 0:
         NUM_FAIL += 1

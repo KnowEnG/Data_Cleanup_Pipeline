@@ -26,9 +26,9 @@ def run_geneset_characterization_pipeline(run_parameters):
             return False, logging
 
         # Checks only non-negative real number appears in user spreadsheet, drop na column wise
-        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True,
-                                                            check_real_number=True,
-                                                            check_positive_number=True)
+        user_spreadsheet_val_chked = check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
+                                                                 check_real_number=True,
+                                                                 check_positive_number=True)
         if user_spreadsheet_val_chked is None:
             return False, logging
 
@@ -82,8 +82,8 @@ def run_samples_clustering_pipeline(run_parameters):
         logging.append("INFO: Start to process user spreadsheet data.")
 
         # Checks if only non-negative real number appears in user spreadsheet and drop na column wise
-        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, dropna_colwise=True,
-                                                            check_real_number=True, check_positive_number=True)
+        user_spreadsheet_val_chked = check_user_spreadsheet_data(user_spreadsheet_df, dropna_colwise=True,
+                                                                 check_real_number=True, check_positive_number=True)
         if user_spreadsheet_val_chked is None:
             return False, logging
 
@@ -146,27 +146,23 @@ def run_gene_prioritization_pipeline(run_parameters):
         message: A message indicates the status of current check.
     """
     try:
-        # dimension: sample x phenotype
+
+        # Loads user spreadsheet data
         user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
 
-        if run_parameters["correlation_measure"] == "pearson":
-            user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
-        else:
-            user_spreadsheet_df_imputed = user_spreadsheet_df
-
+        # Imputes na value on user spreadsheet data
+        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
         if user_spreadsheet_df_imputed is None:
             return False, logging
 
-        # dimension: sample x phenotype
+        # Loads phenotype data
         phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
-
         if phenotype_df is None:
             return False, logging
 
-        # Value check logic b: checks if only 0 and 1 appears in user spreadsheet or if satisfies certain criteria
-        user_spreadsheet_val_chked, phenotype_val_checked = check_input_value_for_gene_prioritization(
-            user_spreadsheet_df_imputed, phenotype_df, run_parameters['correlation_measure'])
-
+        # Checks if value of inputs satisfy certain criteria: see details in function validate_inputs_for_gp_fp
+        user_spreadsheet_val_chked, phenotype_val_checked = validate_inputs_for_gp_fp(user_spreadsheet_df_imputed,
+                                                                                      phenotype_df, run_parameters["correlation_measure"])
         if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
             return False, logging
 
@@ -222,8 +218,8 @@ def run_phenotype_prediction_pipeline(run_parameters):
             return False, logging
 
         # Check if user spreadsheet contains only real number and drop na column wise
-        user_spreadsheet_dropna = check_input_data_value(user_spreadsheet_df, dropna_colwise=True,
-                                                         check_real_number=True)
+        user_spreadsheet_dropna = check_user_spreadsheet_data(user_spreadsheet_df, dropna_colwise=True,
+                                                              check_real_number=True)
 
         if user_spreadsheet_dropna is None or user_spreadsheet_dropna.empty:
             logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
@@ -285,8 +281,9 @@ def run_general_clustering_pipeline(run_parameters):
         logging.append("INFO: Start to process user spreadsheet data.")
 
         # Check if user spreadsheet contains na value and only real number
-        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df, check_na=True, dropna_colwise=True,
-                                                               check_real_number=True)
+        user_spreadsheet_df_val_check = check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
+                                                                    dropna_colwise=True,
+                                                                    check_real_number=True)
         if user_spreadsheet_df_val_check is None:
             return False, logging
 
@@ -366,7 +363,8 @@ def run_pasted_gene_set_conversion(run_parameters):
 
         # filter the duplicate gene name and write them along with their corresponding user supplied gene name to a file
         mapped_small_genes_df[(~mapped_small_genes_df.index.str.contains(
-            r'^unmapped.*$') & mapped_small_genes_df.index.duplicated())]['user_supplied_gene_name'] = 'duplicate ensembl name'
+            r'^unmapped.*$') & mapped_small_genes_df.index.duplicated())][
+            'user_supplied_gene_name'] = 'duplicate ensembl name'
 
         input_small_genes_df['status'] = input_small_genes_df.index
 
@@ -419,49 +417,44 @@ def run_feature_prioritization_pipeline(run_parameters):
     """
     try:
         from phenotype_expander_toolbox import phenotype_expander
-
+        from knpackage.toolbox import get_spreadsheet_df
+        # Loads user spreadsheet data
         user_spreadsheet_df = load_data_file(run_parameters['spreadsheet_name_full_path'])
-        if user_spreadsheet_df is None:
+
+        # Imputes na value on user spreadsheet data
+        user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
+        if user_spreadsheet_df_imputed is None:
             return False, logging
 
-        # dimension: sample x phenotype
+        # Loads phenotype data
         phenotype_df = load_data_file(run_parameters['phenotype_name_full_path'])
         if phenotype_df is None:
             return False, logging
 
-        if run_parameters["correlation_measure"] == "pearson":
-            user_spreadsheet_df_imputed = impute_na(user_spreadsheet_df, option=run_parameters['impute'])
-        else:
-            user_spreadsheet_df_imputed = user_spreadsheet_df
-        if user_spreadsheet_df_imputed is None:
+        # Checks if value of inputs satisfy certain criteria
+        user_spreadsheet_val_chked, phenotype_val_chked = validate_inputs_for_gp_fp(user_spreadsheet_df_imputed,
+                                                                                    phenotype_df, run_parameters[
+                                                                                        'correlation_measure'])
+        if user_spreadsheet_val_chked is None or phenotype_val_chked is None:
             return False, logging
 
-        # Check if user spreadsheet contains na value and only real number
-        user_spreadsheet_df_val_check = check_input_data_value(user_spreadsheet_df_imputed, check_na=False,
-                                                               check_real_number=True)
-        if user_spreadsheet_df_val_check is None:
-            return False, logging
-
-        phenotype_df_val_check = check_data_for_t_test_and_pearson(phenotype_df, run_parameters['correlation_measure'])
-        if phenotype_df_val_check is None:
-            return False, logging
-
-        write_to_file(user_spreadsheet_df, run_parameters['spreadsheet_name_full_path'],
+        write_to_file(user_spreadsheet_val_chked, run_parameters['spreadsheet_name_full_path'],
                       run_parameters['results_directory'], "_ETL.tsv")
         logging.append(
-            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_df.shape[0],
-                                                                                 user_spreadsheet_df.shape[1]))
+            "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(user_spreadsheet_val_chked.shape[0],
+                                                                                 user_spreadsheet_val_chked.shape[1]))
 
         if run_parameters['correlation_measure'] == 't_test':
-            result_df = phenotype_expander(run_parameters)
-            write_to_file(result_df, run_parameters['phenotype_name_full_path'],
-                          run_parameters['results_directory'], "_ETL.tsv", na_rep="NA")
+            phenotype_df = get_spreadsheet_df(run_parameters['phenotype_name_full_path'])
+            phenotype_output = phenotype_expander(phenotype_df)
         else:
-            write_to_file(phenotype_df_val_check, run_parameters['phenotype_name_full_path'],
+            phenotype_output = phenotype_val_chked
+
+        write_to_file(phenotype_output, run_parameters['phenotype_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
-            logging.append(
-                "INFO: Cleaned phenotypic data has {} row(s), {} column(s).".format(phenotype_df_val_check.shape[0],
-                                                                                    phenotype_df_val_check.shape[1]))
+        logging.append("INFO: Cleaned phenotypic data has {} row(s), {} column(s).".format(phenotype_val_chked.shape[0],
+                                                                                           phenotype_val_chked.shape[
+                                                                                               1]))
         return True, logging
 
     except Exception as err:
@@ -499,8 +492,9 @@ def run_signature_analysis_pipeline(run_parameters):
             return False, logging
 
         # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
-        user_spreadsheet_val_chked = check_input_data_value(user_spreadsheet_df, check_na=True, check_real_number=True,
-                                                            check_positive_number=False)
+        user_spreadsheet_val_chked = check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
+                                                                 check_real_number=True,
+                                                                 check_positive_number=False)
 
         if user_spreadsheet_val_chked is None:
             return False, logging
@@ -676,13 +670,11 @@ def load_data_file(file_path):
 
         # removes empty rows
         input_df_wo_empty_ln = remove_empty_row(input_df)
-
         if input_df_wo_empty_ln is None or input_df_wo_empty_ln.empty:
             logging.append(
                 "ERROR: Input data {} becomes empty after removing empty row. Please provide a valid input data.".format(
                     file_path))
             return None
-
         return input_df_wo_empty_ln
     except Exception as err:
         logging.append("ERROR: {}".format(str(err)))
@@ -806,43 +798,42 @@ def check_duplicate_row_name(dataframe):
         return None
 
 
-def check_input_value_for_gene_prioritization(user_spreadsheet_df, phenotype_df, correlation_measure):
+def validate_inputs_for_gp_fp(user_spreadsheet_df, phenotype_df, correlation_measure):
     """
-    Input data check for Gene_Prioritization_Pipeline.
+    Input data check for Gene_Prioritization_Pipeline/Feature_Prioritization_Pipeline.
 
     Args:
-        dataframe: original DataFrame generated by user spreadsheet
-        phenotype_df: original phenotype data
-        correlation_measure: correlation measure : pearson or t-test
+        run_parameters: input configuration table
 
     Returns:
-        dataframe_dropna: cleaned user spreadsheet
+        user_spreadsheet_df_dropna: cleaned user spreadsheet
         phenotype_df_pxs: phenotype data
 
     """
-
-    user_spreadsheet_df_dropna = check_input_data_value(user_spreadsheet_df, dropna_colwise=True,
-                                                        check_real_number=True)
-
-    logging.append("INFO: Start to run checks for phenotypic data.")
-
-    if user_spreadsheet_df_dropna is None or user_spreadsheet_df_dropna.empty:
+    # Checks na, real number in user spreadsheet
+    user_spreadsheet_df_chk = check_user_spreadsheet_data(user_spreadsheet_df, dropna_colwise=True,
+                                                          check_real_number=True)
+    if user_spreadsheet_df_chk is None or user_spreadsheet_df_chk.empty:
         logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
         return None, None
 
-    # output dimension: sample x phenotype
-    user_spreadsheet_df_header = list(user_spreadsheet_df_dropna.columns.values)
+    # Checks value of phenotype dataframe for t-test and pearson
+    logging.append("INFO: Start to run checks for phenotypic data.")
+    phenotype_df_chk = check_phenotype_data(phenotype_df, correlation_measure)
+    if phenotype_df_chk is None:
+        return None, None
 
-    phenotype_df_pxs_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(user_spreadsheet_df_header,
-                                                                                     phenotype_df)
-
-    if phenotype_df_pxs_trimmed is None or phenotype_df_pxs_trimmed.empty:
+    # Checks intersection between user_spreadsheet_df and phenotype data
+    user_spreadsheet_df_header = list(user_spreadsheet_df_chk.columns.values)
+    phenotype_df_trimmed = check_intersection_for_phenotype_and_user_spreadsheet(user_spreadsheet_df_header,
+                                                                             phenotype_df_chk)
+    if phenotype_df_trimmed is None or phenotype_df_trimmed.empty:
         logging.append("ERROR: After drop NA, phenotype data becomes empty.")
         return None, None
-    phenotype_df_pxs = check_data_for_t_test_and_pearson(phenotype_df_pxs_trimmed, correlation_measure)
+
     logging.append("INFO: Finished running checks for phenotypic data.")
 
-    return user_spreadsheet_df_dropna, phenotype_df_pxs
+    return user_spreadsheet_df_chk, phenotype_df_trimmed
 
 
 def check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df_pxs):
@@ -890,7 +881,7 @@ def check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phen
     return phenotype_df_pxs_trimmed
 
 
-def check_data_for_t_test_and_pearson(phenotype_df_pxs, correlation_measure):
+def check_phenotype_data(phenotype_df_pxs, correlation_measure):
     """
     Verifies data value for t-test and pearson separately.
 
@@ -903,15 +894,28 @@ def check_data_for_t_test_and_pearson(phenotype_df_pxs, correlation_measure):
 
     """
     # defines the default values that can exist in phenotype data
-    gold_value_set = {0, 1}
     if correlation_measure == 't_test':
         list_values = pandas.unique(phenotype_df_pxs.values.ravel())
-        phenotype_value_set = set(filter(lambda x: x == x, list_values))
-        if gold_value_set != phenotype_value_set:
+        if len(list_values) < 2:
             logging.append(
-                "ERROR: Only 0, 1 are allowed in phenotype data when running t_test. "
+                "ERROR: t_test requests at least two categories in your phenotype dataset. "
                 "Please revise your phenotype data and reupload.")
             return None
+
+        for column in phenotype_df_pxs:
+            cur_col = phenotype_df_pxs[[column]].dropna(axis=0)
+
+            if not cur_col.empty:
+                if cur_col[column].dtype == object:
+                    cur_df_lowercase = cur_col.apply(lambda x: x.astype(str).str.lower())
+                else:
+                    cur_df_lowercase = cur_col
+
+                num_uniq_value = len(cur_df_lowercase[column].dropna().unique())
+
+                if num_uniq_value < 2:
+                    logging.append("ERROR: t_test requires at least two unique values per category in phenotype data.")
+                    return None
 
     if correlation_measure == 'pearson':
         if False in phenotype_df_pxs.applymap(lambda x: isinstance(x, (int, float))):
@@ -929,7 +933,7 @@ def impute_na(dataframe, option="reject"):
     Args:
         dataframe: the dataframe to be imputed
         option:
-            1. reject(defaul value): reject spreadsheet if we found NA
+            1. reject(default value): reject spreadsheet if we found NA
             2. remove: remove Nan row
             3. average: replace Nan value with row mean
 
@@ -943,20 +947,27 @@ def impute_na(dataframe, option="reject"):
         logging.append("INFO: There is no NA value in spreadsheet.")
         return dataframe
     elif option == "remove":
-        dataframe_dropna = dataframe.dropna(axis=0)
-        logging.append(
-            "INFO: Remove {} row(s) containing NA value.".format(dataframe.shape[0] - dataframe_dropna.shape[0]))
-        return dataframe_dropna
+        if dataframe.isnull().values.any():
+            dataframe_dropna = dataframe.dropna(axis=0)
+            logging.append(
+                "INFO: Remove {} row(s) containing NA value.".format(dataframe.shape[0] - dataframe_dropna.shape[0]))
+            return dataframe_dropna
+        else:
+            return dataframe
     elif option == 'average':
-        logging.append("INFO: Filled NA with mean value of its corresponding row.")
-        return dataframe.apply(lambda x: x.fillna(x.mean()), axis=0)
+        if dataframe.isnull().values.any():
+            dataframe_avg = dataframe.apply(lambda x: x.fillna(x.mean()), axis=0)
+            logging.append("INFO: Filled NA with mean value of its corresponding row.")
+            return dataframe_avg
+        else:
+            return dataframe
 
-    logging.append("Error: Found invalid option to operate on NA value. ")
-    return None
+    logging.append("Warning: Found invalid option to operate on NA value. Skip imputing on NA value.")
+    return dataframe
 
 
-def check_input_data_value(dataframe, check_na=False, dropna_colwise=False, check_real_number=False,
-                           check_positive_number=False):
+def check_user_spreadsheet_data(dataframe, check_na=False, dropna_colwise=False, check_real_number=False,
+                                check_positive_number=False):
     """
     Customized checks for input data (contains NA value, contains all real number, contains all positive number)
     Args:
