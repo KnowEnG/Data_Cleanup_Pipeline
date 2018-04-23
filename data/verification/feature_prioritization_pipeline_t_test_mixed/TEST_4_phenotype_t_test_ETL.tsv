@@ -1,0 +1,7 @@
+sample_id	drug1	drug2_a	drug2_b	drug2_c
+a		1	0	0
+b	0.0	0	1	0
+c	1.0	1	0	0
+d	0.0	0	1	0
+f	1.0	0	0	1
+e	1.0	0	0	1

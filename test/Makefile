@@ -70,6 +70,9 @@ run_feature_prioritization_pipeline_t_test_replace:
 run_feature_prioritization_pipeline_t_test_expand:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_3_feature_prioritization_pipeline_t_test.yml
 
+run_feature_prioritization_pipeline_t_test_mixed:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_4_feature_prioritization_pipeline_t_test.yml
+
 run_signature_analysis_pipeline:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_signature_analysis_pipeline.yml
 
