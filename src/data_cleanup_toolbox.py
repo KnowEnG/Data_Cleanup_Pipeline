@@ -500,7 +500,7 @@ def run_signature_analysis_pipeline(run_parameters):
         if check_duplicates(signature_df, check_column=True):
             logging.append("ERROR: Found duplicates on signature data. Rejecting...")
             return False, logging
-        
+
         intersection_signature_spreadsheet = find_intersection(signature_df.index, user_spreadsheet_df.index)
         if intersection_signature_spreadsheet is None:
             logging.append('ERROR: Cannot find intersection between spreadsheet genes and signature genes.')
@@ -1119,6 +1119,18 @@ def map_ensemble_gene_name(dataframe, run_parameters):
 
 
 def compare_order(list_a, list_b):
+    """
+    Checks if the input two lists are the same, including order.
+
+    Args:
+        list_a: list a
+        list_b: list b
+
+    Returns:
+        True: list a and b are exactly the same
+        False: list a and b are not same
+
+    """
     if list_a == list_b:
         return True
     elif sorted(list_a) == sorted(list_b):
