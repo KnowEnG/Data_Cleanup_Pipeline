@@ -492,13 +492,14 @@ def run_signature_analysis_pipeline(run_parameters):
             logging.append('ERROR: Cannot find intersection between spreadsheet genes and signature genes.')
             return False, logging
 
+
         # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
         user_spreadsheet_val_chked = check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
                                                                  check_real_number=True,
                                                                  check_positive_number=False)
-
         if user_spreadsheet_val_chked is None:
             return False, logging
+
 
         # Checks duplication on column and row name
         user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
@@ -1083,6 +1084,21 @@ def map_ensemble_gene_name(dataframe, run_parameters):
                   "_User_To_Ensembl.tsv", use_index=False, use_header=True)
 
     return output_df_mapped_dedup
+
+
+def compare_order(list_a, list_b):
+    if list_a == list_b:
+        logging.append('Same elements, same order')
+        return list_a
+    elif sorted(list_a) == sorted(list_b):
+        logging.append('Same lists, different order')
+        return list_a
+    else:
+        logging.append('Completely differeent')
+        return None
+
+
+
 
 
 def sanity_check_input_data(input_dataframe):
