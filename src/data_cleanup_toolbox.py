@@ -487,6 +487,20 @@ def run_signature_analysis_pipeline(run_parameters):
         if user_spreadsheet_df is None:
             return False, logging
 
+        if compare_order(list(signature_df.index), list(user_spreadsheet_df.index)) is False:
+            logging.append(
+                "ERROR: Signature Analysis Pipeline requires gene name to be "
+                "exactly the same and in same order in both user spreadsheet file and signature file.")
+            return False, logging
+
+        if check_duplicates(user_spreadsheet_df, check_column=True):
+            logging.append("ERROR: Found duplicates on user spreadsheet data. Rejecting...")
+            return False, logging
+
+        if check_duplicates(signature_df, check_column=True):
+            logging.append("ERROR: Found duplicates on signature data. Rejecting...")
+            return False, logging
+        
         intersection_signature_spreadsheet = find_intersection(signature_df.index, user_spreadsheet_df.index)
         if intersection_signature_spreadsheet is None:
             logging.append('ERROR: Cannot find intersection between spreadsheet genes and signature genes.')
@@ -499,7 +513,6 @@ def run_signature_analysis_pipeline(run_parameters):
                                                                  check_positive_number=False)
         if user_spreadsheet_val_chked is None:
             return False, logging
-
 
         # Checks duplication on column and row name
         user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
@@ -1015,6 +1028,25 @@ def check_user_spreadsheet_data(dataframe, check_na=False, dropna_colwise=False,
     return dataframe
 
 
+def check_duplicates(dataframe, check_column=False, check_row=False):
+    # checks if dataframe contains duplicate columns
+    if check_column is True:
+        dataframe_transpose = dataframe.T
+        dataframe_row_dedup = dataframe_transpose[~dataframe_transpose.index.duplicated()]
+        row_count_diff = len(dataframe_transpose.index) - len(dataframe_row_dedup.index)
+        if row_count_diff > 0:
+            return True
+        return False
+
+    # checks if dataframe contains duplicate rows
+    if check_row is True:
+        dataframe_row_dedup = dataframe[~dataframe.index.duplicated()]
+        row_count_diff = len(dataframe.index) - len(dataframe_row_dedup.index)
+        if row_count_diff > 0:
+            return True
+        return False
+    
+
 def map_ensemble_gene_name(dataframe, run_parameters):
     """
     Checks if the gene name follows ensemble format.
@@ -1088,17 +1120,11 @@ def map_ensemble_gene_name(dataframe, run_parameters):
 
 def compare_order(list_a, list_b):
     if list_a == list_b:
-        logging.append('Same elements, same order')
-        return list_a
+        return True
     elif sorted(list_a) == sorted(list_b):
-        logging.append('Same lists, different order')
-        return list_a
+        return False
     else:
-        logging.append('Completely differeent')
-        return None
-
-
-
+        return False
 
 
 def sanity_check_input_data(input_dataframe):
