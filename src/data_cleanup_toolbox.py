@@ -487,6 +487,27 @@ def run_signature_analysis_pipeline(run_parameters):
         if user_spreadsheet_df is None:
             return False, logging
 
+        # Removes NA index for both signature data and user spreadsheet data
+        signature_df = remove_na_index(signature_df)
+        user_spreadsheet_df = remove_na_index(user_spreadsheet_df)
+
+        # Compares the order of genes in signature data and user spreadsheet data
+        if compare_order(list(signature_df.index), list(user_spreadsheet_df.index)) is False:
+            logging.append(
+                "ERROR: Signature Analysis Pipeline requires gene name to be "
+                "exactly the same and in same order in both user spreadsheet file and signature file.")
+            return False, logging
+
+        # Check dupliate columns on user spreadsheet data
+        if check_duplicates(user_spreadsheet_df, check_column=True):
+            logging.append("ERROR: Found duplicates on user spreadsheet data. Rejecting...")
+            return False, logging
+
+        # Check duplicate rows on user spreadsheet data
+        if check_duplicates(signature_df, check_column=True):
+            logging.append("ERROR: Found duplicates on signature data. Rejecting...")
+            return False, logging
+
         intersection_signature_spreadsheet = find_intersection(signature_df.index, user_spreadsheet_df.index)
         if intersection_signature_spreadsheet is None:
             logging.append('ERROR: Cannot find intersection between spreadsheet genes and signature genes.')
@@ -494,15 +515,11 @@ def run_signature_analysis_pipeline(run_parameters):
 
 
         # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
-        user_spreadsheet_val_chked = check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
+        user_spreadsheet_val_checked = check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
                                                                  check_real_number=True,
                                                                  check_positive_number=False)
-        if user_spreadsheet_val_chked is None:
+        if user_spreadsheet_val_checked is None:
             return False, logging
-
-
-        # Checks duplication on column and row name
-        user_spreadsheet_df_checked = sanity_check_input_data(user_spreadsheet_val_chked)
 
         if 'gg_network_name_full_path' in run_parameters.keys():
             logging.append("INFO: Start to process network data.")
@@ -522,15 +539,15 @@ def run_signature_analysis_pipeline(run_parameters):
                 return False, logging
 
         # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
-        if user_spreadsheet_df_checked is None:
+        if user_spreadsheet_val_checked is None:
             return False, logging
         else:
-            write_to_file(user_spreadsheet_df_checked, run_parameters['spreadsheet_name_full_path'],
+            write_to_file(user_spreadsheet_val_checked, run_parameters['spreadsheet_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
             logging.append(
                 "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(
-                    user_spreadsheet_df_checked.shape[0],
-                    user_spreadsheet_df_checked.shape[1]))
+                    user_spreadsheet_val_checked.shape[0],
+                    user_spreadsheet_val_checked.shape[1]))
         if signature_df is not None:
             write_to_file(signature_df, run_parameters['signature_name_full_path'],
                           run_parameters['results_directory'], "_ETL.tsv")
@@ -588,7 +605,7 @@ def remove_na_index(dataframe):
     if diff > 0:
         logging.append("WARNING: Removed {} row(s) which contains NA in index.".format(diff))
 
-    if diff > 0 and new_row_cnt == 0:
+    if new_row_cnt == 0:
         logging.append(
             "ERROR: After removed {} row(s) that contains NA in index, original dataframe "
             "in shape ({},{}) becames empty.".format(
@@ -1015,6 +1032,25 @@ def check_user_spreadsheet_data(dataframe, check_na=False, dropna_colwise=False,
     return dataframe
 
 
+def check_duplicates(dataframe, check_column=False, check_row=False):
+    # checks if dataframe contains duplicate columns
+    if check_column is True:
+        dataframe_transpose = dataframe.T
+        dataframe_row_dedup = dataframe_transpose[~dataframe_transpose.index.duplicated()]
+        row_count_diff = len(dataframe_transpose.index) - len(dataframe_row_dedup.index)
+        if row_count_diff > 0:
+            return True
+        return False
+
+    # checks if dataframe contains duplicate rows
+    if check_row is True:
+        dataframe_row_dedup = dataframe[~dataframe.index.duplicated()]
+        row_count_diff = len(dataframe.index) - len(dataframe_row_dedup.index)
+        if row_count_diff > 0:
+            return True
+        return False
+    
+
 def map_ensemble_gene_name(dataframe, run_parameters):
     """
     Checks if the gene name follows ensemble format.
@@ -1087,18 +1123,24 @@ def map_ensemble_gene_name(dataframe, run_parameters):
 
 
 def compare_order(list_a, list_b):
+    """
+    Checks if the input two lists are the same, including order.
+
+    Args:
+        list_a: list a
+        list_b: list b
+
+    Returns:
+        True: list a and b are exactly the same
+        False: list a and b are not same
+
+    """
     if list_a == list_b:
-        logging.append('Same elements, same order')
-        return list_a
+        return True
     elif sorted(list_a) == sorted(list_b):
-        logging.append('Same lists, different order')
-        return list_a
+        return False
     else:
-        logging.append('Completely differeent')
-        return None
-
-
-
+        return False
 
 
 def sanity_check_input_data(input_dataframe):
