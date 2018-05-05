@@ -23,6 +23,7 @@ class DataCheckUtil:
                 return True
             return False
 
+
     @staticmethod
     def check_duplicate_column_name(dataframe):
         """
@@ -57,6 +58,7 @@ class DataCheckUtil:
             logger.logging.append("ERROR: An unexpected error occurred during checking duplicate column name.")
             return None
 
+
     @staticmethod
     def check_duplicate_row_name(dataframe):
         """
@@ -86,6 +88,7 @@ class DataCheckUtil:
         if row_count_diff < 0:
             logger.logging.append("ERROR: An unexpected error occurred during checking duplicate row name.")
             return None
+
 
     @staticmethod
     def check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df_pxs):
@@ -132,23 +135,6 @@ class DataCheckUtil:
 
         return phenotype_df_pxs_trimmed
 
-    @staticmethod
-    def compare_order(list_a, list_b):
-        """
-        Checks if the input two lists are the same, including order.
-        Args:
-            list_a: list a
-            list_b: list b
-        Returns:
-            True: list a and b are exactly the same
-            False: list a and b are not same
-        """
-        if list_a == list_b:
-            return True
-        elif sorted(list_a) == sorted(list_b):
-            return False
-        else:
-            return False
 
     @staticmethod
     def sanity_check_input_data(self, input_dataframe):
@@ -184,6 +170,7 @@ class DataCheckUtil:
 
         return input_dataframe_genename_dedup
 
+
     @staticmethod
     def find_intersection(list_a, list_b):
         '''
@@ -202,6 +189,7 @@ class DataCheckUtil:
         logger.logging.append(
             "INFO: Found {} intersected gene(s) between phenotype and spreadsheet data.".format(len(intersection)))
         return intersection
+
 
     @staticmethod
     def run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df_header):
@@ -228,6 +216,7 @@ class DataCheckUtil:
         logger.logging.append("INFO: Finished running sanity check for phenotype data.")
 
         return phenotype_df_genename_dedup
+
 
     @staticmethod
     def sanity_check_input_data(dataframe):
@@ -263,6 +252,7 @@ class DataCheckUtil:
 
         return input_dataframe_genename_dedup
 
+
     @staticmethod
     def compare_order(list_a, list_b):
         """
@@ -283,6 +273,7 @@ class DataCheckUtil:
             return False
         else:
             return False
+
 
     @staticmethod
     def check_user_spreadsheet_data(dataframe, check_na=False, dropna_colwise=False, check_real_number=False,
@@ -332,6 +323,7 @@ class DataCheckUtil:
 
         return dataframe
 
+
     @staticmethod
     def check_phenotype_data(phenotype_df_pxs, correlation_measure):
         """
@@ -378,6 +370,7 @@ class DataCheckUtil:
 
         return phenotype_df_pxs
 
+
     @staticmethod
     def check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df_pxs):
         '''
@@ -422,6 +415,7 @@ class DataCheckUtil:
         phenotype_df_pxs_trimmed = phenotype_df_pxs[sorted(valid_samples)]
 
         return phenotype_df_pxs_trimmed
+
 
     @staticmethod
     def validate_inputs_for_gp_fp(user_spreadsheet_df, phenotype_df, correlation_measure):
