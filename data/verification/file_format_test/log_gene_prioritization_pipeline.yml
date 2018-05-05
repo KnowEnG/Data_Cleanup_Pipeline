@@ -1,3 +1,4 @@
 FAIL:
 - 'ERROR: ''utf-8'' codec can''t decode byte 0xab in position 0: invalid start byte'
-- 'ERROR: ''NoneType'' object has no attribute ''isnull'''
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_phenotype_pearson.tsv
+  with 6 row(s) and 2 column(s)'
