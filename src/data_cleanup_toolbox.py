@@ -441,7 +441,6 @@ class FeaturePrioritizationPipeline:
             validation_flag: Boolean type value indicating if input data is valid or not.
             message: A message indicates the status of current check.
         """
-        from phenotype_expander_toolbox import phenotype_expander
         from knpackage.toolbox import get_spreadsheet_df
         # Imputes na value on user spreadsheet data
         user_spreadsheet_df_imputed = DataTransformationUtil.impute_na(self.user_spreadsheet_df,
@@ -470,7 +469,7 @@ class FeaturePrioritizationPipeline:
 
         if self.run_parameters['correlation_measure'] == 't_test':
             phenotype_df = get_spreadsheet_df(self.run_parameters['phenotype_name_full_path'])
-            phenotype_output = phenotype_expander(phenotype_df)
+            phenotype_output = DataTransformationUtil.phenotype_expander(phenotype_df)
         else:
             phenotype_output = phenotype_val_chked
 
