@@ -40,7 +40,7 @@ class GeneSetCharacterizationPipeline:
             return False, logger.logging
 
         # Checks duplication on column and row name
-        user_spreadsheet_df_checked = CommonUtil.sanity_check_input_data(user_spreadsheet_val_chked)
+        user_spreadsheet_df_checked = CommonUtil.check_dataframe_indexer_duplication(user_spreadsheet_val_chked)
 
         # Checks the validity of gene name to see if it can be ensemble or not
         user_spreadsheet_df_cleaned = GeneMappingUtil.map_ensemble_gene_name(user_spreadsheet_df_checked,
@@ -89,15 +89,15 @@ class SamplesClusteringPipeline:
             return False, logger.logging
 
         # Checks duplication on column and row name
-        user_spreadsheet_df_checked = CommonUtil.sanity_check_input_data(user_spreadsheet_val_chked)
+        user_spreadsheet_df_checked = CommonUtil.check_dataframe_indexer_duplication(user_spreadsheet_val_chked)
 
         # Checks the validity of gene name to see if it can be ensemble or not
         user_spreadsheet_df_cleaned = GeneMappingUtil.map_ensemble_gene_name(user_spreadsheet_df_checked,
                                                                              self.run_parameters)
 
         if 'gg_network_name_full_path' in self.run_parameters.keys() and \
-                not CommonUtil.run_network_data_intersection_check(user_spreadsheet_df_cleaned.index,
-                                                                   self.run_parameters):
+                not CommonUtil.check_network_data_intersection(user_spreadsheet_df_cleaned.index,
+                                                               self.run_parameters):
             return False, logger.logging
 
         # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
@@ -166,7 +166,7 @@ class GenePrioritizationPipeline:
         if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
             return False, logger.logging
         # Checks duplication on column and row name
-        user_spreadsheet_df_checked = CommonUtil.sanity_check_input_data(user_spreadsheet_val_chked)
+        user_spreadsheet_df_checked = CommonUtil.check_dataframe_indexer_duplication(user_spreadsheet_val_chked)
         # Checks the validity of gene name to see if it can be ensemble or not
         user_spreadsheet_df_cleaned = GeneMappingUtil.map_ensemble_gene_name(user_spreadsheet_df_checked,
                                                                              self.run_parameters)
@@ -229,7 +229,7 @@ class PhenotypePredictionPipeline:
                                                                                                    self.phenotype_df)
 
         # Checks duplication on column and row name
-        user_spreadsheet_df_cleaned = CommonUtil.sanity_check_input_data(user_spreadsheet_dropna)
+        user_spreadsheet_df_cleaned = CommonUtil.check_dataframe_indexer_duplication(user_spreadsheet_dropna)
         if user_spreadsheet_df_cleaned is None or phenotype_df_pxs_trimmed is None:
             return False, logger.logging
 
@@ -292,7 +292,7 @@ class GeneralClusteringPipeline:
         if user_spreadsheet_df_rm_na_header is None:
             return False, logger.logging
 
-        user_spreadsheet_df_cleaned = CommonUtil.sanity_check_input_data(user_spreadsheet_df_rm_na_header)
+        user_spreadsheet_df_cleaned = CommonUtil.check_dataframe_indexer_duplication(user_spreadsheet_df_rm_na_header)
         if user_spreadsheet_df_cleaned is None:
             return False, logger.logging
 
@@ -528,11 +528,12 @@ class SignatureAnalysisPipeline:
             return False, logger.logging
 
         if 'gg_network_name_full_path' in self.run_parameters.keys() and \
-                not CommonUtil.run_network_data_intersection_check(intersection,
-                                                                   self.run_parameters):
+                not CommonUtil.check_network_data_intersection(intersection,
+                                                               self.run_parameters):
             return False, logger.logging
 
-            # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
+        # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
+        if user_spreadsheet_val_checked is None:
             return False, logger.logging
         else:
             IOUtil.write_to_file(user_spreadsheet_val_checked,
@@ -542,6 +543,7 @@ class SignatureAnalysisPipeline:
                 "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(
                     user_spreadsheet_val_checked.shape[0],
                     user_spreadsheet_val_checked.shape[1]))
+
         if signature_df is not None:
             IOUtil.write_to_file(signature_df, self.run_parameters['signature_name_full_path'],
                                  self.run_parameters['results_directory'], "_ETL.tsv")
