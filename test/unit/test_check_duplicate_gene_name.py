@@ -10,28 +10,24 @@ class TestCheck_duplicate_gene_name(unittest.TestCase):
                                           [0, 0],
                                           [1, 1]],
                                          index=['ENSG00000000003', "ENSG00001027003", 'ENSG00000000003'],
-                                         columns=['a', 'b']
-                                         )
+                                         columns=['a', 'b'])
 
         self.input_df_nodup = pd.DataFrame([[1, 0],
                                             [0, 0],
                                             [1, 1]],
                                            index=['ENSG00001027003', "ENSG00000002008", 'ENSG00008000303'],
-                                           columns=['a', 'b']
-                                           )
+                                           columns=['a', 'b'])
 
         self.golden_output_dedup = pd.DataFrame([[1, 0],
                                                  [0, 0]],
                                                 index=[ "ENSG00000000003", 'ENSG00001027003'],
-                                                columns=['a', 'b']
-                                                )
+                                                columns=['a', 'b'])
 
         self.golden_output_nodup = pd.DataFrame([[1, 0],
                                                  [0, 0],
                                                  [1, 1]],
                                                 index=['ENSG00001027003', "ENSG00000002008", 'ENSG00008000303'],
-                                                columns=['a', 'b']
-                                                )
+                                                columns=['a', 'b'])
 
     def tearDown(self):
         del self.input_df_dup

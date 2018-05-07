@@ -121,7 +121,7 @@ class SamplesClusteringPipeline:
                 return False, logger.logging
             else:
                 IOUtil.write_to_file(phenotype_df_cleaned, self.run_parameters['phenotype_name_full_path'],
-                                 self.run_parameters['results_directory'], "_ETL.tsv")
+                                     self.run_parameters['results_directory'], "_ETL.tsv")
                 logger.logging.append("INFO: Cleaned phenotype data has {} row(s), {} "
                                       "column(s).".format(phenotype_df_cleaned.shape[0], phenotype_df_cleaned.shape[1]))
         return True, logger.logging
