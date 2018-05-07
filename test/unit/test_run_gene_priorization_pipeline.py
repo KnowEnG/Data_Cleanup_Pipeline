@@ -1,6 +1,8 @@
 import unittest
-import data_cleanup_toolbox as data_cln
 import os
+import utils.log_util as logger
+from data_cleanup_toolbox import GenePrioritizationPipeline
+
 
 class TestRun_gene_prioritization_pipeline(unittest.TestCase):
     def setUp(self):
@@ -34,9 +36,10 @@ class TestRun_gene_prioritization_pipeline(unittest.TestCase):
 
 
     def test_run_gene_prioritization_pipeline(self):
-        ret_flag, ret_msg = data_cln.run_gene_prioritization_pipeline(self.run_parameters)
+        ret_flag, ret_msg = GenePrioritizationPipeline(self.run_parameters).run_gene_prioritization_pipeline()
         self.assertEqual(True, ret_flag)
 
 
 if __name__ == '__main__':
+    logger.init()
     unittest.main()

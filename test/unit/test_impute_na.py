@@ -1,7 +1,8 @@
 import unittest
 import pandas as pd
-import data_cleanup_toolbox as data_cln
 import numpy.testing as npytest
+from utils.transformation_util import TransformationUtil
+import utils.log_util as logger
 
 
 class TestImpute_na(unittest.TestCase):
@@ -26,13 +27,19 @@ class TestImpute_na(unittest.TestCase):
         del self.input_df
 
     def test_impute_na_average(self):
-        ret = data_cln.impute_na(self.input_df, "average")
+        ret = TransformationUtil.impute_na(self.input_df, "average")
         npytest.assert_array_equal(self.golden_output_average, ret)
 
     def test_impute_na_remove(self):
-        ret = data_cln.impute_na(self.input_df, "remove")
+        ret = TransformationUtil.impute_na(self.input_df, "remove")
         npytest.assert_array_equal(self.golden_output_remove, ret)
 
     def test_impute_na_bad_option(self):
-        ret = data_cln.impute_na(self.input_df, "bad")
+        ret = TransformationUtil.impute_na(self.input_df, "bad")
         npytest.assert_array_equal(self.input_df, ret)
+
+
+
+if __name__ == '__main__':
+    logger.init()
+    unittest.main()

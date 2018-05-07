@@ -56,7 +56,7 @@ class CommonUtil:
 
         # checks the intersection on phenotype
         intersection = CheckUtil.find_intersection(phenotype_df_genename_dedup.index.values,
-                                                       user_spreadsheet_df_header)
+                                                   user_spreadsheet_df_header)
         if intersection is None:
             return None
 
@@ -80,7 +80,7 @@ class CommonUtil:
         """
         # Checks na, real number in user spreadsheet
         user_spreadsheet_df_chk = CheckUtil.check_user_spreadsheet_data(user_spreadsheet_df, dropna_colwise=True,
-                                                                            check_real_number=True)
+                                                                        check_real_number=True)
         if user_spreadsheet_df_chk is None or user_spreadsheet_df_chk.empty:
             logger.logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
             return None, None

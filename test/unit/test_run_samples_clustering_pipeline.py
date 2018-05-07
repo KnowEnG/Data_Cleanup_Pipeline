@@ -1,6 +1,7 @@
 import unittest
-import data_cleanup_toolbox as data_cln
 import os
+import utils.log_util as logger
+from data_cleanup_toolbox import SamplesClusteringPipeline
 
 class TestRun_samples_clustering_pipeline(unittest.TestCase):
     def setUp(self):
@@ -41,16 +42,20 @@ class TestRun_samples_clustering_pipeline(unittest.TestCase):
         del self.run_parameters
 
     def test_run_samples_clustering_pipeline(self):
-        ret_flag, ret_msg = data_cln.run_samples_clustering_pipeline(self.run_parameters)
+        ret_flag, ret_msg = SamplesClusteringPipeline(self.run_parameters).run_samples_clustering_pipeline()
         self.assertEqual(True, ret_flag)
         os.remove(self.file_ETL)
         os.remove(self.file_MAP)
         os.remove(self.file_UNMAPPED)
 
     def test_run_samples_clustering_pipeline_no_phenotype(self):
-        ret_flag, ret_msg = data_cln.run_samples_clustering_pipeline(self.run_parameters_empty_phenotype)
-        self.assertEqual(False, ret_flag)
+        ret_flag, ret_msg = SamplesClusteringPipeline(self.run_parameters_empty_phenotype).run_samples_clustering_pipeline()
+        self.assertEqual(True, ret_flag)
+        os.remove(self.file_ETL)
+        os.remove(self.file_MAP)
+        os.remove(self.file_UNMAPPED)
 
 
 if __name__ == '__main__':
+    logger.init()
     unittest.main()

@@ -1,11 +1,10 @@
 import unittest
-import os
 import pandas as pd
-import numpy.testing as npytest
-import data_cleanup_toolbox as data_cln
+from utils.common_util import CommonUtil
+import utils.log_util as logger
 
 
-class TestSanity_check_input_data(unittest.TestCase):
+class TestCheck_dataframe_indexer_duplication(unittest.TestCase):
     def setUp(self):
         self.input_df_good = pd.DataFrame(
             [[1, 0],
@@ -35,16 +34,17 @@ class TestSanity_check_input_data(unittest.TestCase):
             "input_data_type": ""
         }
 
-
     def tearDown(self):
         del self.input_df_good
         del self.run_parameters
 
-    def test_sanity_check_input_data(self):
-        ret_val = data_cln.sanity_check_input_data(self.input_df_good)
+    def test_check_dataframe_indexer_duplication(self):
+
+        ret_val = CommonUtil.check_dataframe_indexer_duplication(self.input_df_good)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(True, ret_val_boolean)
 
 
 if __name__ == '__main__':
+    logger.init()
     unittest.main()
