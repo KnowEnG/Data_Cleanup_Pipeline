@@ -1,9 +1,8 @@
 import pandas
-import logger
-from data_transformation_util import DataTransformationUtil
+import utils.log_util as logger
+from utils.transformation_util import TransformationUtil
 
-class DataIOUtil:
-
+class IOUtil:
     @staticmethod
     def load_data_file(file_path):
         """
@@ -21,8 +20,7 @@ class DataIOUtil:
 
         try:
             # loads input data
-            input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False,
-                                       error_bad_lines=False, warn_bad_lines=True)
+            input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False, error_bad_lines=False, warn_bad_lines=True)
 
             # casting index and headers to String type
             input_df.index = input_df.index.map(str)
@@ -32,7 +30,7 @@ class DataIOUtil:
                            "column(s)".format(file_path, input_df.shape[0], input_df.shape[1]))
 
             # removes rows with "NA" values (which is a valid value in Gene name)
-            input_df_wo_empty_ln = DataTransformationUtil.remove_empty_row(input_df)
+            input_df_wo_empty_ln = TransformationUtil.remove_empty_row(input_df)
             if input_df_wo_empty_ln is None or input_df_wo_empty_ln.empty:
                 logger.logging.append(
                     "ERROR: Input data {} becomes empty after removing empty row. Please provide a valid input data.".format(

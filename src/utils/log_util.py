@@ -3,7 +3,6 @@ def init():
     logging = []
 
 
-
 def generate_logging(flag, message, path):
     '''
     Creates logger.logging file

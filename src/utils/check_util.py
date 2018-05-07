@@ -1,11 +1,20 @@
 import pandas
-import logger
-from data_transformation_util import DataTransformationUtil
+import utils.log_util as logger
 
 
-class DataCheckUtil:
+class CheckUtil:
     @staticmethod
     def check_duplicates(dataframe, check_column=False, check_row=False):
+        """
+        Checks duplicates on column direction or row direction
+        Args:
+            dataframe: input data frame to be checked
+            check_column: boolean value True: check, False: not check
+            check_row: boolean value True: check, False: not check
+
+        Returns:
+            NA
+        """
         # checks if dataframe contains duplicate columns
         if check_column is True:
             dataframe_transpose = dataframe.T
@@ -22,7 +31,6 @@ class DataCheckUtil:
             if row_count_diff > 0:
                 return True
             return False
-
 
     @staticmethod
     def check_duplicate_column_name(dataframe):
@@ -58,7 +66,6 @@ class DataCheckUtil:
             logger.logging.append("ERROR: An unexpected error occurred during checking duplicate column name.")
             return None
 
-
     @staticmethod
     def check_duplicate_row_name(dataframe):
         """
@@ -88,7 +95,6 @@ class DataCheckUtil:
         if row_count_diff < 0:
             logger.logging.append("ERROR: An unexpected error occurred during checking duplicate row name.")
             return None
-
 
     @staticmethod
     def check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df_pxs):
@@ -135,42 +141,6 @@ class DataCheckUtil:
 
         return phenotype_df_pxs_trimmed
 
-
-    @staticmethod
-    def sanity_check_input_data(self, input_dataframe):
-        """
-        Checks the validity of user input spreadsheet data file, including duplication and nan
-
-        Args:
-            input_dataframe: user spreadsheet input file DataFrame, which is uploaded from frontend
-            run_parameters: run_file parameter dictionary
-
-        Returns:
-            flag: Boolean value indicates the status of current check
-            message: A message indicates the status of current check
-        """
-        logger.logging.append("INFO: Start to run sanity checks for input data.")
-
-        # Case 1: removes NA rows in index
-        input_dataframe_idx_na_rmd = DataTransformationUtil.remove_na_index(input_dataframe)
-        if input_dataframe_idx_na_rmd is None:
-            return None
-
-        # Case 2: checks the duplication on column name and removes it if exists
-        input_dataframe_col_dedup = DataCheckUtil.check_duplicate_column_name(input_dataframe_idx_na_rmd)
-        if input_dataframe_col_dedup is None:
-            return None
-
-        # Case 3: checks the duplication on gene name and removes it if exists
-        input_dataframe_genename_dedup = DataCheckUtil.check_duplicate_row_name(input_dataframe_col_dedup)
-        if input_dataframe_genename_dedup is None:
-            return None
-
-        logger.logging.append("INFO: Finished running sanity check for input data.")
-
-        return input_dataframe_genename_dedup
-
-
     @staticmethod
     def find_intersection(list_a, list_b):
         '''
@@ -186,72 +156,8 @@ class DataCheckUtil:
         if not intersection:
             logger.logging.append("ERROR: Cannot find intersection between spreadsheet and phenotype data.")
             return None
-        logger.logging.append(
-            "INFO: Found {} intersected gene(s) between phenotype and spreadsheet data.".format(len(intersection)))
+
         return intersection
-
-
-    @staticmethod
-    def run_pre_processing_phenotype_data(phenotype_df, user_spreadsheet_df_header):
-        '''
-        Pre-processing phenotype data. This includes checking for na index, duplicate column name and row name.
-        Args:
-            phenotype_df: input phenotype dataframe to be checked
-
-        Returns:
-            phenotype_df_genename_dedup: cleaned phenotype dataframe
-        '''
-        logger.logging.append("INFO: Start to pre-process phenotype data.")
-
-        phenotype_df_genename_dedup = DataCheckUtil.sanity_check_input_data(phenotype_df)
-        if phenotype_df_genename_dedup is None:
-            return None
-
-        # Case 4: checks the intersection on phenotype
-        intersection = DataCheckUtil.find_intersection(phenotype_df_genename_dedup.index.values,
-                                                       user_spreadsheet_df_header)
-        if intersection is None:
-            return None
-
-        logger.logging.append("INFO: Finished running sanity check for phenotype data.")
-
-        return phenotype_df_genename_dedup
-
-
-    @staticmethod
-    def sanity_check_input_data(dataframe):
-        """
-        Checks the validity of user input spreadsheet data file, including duplication and nan
-
-        Args:
-            input_dataframe: user spreadsheet input file DataFrame, which is uploaded from frontend
-            run_parameters: run_file parameter dictionary
-
-        Returns:
-            flag: Boolean value indicates the status of current check
-            message: A message indicates the status of current check
-        """
-        logger.logging.append("INFO: Start to run sanity checks for input data.")
-
-        # Case 1: removes NA rows in index
-        input_dataframe_idx_na_rmd = DataTransformationUtil.remove_na_index(dataframe)
-        if input_dataframe_idx_na_rmd is None:
-            return None
-
-        # Case 2: checks the duplication on column name and removes it if exists
-        input_dataframe_col_dedup = DataCheckUtil.check_duplicate_column_name(input_dataframe_idx_na_rmd)
-        if input_dataframe_col_dedup is None:
-            return None
-
-        # Case 3: checks the duplication on gene name and removes it if exists
-        input_dataframe_genename_dedup = DataCheckUtil.check_duplicate_row_name(input_dataframe_col_dedup)
-        if input_dataframe_genename_dedup is None:
-            return None
-
-        logger.logging.append("INFO: Finished running sanity check for input data.")
-
-        return input_dataframe_genename_dedup
-
 
     @staticmethod
     def compare_order(list_a, list_b):
@@ -273,7 +179,6 @@ class DataCheckUtil:
             return False
         else:
             return False
-
 
     @staticmethod
     def check_user_spreadsheet_data(dataframe, check_na=False, dropna_colwise=False, check_real_number=False,
@@ -323,7 +228,6 @@ class DataCheckUtil:
 
         return dataframe
 
-
     @staticmethod
     def check_phenotype_data(phenotype_df_pxs, correlation_measure):
         """
@@ -370,7 +274,6 @@ class DataCheckUtil:
 
         return phenotype_df_pxs
 
-
     @staticmethod
     def check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df_pxs):
         '''
@@ -415,44 +318,3 @@ class DataCheckUtil:
         phenotype_df_pxs_trimmed = phenotype_df_pxs[sorted(valid_samples)]
 
         return phenotype_df_pxs_trimmed
-
-
-    @staticmethod
-    def validate_inputs_for_gp_fp(user_spreadsheet_df, phenotype_df, correlation_measure):
-        """
-        Input data check for Gene_Prioritization_Pipeline/Feature_Prioritization_Pipeline.
-
-        Args:
-            run_parameters: input configuration table
-
-        Returns:
-            user_spreadsheet_df_dropna: cleaned user spreadsheet
-            phenotype_df_pxs: phenotype data
-
-        """
-        # Checks na, real number in user spreadsheet
-        user_spreadsheet_df_chk = DataCheckUtil.check_user_spreadsheet_data(user_spreadsheet_df, dropna_colwise=True,
-                                                                            check_real_number=True)
-        if user_spreadsheet_df_chk is None or user_spreadsheet_df_chk.empty:
-            logger.logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
-            return None, None
-
-        # Checks value of phenotype dataframe for t-test and pearson
-        logger.logging.append("INFO: Start to run checks for phenotypic data.")
-        phenotype_df_chk = DataCheckUtil.check_phenotype_data(phenotype_df, correlation_measure)
-        if phenotype_df_chk is None:
-            return None, None
-
-        # Checks intersection between user_spreadsheet_df and phenotype data
-        user_spreadsheet_df_header = list(user_spreadsheet_df_chk.columns.values)
-        phenotype_df_trimmed = DataCheckUtil.check_intersection_for_phenotype_and_user_spreadsheet(
-            user_spreadsheet_df_header,
-            phenotype_df_chk)
-        if phenotype_df_trimmed is None or phenotype_df_trimmed.empty:
-            logger.logging.append("ERROR: After drop NA, phenotype data becomes empty.")
-            return None, None
-
-        logger.logging.append("INFO: Finished running checks for phenotypic data.")
-
-        return user_spreadsheet_df_chk, phenotype_df_trimmed
-

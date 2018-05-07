@@ -1,9 +1,9 @@
-import logger
+import utils.log_util as logger
 import pandas as pd
 import numpy as np
 
 
-class DataTransformationUtil:
+class TransformationUtil:
     @staticmethod
     def remove_empty_row(dataframe):
         """
@@ -79,7 +79,8 @@ class DataTransformationUtil:
 
         if diff > 0 and dataframe_rm_na_header.empty:
             logger.logging.append("ERROR: After removed {} column(s) that contains NA in header, original dataframe "
-                           "in shape ({},{}) becames empty.".format(diff, dataframe.shape[0], dataframe.shape[1]))
+                                  "in shape ({},{}) becames empty.".format(diff, dataframe.shape[0],
+                                                                           dataframe.shape[1]))
             return None
 
         return dataframe_rm_na_header
@@ -138,7 +139,7 @@ class DataTransformationUtil:
             expanded phenotype dataframe
         """
         # Standardizes data to be all lower case if there is any data with String type and process binary column
-        output_list = DataTransformationUtil.uniform_phenotype_data(phenotype_df)
+        output_list = TransformationUtil.uniform_phenotype_data(phenotype_df)
 
         # Creates an empty result_df
         result_df = pd.DataFrame(index=phenotype_df.index)

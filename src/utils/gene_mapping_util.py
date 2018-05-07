@@ -1,7 +1,8 @@
 import pandas
-import logger
-from redis_utilities import RedisUtil
-from data_io_util import DataIOUtil
+import utils.log_util as logger
+from utils.redis_util import RedisUtil
+from utils.io_util import IOUtil
+
 
 class GeneMappingUtil:
     @staticmethod
@@ -59,9 +60,9 @@ class GeneMappingUtil:
         map_filtered_dedup = map_filtered[~map_filtered.index.duplicated()]
 
         # writes dedupped mapping between user_supplied_gene_name and ensemble name to a file
-        DataIOUtil.write_to_file(map_filtered_dedup, run_parameters['spreadsheet_name_full_path'],
-                      run_parameters['results_directory'],
-                      "_MAP.tsv", use_index=True, use_header=False)
+        IOUtil.write_to_file(map_filtered_dedup, run_parameters['spreadsheet_name_full_path'],
+                             run_parameters['results_directory'],
+                             "_MAP.tsv", use_index=True, use_header=False)
 
         # adds a status column
         mapping = mapping.assign(status=dataframe.index)
@@ -71,7 +72,8 @@ class GeneMappingUtil:
             r'^unmapped.*$') & mapping.index.duplicated()), 'status'] = 'duplicate ensembl name'
 
         # writes user supplied gene name along with its mapping status to a file
-        DataIOUtil.write_to_file(mapping, run_parameters['spreadsheet_name_full_path'], run_parameters['results_directory'],
-                      "_User_To_Ensembl.tsv", use_index=False, use_header=True)
+        IOUtil.write_to_file(mapping, run_parameters['spreadsheet_name_full_path'],
+                             run_parameters['results_directory'],
+                             "_User_To_Ensembl.tsv", use_index=False, use_header=True)
 
         return output_df_mapped_dedup
