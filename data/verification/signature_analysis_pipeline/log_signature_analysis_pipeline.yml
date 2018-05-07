@@ -1,11 +1,9 @@
 SUCCESS:
-- 'INFO: Start to process signature data.'
-- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_signature.tsv
-  with 6 row(s) and 4 column(s)'
-- 'INFO: Start to process user spreadsheet data.'
 - 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_expression_real_number.tsv
   with 7 row(s) and 4 column(s)'
 - 'WARNING: Removed 1 empty row(s).'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_gene_signature.tsv
+  with 6 row(s) and 4 column(s)'
 - 'INFO: Found 6 intersected gene(s) between phenotype and spreadsheet data.'
 - 'INFO: Cleaned user spreadsheet has 6 row(s), 4 column(s).'
 - 'INFO: Cleaned phenotype data has 6 row(s), 4 column(s).'
