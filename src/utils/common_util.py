@@ -5,7 +5,7 @@ from utils.transformation_util import TransformationUtil
 
 class CommonUtil:
     @staticmethod
-    def sanity_check_input_data(input_dataframe):
+    def check_dataframe_indexer_duplication(input_dataframe):
         """
         Checks the validity of user input spreadsheet data file, including duplication and nan
 
@@ -50,7 +50,7 @@ class CommonUtil:
         '''
         logger.logging.append("INFO: Start to pre-process phenotype data.")
 
-        phenotype_df_genename_dedup = CommonUtil.sanity_check_input_data(phenotype_df)
+        phenotype_df_genename_dedup = CommonUtil.check_dataframe_indexer_duplication(phenotype_df)
         if phenotype_df_genename_dedup is None:
             return None
 
@@ -105,7 +105,7 @@ class CommonUtil:
         return user_spreadsheet_df_chk, phenotype_df_trimmed
 
     @staticmethod
-    def run_network_data_intersection_check(list_of_genes, run_parameters):
+    def check_network_data_intersection(list_of_genes, run_parameters):
         """
         Checks intersection of genes between network data and input list
         Args:
