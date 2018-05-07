@@ -1,6 +1,8 @@
 import unittest
 import os
-import data_cleanup_toolbox as data_cln
+import utils.log_util as logger
+from data_cleanup_toolbox import GeneSetCharacterizationPipeline
+
 
 class TestRun_geneset_characterization_pipeline(unittest.TestCase):
     def setUp(self):
@@ -29,7 +31,7 @@ class TestRun_geneset_characterization_pipeline(unittest.TestCase):
         del self.file_UNMAPPED
 
     def test_run_geneset_characterization_pipeline(self):
-        ret_flag, ret_msg = data_cln.run_geneset_characterization_pipeline(self.run_parameters)
+        ret_flag, ret_msg = GeneSetCharacterizationPipeline(self.run_parameters).run_geneset_characterization_pipeline()
         self.assertEqual(True, ret_flag)
         os.remove(self.file_UNMAPPED)
         os.remove(self.file_MAP)
@@ -37,4 +39,5 @@ class TestRun_geneset_characterization_pipeline(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    logger.init()
     unittest.main()
