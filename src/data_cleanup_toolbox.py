@@ -438,7 +438,7 @@ class Pipelines:
             "INFO: Found {} intersected gene(s) between phenotype and spreadsheet data.".format(len(intersection)))
 
         # Check number of unique value in userspread sheet equals to 2
-        if CheckUtil.check_unique_values(user_spreadsheet_df) < 2:
+        if not CheckUtil.check_unique_values(user_spreadsheet_df, cnt=2):
             logger.logging.append(
                 "ERROR: user spreadsheet data doesn't meet the requirment of having two unique values.")
             return False, logger.logging
