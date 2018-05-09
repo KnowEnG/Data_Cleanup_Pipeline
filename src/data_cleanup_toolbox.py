@@ -440,7 +440,7 @@ class Pipelines:
         # Check number of unique value in userspread sheet equals to 2
         if not CheckUtil.check_unique_values(user_spreadsheet_df, cnt=2):
             logger.logging.append(
-                "ERROR: user spreadsheet data doesn't meet the requirment of having two unique values.")
+                "ERROR: user spreadsheet data doesn't meet the requirment of having at least two unique values.")
             return False, logger.logging
 
         # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
