@@ -12,11 +12,18 @@ from utils.transformation_util import TransformationUtil
 from utils.common_util import CommonUtil
 
 
-class GeneSetCharacterizationPipeline:
+class Pipelines:
     def __init__(self, run_parameters):
         self.run_parameters = run_parameters
         self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
             if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
+        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
+            if 'phenotype_name_full_path' in self.run_parameters.keys() else None
+        self.pasted_gene_df = IOUtil.load_pasted_gene_list(self.run_parameters['pasted_gene_list_full_path']) \
+            if "pasted_gene_list_full_path" in self.run_parameters.keys() else None
+        self.signature_df = IOUtil.load_data_file(self.run_parameters['signature_name_full_path']) \
+            if "signature_name_full_path" in self.run_parameters.keys() else None
+
 
     def run_geneset_characterization_pipeline(self):
         """
@@ -56,14 +63,6 @@ class GeneSetCharacterizationPipeline:
                 user_spreadsheet_df_cleaned.shape[1]))
         return True, logger.logging
 
-
-class SamplesClusteringPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
-            if 'phenotype_name_full_path' in self.run_parameters.keys() else None
 
     def run_samples_clustering_pipeline(self):
         """
@@ -111,7 +110,6 @@ class SamplesClusteringPipeline:
                     user_spreadsheet_df_cleaned.shape[0],
                     user_spreadsheet_df_cleaned.shape[1]))
 
-        phenotype_df_cleaned = None
         if self.phenotype_df is not None:
             logger.logging.append("INFO: Start to process phenotype data.")
             phenotype_df_cleaned = CommonUtil.check_phenotype_intersection(self.phenotype_df,
@@ -126,14 +124,6 @@ class SamplesClusteringPipeline:
                                       "column(s).".format(phenotype_df_cleaned.shape[0], phenotype_df_cleaned.shape[1]))
         return True, logger.logging
 
-
-class GenePrioritizationPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
-            if 'phenotype_name_full_path' in self.run_parameters.keys() else None
 
     def run_gene_prioritization_pipeline(self):
         """
@@ -184,14 +174,6 @@ class GenePrioritizationPipeline:
                                                                                phenotype_val_checked.shape[1]))
         return True, logger.logging
 
-
-class PhenotypePredictionPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
-            if 'phenotype_name_full_path' in self.run_parameters.keys() else None
 
     def run_phenotype_prediction_pipeline(self):
         """
@@ -247,14 +229,6 @@ class PhenotypePredictionPipeline:
         return True, logger.logging
 
 
-class GeneralClusteringPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
-            if 'phenotype_name_full_path' in self.run_parameters.keys() else None
-
     def run_general_clustering_pipeline(self):
         """
             Runs data cleaning for general_clustering_pipeline.
@@ -309,12 +283,6 @@ class GeneralClusteringPipeline:
                                                                                    phenotype_df_cleaned.shape[1]))
         return True, logger.logging
 
-
-class PastedGeneSetConversion:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        self.pasted_gene_df = IOUtil.load_pasted_gene_list(self.run_parameters['pasted_gene_list_full_path']) \
-            if "pasted_gene_list_full_path" in self.run_parameters.keys() else None
 
     def run_pasted_gene_set_conversion(self):
         """
@@ -401,16 +369,6 @@ class PastedGeneSetConversion:
         return True, logger.logging
 
 
-class FeaturePrioritizationPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        # Loads user spreadsheet data
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        # Loads phenotype data
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
-            if "phenotype_name_full_path" in self.run_parameters.keys() else None
-
     def run_feature_prioritization_pipeline(self):
         """
         Run data cleaning for feature prioritization pipeline.
@@ -462,16 +420,6 @@ class FeaturePrioritizationPipeline:
         return True, logger.logging
 
 
-class SignatureAnalysisPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        # Loads user spreadsheet data
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        # Loads phenotype data
-        self.signature_df = IOUtil.load_data_file(self.run_parameters['signature_name_full_path']) \
-            if "signature_name_full_path" in self.run_parameters.keys() else None
-
     def run_signature_analysis_pipeline(self):
         """
            Runs data cleaning for signature_analysis_pipeline.
@@ -493,13 +441,6 @@ class SignatureAnalysisPipeline:
         # Removes NA index for both signature data and user spreadsheet data
         signature_df = TransformationUtil.remove_na_index(self.signature_df)
         user_spreadsheet_df = TransformationUtil.remove_na_index(self.user_spreadsheet_df)
-
-        # Compares the order of genes in signature data and user spreadsheet data
-        if CheckUtil.compare_order(list(signature_df.index), list(user_spreadsheet_df.index)) is False:
-            logger.logging.append(
-                "ERROR: Signature Analysis Pipeline requires gene name to be "
-                "exactly the same and in same order in both user spreadsheet file and signature file.")
-            return False, logger.logging
 
         # Check dupliate columns on user spreadsheet data
         if CheckUtil.check_duplicates(user_spreadsheet_df, check_column=True):
