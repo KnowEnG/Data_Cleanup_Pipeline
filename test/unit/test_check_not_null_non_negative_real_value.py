@@ -5,6 +5,8 @@ import utils.log_util as logger
 
 class TestCheck_user_spreadsheet_data(unittest.TestCase):
     def setUp(self):
+        logger.init()
+
         self.input_df = pd.DataFrame([[1, 2],
                                       [0, 10],
                                       [1, 9]],
@@ -60,5 +62,4 @@ class TestCheck_user_spreadsheet_data(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    logger.init()
     unittest.main()

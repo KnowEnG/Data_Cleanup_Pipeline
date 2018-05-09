@@ -1,11 +1,13 @@
 import unittest
 import pandas as pd
 import numpy.testing as npytest
-from utils.check_util import CheckUtil
+from utils.transformation_util import TransformationUtil
 import utils.log_util as logger
 
 class TestCheck_duplicate_gene_name(unittest.TestCase):
     def setUp(self):
+        logger.init()
+
         self.input_df_dup = pd.DataFrame([[1, 0],
                                           [0, 0],
                                           [1, 1]],
@@ -36,18 +38,17 @@ class TestCheck_duplicate_gene_name(unittest.TestCase):
         del self.golden_output_nodup
 
     def test_check_duplicate_row_name_with_dup(self):
-        ret_df = CheckUtil.check_duplicate_row_name(self.input_df_dup)
+        ret_df = TransformationUtil.remove_duplicate_row_name(self.input_df_dup)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
         npytest.assert_array_equal(self.golden_output_dedup, ret_df)
 
     def test_check_duplicate_row_name_without_dup(self):
-        ret_df = CheckUtil.check_duplicate_row_name(self.input_df_nodup)
+        ret_df = TransformationUtil.remove_duplicate_row_name(self.input_df_nodup)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
         npytest.assert_array_equal(self.golden_output_nodup, ret_df)
 
 
 if __name__ == '__main__':
-    logger.init()
     unittest.main()
