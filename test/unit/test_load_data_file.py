@@ -9,6 +9,8 @@ import utils.log_util as logger
 
 class TestLoad_data_file(unittest.TestCase):
     def setUp(self):
+        logger.init()
+
         self.run_dir = "./run_file"
         self.user_spreadsheet = "user_spreadsheet.tsv"
         self.spreadsheet_path = self.run_dir + "/" + self.user_spreadsheet
@@ -48,6 +50,5 @@ class TestLoad_data_file(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    logger.init()
     unittest.main()
 

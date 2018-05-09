@@ -6,6 +6,8 @@ from utils.transformation_util import TransformationUtil
 
 class TestRemove_na_index(unittest.TestCase):
     def setUp(self):
+        logger.init()
+
         self.input_df = pd.DataFrame([[1, 2],
                                       [0, 10],
                                       [1, 9]],
@@ -58,5 +60,4 @@ class TestRemove_na_index(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    logger.init()
     unittest.main()

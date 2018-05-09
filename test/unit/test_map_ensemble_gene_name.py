@@ -7,6 +7,8 @@ import utils.log_util as logger
 
 class TestMap_ensemble_gene_name(unittest.TestCase):
     def setUp(self):
+        logger.init()
+
         self.input_df_good = pd.DataFrame([[1, 0],
                                            [0, 0],
                                            [1, 1]],
@@ -80,5 +82,4 @@ class TestMap_ensemble_gene_name(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    logger.init()
     unittest.main()

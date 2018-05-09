@@ -6,6 +6,8 @@ import utils.log_util as logger
 
 class Testcheck_phenotype_data(unittest.TestCase):
     def setUp(self):
+        logger.init()
+
         self.input_phenotype_df = pd.DataFrame([[1, 0],
                                                 [0, 0],
                                                 [1, 1],
@@ -79,5 +81,4 @@ class Testcheck_phenotype_data(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    logger.init()
     unittest.main()

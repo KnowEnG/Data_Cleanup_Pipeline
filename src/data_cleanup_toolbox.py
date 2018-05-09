@@ -12,11 +12,17 @@ from utils.transformation_util import TransformationUtil
 from utils.common_util import CommonUtil
 
 
-class GeneSetCharacterizationPipeline:
+class Pipelines:
     def __init__(self, run_parameters):
         self.run_parameters = run_parameters
         self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
             if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
+        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
+            if 'phenotype_name_full_path' in self.run_parameters.keys() else None
+        self.pasted_gene_df = IOUtil.load_pasted_gene_list(self.run_parameters['pasted_gene_list_full_path']) \
+            if "pasted_gene_list_full_path" in self.run_parameters.keys() else None
+        self.signature_df = IOUtil.load_data_file(self.run_parameters['signature_name_full_path']) \
+            if "signature_name_full_path" in self.run_parameters.keys() else None
 
     def run_geneset_characterization_pipeline(self):
         """
@@ -40,7 +46,7 @@ class GeneSetCharacterizationPipeline:
             return False, logger.logging
 
         # Checks duplication on column and row name
-        user_spreadsheet_df_checked = CommonUtil.check_dataframe_indexer_duplication(user_spreadsheet_val_chked)
+        user_spreadsheet_df_checked = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
 
         # Checks the validity of gene name to see if it can be ensemble or not
         user_spreadsheet_df_cleaned = GeneMappingUtil.map_ensemble_gene_name(user_spreadsheet_df_checked,
@@ -55,15 +61,6 @@ class GeneSetCharacterizationPipeline:
                 user_spreadsheet_df_cleaned.shape[0],
                 user_spreadsheet_df_cleaned.shape[1]))
         return True, logger.logging
-
-
-class SamplesClusteringPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
-            if 'phenotype_name_full_path' in self.run_parameters.keys() else None
 
     def run_samples_clustering_pipeline(self):
         """
@@ -89,7 +86,7 @@ class SamplesClusteringPipeline:
             return False, logger.logging
 
         # Checks duplication on column and row name
-        user_spreadsheet_df_checked = CommonUtil.check_dataframe_indexer_duplication(user_spreadsheet_val_chked)
+        user_spreadsheet_df_checked = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
 
         # Checks the validity of gene name to see if it can be ensemble or not
         user_spreadsheet_df_cleaned = GeneMappingUtil.map_ensemble_gene_name(user_spreadsheet_df_checked,
@@ -111,7 +108,6 @@ class SamplesClusteringPipeline:
                     user_spreadsheet_df_cleaned.shape[0],
                     user_spreadsheet_df_cleaned.shape[1]))
 
-        phenotype_df_cleaned = None
         if self.phenotype_df is not None:
             logger.logging.append("INFO: Start to process phenotype data.")
             phenotype_df_cleaned = CommonUtil.check_phenotype_intersection(self.phenotype_df,
@@ -126,15 +122,6 @@ class SamplesClusteringPipeline:
                                       "column(s).".format(phenotype_df_cleaned.shape[0], phenotype_df_cleaned.shape[1]))
         return True, logger.logging
 
-
-class GenePrioritizationPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
-            if 'phenotype_name_full_path' in self.run_parameters.keys() else None
-
     def run_gene_prioritization_pipeline(self):
         """
         Runs data cleaning for gene_prioritization_pipeline.
@@ -146,8 +133,8 @@ class GenePrioritizationPipeline:
             validation_flag: Boolean type value indicating if input data is valid or not.
             message: A message indicates the status of current check.
         """
-        # Loads user spreadsheet data
-        if self.user_spreadsheet_df is None:
+        # Checks user spreadsheet data and phenotype data
+        if self.user_spreadsheet_df is None or self.phenotype_df is None:
             return False, logger.logging
 
         # Imputes na value on user spreadsheet data
@@ -155,16 +142,14 @@ class GenePrioritizationPipeline:
                                                                    option=self.run_parameters['impute'])
         if user_spreadsheet_df_imputed is None:
             return False, logger.logging
-        # Loads phenotype data
-        if self.phenotype_df is None:
-            return False, logger.logging
+
         # Checks if value of inputs satisfy certain criteria: see details in function validate_inputs_for_gp_fp
         user_spreadsheet_val_chked, phenotype_val_checked = CommonUtil.validate_inputs_for_gp_fp(
             user_spreadsheet_df_imputed, self.phenotype_df, self.run_parameters["correlation_measure"])
         if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
             return False, logger.logging
         # Checks duplication on column and row name
-        user_spreadsheet_df_checked = CommonUtil.check_dataframe_indexer_duplication(user_spreadsheet_val_chked)
+        user_spreadsheet_df_checked = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
         # Checks the validity of gene name to see if it can be ensemble or not
         user_spreadsheet_df_cleaned = GeneMappingUtil.map_ensemble_gene_name(user_spreadsheet_df_checked,
                                                                              self.run_parameters)
@@ -184,15 +169,6 @@ class GenePrioritizationPipeline:
                                                                                phenotype_val_checked.shape[1]))
         return True, logger.logging
 
-
-class PhenotypePredictionPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
-            if 'phenotype_name_full_path' in self.run_parameters.keys() else None
-
     def run_phenotype_prediction_pipeline(self):
         """
             Runs data cleaning for phenotype_prediction_pipeline.
@@ -204,12 +180,8 @@ class PhenotypePredictionPipeline:
                 validation_flag: Boolean type value indicating if input data is valid or not.
                 message: A message indicates the status of current check.
         """
-        # dimension: sample x phenotype
-        if self.user_spreadsheet_df is None:
-            return False, logger.logging
-
-        # dimension: sample x phenotype
-        if self.phenotype_df is None:
+        # spreadsheet dimension: sample x phenotype, phenotype dimension : sample x phenotype
+        if self.user_spreadsheet_df is None or self.phenotype_df is None:
             return False, logger.logging
 
         # Check if user spreadsheet contains only real number and drop na column wise
@@ -227,7 +199,7 @@ class PhenotypePredictionPipeline:
                                                                                                    self.phenotype_df)
 
         # Checks duplication on column and row name
-        user_spreadsheet_df_cleaned = CommonUtil.check_dataframe_indexer_duplication(user_spreadsheet_dropna)
+        user_spreadsheet_df_cleaned = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_dropna)
         if user_spreadsheet_df_cleaned is None or phenotype_df_pxs_trimmed is None:
             return False, logger.logging
 
@@ -245,15 +217,6 @@ class PhenotypePredictionPipeline:
             "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_pxs_trimmed.shape[0],
                                                                                phenotype_df_pxs_trimmed.shape[1]))
         return True, logger.logging
-
-
-class GeneralClusteringPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
-            if 'phenotype_name_full_path' in self.run_parameters.keys() else None
 
     def run_general_clustering_pipeline(self):
         """
@@ -290,7 +253,7 @@ class GeneralClusteringPipeline:
         if user_spreadsheet_df_rm_na_header is None:
             return False, logger.logging
 
-        user_spreadsheet_df_cleaned = CommonUtil.check_dataframe_indexer_duplication(user_spreadsheet_df_rm_na_header)
+        user_spreadsheet_df_cleaned = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_df_rm_na_header)
         if user_spreadsheet_df_cleaned is None:
             return False, logger.logging
 
@@ -308,13 +271,6 @@ class GeneralClusteringPipeline:
                 "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(phenotype_df_cleaned.shape[0],
                                                                                    phenotype_df_cleaned.shape[1]))
         return True, logger.logging
-
-
-class PastedGeneSetConversion:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        self.pasted_gene_df = IOUtil.load_pasted_gene_list(self.run_parameters['pasted_gene_list_full_path']) \
-            if "pasted_gene_list_full_path" in self.run_parameters.keys() else None
 
     def run_pasted_gene_set_conversion(self):
         """
@@ -400,17 +356,6 @@ class PastedGeneSetConversion:
         logger.logging.append("INFO: Mapped gene list contains {} genes.".format(mapped_small_genes_df.shape[0]))
         return True, logger.logging
 
-
-class FeaturePrioritizationPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        # Loads user spreadsheet data
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        # Loads phenotype data
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
-            if "phenotype_name_full_path" in self.run_parameters.keys() else None
-
     def run_feature_prioritization_pipeline(self):
         """
         Run data cleaning for feature prioritization pipeline.
@@ -423,14 +368,14 @@ class FeaturePrioritizationPipeline:
             message: A message indicates the status of current check.
         """
         from knpackage.toolbox import get_spreadsheet_df
+
+        if self.user_spreadsheet_df is None or self.phenotype_df is None:
+            return False, logger.logging
+
         # Imputes na value on user spreadsheet data
         user_spreadsheet_df_imputed = TransformationUtil.impute_na(self.user_spreadsheet_df,
                                                                    option=self.run_parameters['impute'])
         if user_spreadsheet_df_imputed is None:
-            return False, logger.logging
-
-        # Loads phenotype data
-        if self.phenotype_df is None:
             return False, logger.logging
 
         # Checks if value of inputs satisfy certain criteria
@@ -461,17 +406,6 @@ class FeaturePrioritizationPipeline:
                                                                                 phenotype_val_chked.shape[1]))
         return True, logger.logging
 
-
-class SignatureAnalysisPipeline:
-    def __init__(self, run_parameters):
-        self.run_parameters = run_parameters
-        # Loads user spreadsheet data
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
-            if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        # Loads phenotype data
-        self.signature_df = IOUtil.load_data_file(self.run_parameters['signature_name_full_path']) \
-            if "signature_name_full_path" in self.run_parameters.keys() else None
-
     def run_signature_analysis_pipeline(self):
         """
            Runs data cleaning for signature_analysis_pipeline.
@@ -483,34 +417,19 @@ class SignatureAnalysisPipeline:
                validation_flag: Boolean type value indicating if input data is valid or not.
                message: A message indicates the status of current check.
         """
-
-        if self.signature_df is None:
-            return False, logger.logging
-
-        if self.user_spreadsheet_df is None:
+        if self.signature_df is None or self.user_spreadsheet_df is None:
             return False, logger.logging
 
         # Removes NA index for both signature data and user spreadsheet data
         signature_df = TransformationUtil.remove_na_index(self.signature_df)
         user_spreadsheet_df = TransformationUtil.remove_na_index(self.user_spreadsheet_df)
 
-        # Compares the order of genes in signature data and user spreadsheet data
-        if CheckUtil.compare_order(list(signature_df.index), list(user_spreadsheet_df.index)) is False:
-            logger.logging.append(
-                "ERROR: Signature Analysis Pipeline requires gene name to be "
-                "exactly the same and in same order in both user spreadsheet file and signature file.")
-            return False, logger.logging
-
-        # Check dupliate columns on user spreadsheet data
-        if CheckUtil.check_duplicates(user_spreadsheet_df, check_column=True):
+        # Check dupliate columns and rows on user spreadsheet data
+        if CheckUtil.check_duplicates(user_spreadsheet_df, check_column=True, check_row=True):
             logger.logging.append("ERROR: Found duplicates on user spreadsheet data. Rejecting...")
             return False, logger.logging
 
-        # Check duplicate rows on user spreadsheet data
-        if CheckUtil.check_duplicates(signature_df, check_row=True):
-            logger.logging.append("ERROR: Found duplicates on signature data. Rejecting...")
-            return False, logger.logging
-
+        # Check intersection of genes between signature data and user spreadsheet data
         intersection = CheckUtil.find_intersection(signature_df.index, user_spreadsheet_df.index)
         if intersection is None:
             logger.logging.append('ERROR: Cannot find intersection between spreadsheet genes and signature genes.')
@@ -518,11 +437,16 @@ class SignatureAnalysisPipeline:
         logger.logging.append(
             "INFO: Found {} intersected gene(s) between phenotype and spreadsheet data.".format(len(intersection)))
 
+        # Check number of unique value in userspread sheet equals to 2
+        if CheckUtil.check_unique_values(user_spreadsheet_df) < 2:
+            logger.logging.append(
+                "ERROR: user spreadsheet data doesn't meet the requirment of having two unique values.")
+            return False, logger.logging
+
         # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
-        user_spreadsheet_val_checked = CheckUtil.check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
-                                                                             check_real_number=True,
-                                                                             check_positive_number=False)
-        if user_spreadsheet_val_checked is None:
+        if CheckUtil.check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
+                                                 check_real_number=True,
+                                                 check_positive_number=False) is None:
             return False, logger.logging
 
         if 'gg_network_name_full_path' in self.run_parameters.keys() and \
@@ -531,16 +455,16 @@ class SignatureAnalysisPipeline:
             return False, logger.logging
 
         # The logic here ensures that even if phenotype data doesn't fits requirement, the rest pipelines can still run.
-        if user_spreadsheet_val_checked is None:
+        if user_spreadsheet_df is None:
             return False, logger.logging
         else:
-            IOUtil.write_to_file(user_spreadsheet_val_checked,
+            IOUtil.write_to_file(user_spreadsheet_df,
                                  self.run_parameters['spreadsheet_name_full_path'],
                                  self.run_parameters['results_directory'], "_ETL.tsv")
             logger.logging.append(
                 "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(
-                    user_spreadsheet_val_checked.shape[0],
-                    user_spreadsheet_val_checked.shape[1]))
+                    user_spreadsheet_df.shape[0],
+                    user_spreadsheet_df.shape[1]))
 
         if signature_df is not None:
             IOUtil.write_to_file(signature_df, self.run_parameters['signature_name_full_path'],

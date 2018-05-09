@@ -5,7 +5,7 @@ from utils.transformation_util import TransformationUtil
 
 class CommonUtil:
     @staticmethod
-    def check_dataframe_indexer_duplication(input_dataframe):
+    def remove_dataframe_indexer_duplication(input_dataframe):
         """
         Checks the validity of user input spreadsheet data file, including duplication and nan
 
@@ -25,12 +25,12 @@ class CommonUtil:
             return None
 
         # Case 2: checks the duplication on column name and removes it if exists
-        input_dataframe_col_dedup = CheckUtil.check_duplicate_column_name(input_dataframe_idx_na_rmd)
+        input_dataframe_col_dedup = TransformationUtil.remove_duplicate_column_name(input_dataframe_idx_na_rmd)
         if input_dataframe_col_dedup is None:
             return None
 
         # Case 3: checks the duplication on gene name and removes it if exists
-        input_dataframe_genename_dedup = CheckUtil.check_duplicate_row_name(input_dataframe_col_dedup)
+        input_dataframe_genename_dedup = TransformationUtil.remove_duplicate_row_name(input_dataframe_col_dedup)
         if input_dataframe_genename_dedup is None:
             return None
 
@@ -50,7 +50,7 @@ class CommonUtil:
         '''
         logger.logging.append("INFO: Start to pre-process phenotype data.")
 
-        phenotype_df_genename_dedup = CommonUtil.check_dataframe_indexer_duplication(phenotype_df)
+        phenotype_df_genename_dedup = CommonUtil.remove_dataframe_indexer_duplication(phenotype_df)
         if phenotype_df_genename_dedup is None:
             return None
 

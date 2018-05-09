@@ -86,6 +86,70 @@ class TransformationUtil:
         return dataframe_rm_na_header
 
     @staticmethod
+    def remove_duplicate_column_name(dataframe):
+        """
+        Checks duplicate column names and rejects it if it exists
+
+        Args:
+            dataframe: input dataframe to be checked
+
+        Returns:
+            user_spreadsheet_df_genename_dedup.T: a DataFrame in original format
+            ret_msg: error message
+        """
+
+        dataframe_transpose = dataframe.T
+        dataframe_row_dedup = dataframe_transpose[~dataframe_transpose.index.duplicated()]
+        if dataframe_row_dedup.empty:
+            logger.logging.append("ERROR: User spreadsheet becomes empty after remove column duplicates.")
+            return None
+
+        row_count_diff = len(dataframe_transpose.index) - len(dataframe_row_dedup.index)
+
+        if row_count_diff > 0:
+            logger.logging.append(
+                "WARNING: Removed {} duplicate column(s) from user spreadsheet.".format(row_count_diff))
+            return dataframe_row_dedup.T
+
+        if row_count_diff == 0:
+            logger.logging.append("INFO: No duplicate column name detected in this data set.")
+            return dataframe_row_dedup.T
+
+        if row_count_diff < 0:
+            logger.logging.append("ERROR: An unexpected error occurred during checking duplicate column name.")
+            return None
+
+    @staticmethod
+    def remove_duplicate_row_name(dataframe):
+        """
+        Checks duplication on gene name and rejects it if it exists.
+
+        Args:
+            dataframe: input DataFrame
+
+        Returns:
+            dataframe_genename_dedup: a DataFrame in original format
+            ret_msg: error message
+        """
+        dataframe_genename_dedup = dataframe[~dataframe.index.duplicated()]
+        if dataframe_genename_dedup.empty:
+            logger.logging.append("ERROR: User spreadsheet becomes empty after remove column duplicates.")
+            return None
+
+        row_count_diff = len(dataframe.index) - len(dataframe_genename_dedup.index)
+        if row_count_diff > 0:
+            logger.logging.append("WARNING: Removed {} duplicate row(s) from user spreadsheet.".format(row_count_diff))
+            return dataframe_genename_dedup
+
+        if row_count_diff == 0:
+            logger.logging.append("INFO: No duplicate row name detected in this data set.")
+            return dataframe_genename_dedup
+
+        if row_count_diff < 0:
+            logger.logging.append("ERROR: An unexpected error occurred during checking duplicate row name.")
+            return None
+
+    @staticmethod
     def impute_na(dataframe, option="reject"):
         '''
         Impute NA value based on options user selected

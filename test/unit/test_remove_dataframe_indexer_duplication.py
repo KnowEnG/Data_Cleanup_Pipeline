@@ -4,8 +4,9 @@ from utils.common_util import CommonUtil
 import utils.log_util as logger
 
 
-class TestCheck_dataframe_indexer_duplication(unittest.TestCase):
+class TestRemove_dataframe_indexer_duplication(unittest.TestCase):
     def setUp(self):
+        logger.init()
         self.input_df_good = pd.DataFrame(
             [[1, 0],
              [0, 0],
@@ -38,13 +39,11 @@ class TestCheck_dataframe_indexer_duplication(unittest.TestCase):
         del self.input_df_good
         del self.run_parameters
 
-    def test_check_dataframe_indexer_duplication(self):
-
-        ret_val = CommonUtil.check_dataframe_indexer_duplication(self.input_df_good)
+    def test_Remove_dataframe_indexer_duplication(self):
+        ret_val = CommonUtil.remove_dataframe_indexer_duplication(self.input_df_good)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(True, ret_val_boolean)
 
 
 if __name__ == '__main__':
-    logger.init()
     unittest.main()

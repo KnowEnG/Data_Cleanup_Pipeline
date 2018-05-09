@@ -7,6 +7,8 @@ import utils.log_util as logger
 
 class TestImpute_na(unittest.TestCase):
     def setUp(self):
+        logger.init()
+
         self.input_df = pd.DataFrame([[1, 1, None],
                                       [2, 0, 0],
                                       [4, 1, 1]],
