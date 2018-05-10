@@ -29,7 +29,7 @@ class Pipelines:
         Runs data cleaning for geneset_characterization_pipeline.
 
         Args:
-            run_parameters: configuration dictionary
+            NA
 
         Returns:
             validation_flag: Boolean type value indicating if input data is valid or not.
@@ -45,7 +45,7 @@ class Pipelines:
         if user_spreadsheet_val_chked is None:
             return False, logger.logging
 
-        # Checks duplication on column and row name
+        # Removes NA value and duplication on column and row name
         user_spreadsheet_df_checked = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
 
         # Checks the validity of gene name to see if it can be ensemble or not
@@ -67,7 +67,7 @@ class Pipelines:
         Runs data cleaning for samples_clustering_pipeline.
 
         Args:
-            run_parameters: configuration dictionary
+            NA
 
         Returns:
             validation_flag: Boolean type value indicating if input data is valid or not.
@@ -85,7 +85,7 @@ class Pipelines:
         if user_spreadsheet_val_chked is None:
             return False, logger.logging
 
-        # Checks duplication on column and row name
+        # Removes NA value and duplication on column and row name
         user_spreadsheet_df_checked = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
 
         # Checks the validity of gene name to see if it can be ensemble or not
@@ -127,7 +127,7 @@ class Pipelines:
         Runs data cleaning for gene_prioritization_pipeline.
 
         Args:
-            run_parameters: configuration dictionary
+            NA.
 
         Returns:
             validation_flag: Boolean type value indicating if input data is valid or not.
@@ -148,7 +148,7 @@ class Pipelines:
             user_spreadsheet_df_imputed, self.phenotype_df, self.run_parameters["correlation_measure"])
         if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
             return False, logger.logging
-        # Checks duplication on column and row name
+        # Removes NA value and duplication on column and row name
         user_spreadsheet_df_checked = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
         # Checks the validity of gene name to see if it can be ensemble or not
         user_spreadsheet_df_cleaned = GeneMappingUtil.map_ensemble_gene_name(user_spreadsheet_df_checked,
@@ -174,7 +174,7 @@ class Pipelines:
             Runs data cleaning for phenotype_prediction_pipeline.
 
             Args:
-                run_parameters: configuration dictionary
+                NA.
 
             Returns:
                 validation_flag: Boolean type value indicating if input data is valid or not.
@@ -184,7 +184,7 @@ class Pipelines:
         if self.user_spreadsheet_df is None or self.phenotype_df is None:
             return False, logger.logging
 
-        # Check if user spreadsheet contains only real number and drop na column wise
+        # Checks if user spreadsheet contains only real number and drop na column wise
         user_spreadsheet_dropna = CheckUtil.check_user_spreadsheet_data(self.user_spreadsheet_df,
                                                                         dropna_colwise=True,
                                                                         check_real_number=True)
@@ -193,12 +193,12 @@ class Pipelines:
             logger.logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
             return None, None
 
-        # Checks if there is valid intersection between phenotype data and user spreadsheet data
+        # Checks for valid intersection between phenotype data and user spreadsheet data
         dataframe_header = list(user_spreadsheet_dropna.columns.values)
         phenotype_df_pxs_trimmed = CheckUtil.check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header,
                                                                                                    self.phenotype_df)
 
-        # Checks duplication on column and row name
+        # Removes NA value and duplication on column and row name
         user_spreadsheet_df_cleaned = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_dropna)
         if user_spreadsheet_df_cleaned is None or phenotype_df_pxs_trimmed is None:
             return False, logger.logging
@@ -223,7 +223,7 @@ class Pipelines:
             Runs data cleaning for general_clustering_pipeline.
 
             Args:
-                run_parameters: configuration dictionary
+                NA.
 
             Returns:
                 validation_flag: Boolean type value indicating if input data is valid or not.
@@ -232,6 +232,7 @@ class Pipelines:
         if self.user_spreadsheet_df is None:
             return False, logger.logging
 
+        # Checks intersection between user spreadsheet data and phenotype data
         phenotype_df_cleaned = None
         if self.phenotype_df is not None:
             phenotype_df_cleaned = CommonUtil.check_phenotype_intersection(self.phenotype_df,
@@ -241,7 +242,7 @@ class Pipelines:
                 return False, logger.logging
         logger.logging.append("INFO: Start to process user spreadsheet data.")
 
-        # Check if user spreadsheet contains na value and only real number
+        # Checks if user spreadsheet contains na value and only real number
         user_spreadsheet_df_val_check = CheckUtil.check_user_spreadsheet_data(self.user_spreadsheet_df,
                                                                               check_na=True,
                                                                               dropna_colwise=True,
@@ -253,6 +254,7 @@ class Pipelines:
         if user_spreadsheet_df_rm_na_header is None:
             return False, logger.logging
 
+        # Removes NA value and duplication on column and row name
         user_spreadsheet_df_cleaned = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_df_rm_na_header)
         if user_spreadsheet_df_cleaned is None:
             return False, logger.logging
@@ -277,7 +279,7 @@ class Pipelines:
         Runs data cleaning for pasted_gene_set_conversion.
 
         Args:
-            run_parameters: configuration dictionary
+            NA.
 
         Returns:
              validation_flag: Boolean type value indicating if input data is valid or not.
@@ -286,18 +288,18 @@ class Pipelines:
         """
         from utils.redis_util import RedisUtil
 
-        # gets redis database instance by its credential
+        # Gets redis database instance by its credential
         redis_db = RedisUtil(self.run_parameters['redis_credential'],
                              self.run_parameters['source_hint'],
                              self.run_parameters['taxonid'])
 
-        # reads pasted_gene_list as a dataframe
+        # Reads pasted_gene_list as a dataframe
         if self.pasted_gene_df is None:
             return False, logger.logging
         logger.logging.append("INFO: Successfully load spreadsheet data: {} with {} gene(s).".format(
             self.run_parameters['pasted_gene_list_full_path'], self.pasted_gene_df.shape[0]))
 
-        # removes nan index rows
+        # Removes nan index rows
         input_small_genes_df = TransformationUtil.remove_na_index(self.pasted_gene_df)
 
         # casting index to String type
@@ -309,15 +311,15 @@ class Pipelines:
 
         input_small_genes_df["user_supplied_gene_name"] = input_small_genes_df.index
 
-        # converts pasted_gene_list to ensemble name
+        # Converts pasted_gene_list to ensemble name
         redis_ret = redis_db.get_node_info(input_small_genes_df.index, "Gene")
         ensemble_names = [x[1] for x in redis_ret]
         input_small_genes_df.index = pandas.Series(ensemble_names)
 
-        # filters out the unmapped genes
+        # Filters out the unmapped genes
         mapped_small_genes_df = input_small_genes_df[~input_small_genes_df.index.str.contains(r'^unmapped.*$')]
 
-        # filter the duplicate gene name and write them along with their corresponding user supplied gene name to a file
+        # Filters the duplicate gene name and write them along with their corresponding user supplied gene name to a file
         mapped_small_genes_df[(~mapped_small_genes_df.index.str.contains(
             r'^unmapped.*$') & mapped_small_genes_df.index.duplicated())][
             'user_supplied_gene_name'] = 'duplicate ensembl name'
@@ -328,14 +330,14 @@ class Pipelines:
                              self.run_parameters['results_directory'], "_User_To_Ensembl.tsv", use_index=False,
                              use_header=True)
 
-        # reads the univeral_gene_list
+        # Reads the univeral_gene_list
         universal_genes_df = IOUtil.load_pasted_gene_list(self.run_parameters['temp_redis_vector'])
         if universal_genes_df is None:
             return False, logger.logging
 
-        # inserts a column with value 0
+        # Inserts a column with value 0
         universal_genes_df.insert(0, 'value', 0)
-        # finds the intersection between pasted_gene_list and universal_gene_list
+        # Finds the intersection between pasted_gene_list and universal_gene_list
         common_idx = universal_genes_df.index.intersection(mapped_small_genes_df.index)
         logger.logging.append(
             "INFO: Found {} common gene(s) that shared between pasted gene list and universal gene list.".format(
@@ -361,7 +363,7 @@ class Pipelines:
         Run data cleaning for feature prioritization pipeline.
 
         Args:
-            run_parameters: configuration dictionary
+            NA.
 
         Returns:
             validation_flag: Boolean type value indicating if input data is valid or not.
@@ -411,8 +413,8 @@ class Pipelines:
            Runs data cleaning for signature_analysis_pipeline.
 
            Args:
-               run_parameters: configuration dictionary
-
+                NA.
+                
            Returns:
                validation_flag: Boolean type value indicating if input data is valid or not.
                message: A message indicates the status of current check.
@@ -424,12 +426,18 @@ class Pipelines:
         signature_df = TransformationUtil.remove_na_index(self.signature_df)
         user_spreadsheet_df = TransformationUtil.remove_na_index(self.user_spreadsheet_df)
 
-        # Check dupliate columns and rows on user spreadsheet data
+        # Checks if only real number and non-NA value appear in user spreadsheet
+        if CheckUtil.check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
+                                                 check_real_number=True,
+                                                 check_positive_number=False) is None:
+            return False, logger.logging
+
+        # Checks duplicate columns and rows in user spreadsheet data
         if CheckUtil.check_duplicates(user_spreadsheet_df, check_column=True, check_row=True):
             logger.logging.append("ERROR: Found duplicates on user spreadsheet data. Rejecting...")
             return False, logger.logging
 
-        # Check intersection of genes between signature data and user spreadsheet data
+        # Checks intersection of genes between signature data and user spreadsheet data
         intersection = CheckUtil.find_intersection(signature_df.index, user_spreadsheet_df.index)
         if intersection is None:
             logger.logging.append('ERROR: Cannot find intersection between spreadsheet genes and signature genes.')
@@ -437,18 +445,13 @@ class Pipelines:
         logger.logging.append(
             "INFO: Found {} intersected gene(s) between phenotype and spreadsheet data.".format(len(intersection)))
 
-        # Check number of unique value in userspread sheet equals to 2
+        # Checks number of unique value in userspread sheet equals to 2
         if not CheckUtil.check_unique_values(user_spreadsheet_df, cnt=2):
             logger.logging.append(
                 "ERROR: user spreadsheet data doesn't meet the requirment of having at least two unique values.")
             return False, logger.logging
 
-        # Value check logic a: checks if only real number appears in user spreadsheet and create absolute value
-        if CheckUtil.check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
-                                                 check_real_number=True,
-                                                 check_positive_number=False) is None:
-            return False, logger.logging
-
+        # Checks intersection among network data, signature data and user spreadsheet data
         if 'gg_network_name_full_path' in self.run_parameters.keys() and \
                 not CommonUtil.check_network_data_intersection(intersection,
                                                                self.run_parameters):

@@ -82,12 +82,13 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 ### signatuer_analysis_pipeline
   *After removing empty rows and columns, check if a spreadsheet:*
   1. contains NaN value/s column wise.
-  2. contains positive real value. 
+  2. contains real value. 
   3. contains NaN value in gene name.
   4. contains NaN value in header.
   5. contains duplicate row names. 
   6. contains duplicate column names. 
-  7. gene name can be mapped to ensemble gene name.
+  7. contains at least two unique values per column.
+  8. gene name can be mapped to ensemble gene name.
 
   *After removing empty rows and columns, check if a signature data:*
   1. intersects with spreadsheet.

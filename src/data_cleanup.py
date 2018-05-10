@@ -3,7 +3,6 @@ import utils.log_util as logger
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
 from data_cleanup_toolbox import Pipelines
 
-
 SELECT = {
     "samples_clustering_pipeline": "run_samples_clustering_pipeline",
     "general_clustering_pipeline": "run_general_clustering_pipeline",
@@ -35,6 +34,3 @@ def data_cleanup():
 
 if __name__ == "__main__":
     data_cleanup()
-
-
-
