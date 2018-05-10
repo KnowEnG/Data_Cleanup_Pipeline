@@ -230,47 +230,4 @@ class CheckUtil:
 
         return phenotype_df_pxs
 
-    @staticmethod
-    def check_intersection_for_phenotype_and_user_spreadsheet(dataframe_header, phenotype_df_pxs):
-        '''
-        Checks intersection between phenotype data and user spreadsheet on each drug
 
-        Args:
-            dataframe_header: the header of dataframe as a list
-            phenotype_df_pxs: phenotype dataframe in phenotype x sample
-
-        Returns:
-            phenotype_df_pxs_trimmed: a trimmed phenotype dataframe
-
-        '''
-        # a list to store headers that has intersection between phenotype data and user spreadsheet
-        valid_samples = []
-
-        # loop through phenotype (phenotype x sample) to check header intersection between phenotype and spreadsheet
-        for column in range(0, len(phenotype_df_pxs.columns)):
-            # drops columns with NA value in phenotype dataframe
-            phenotype_df_sxp = phenotype_df_pxs.ix[:, column].to_frame().dropna(axis=0)
-            phenotype_index = list(phenotype_df_sxp.index.values)
-            # finds common headers
-            common_headers = set(phenotype_index) & set(dataframe_header)
-            cur_column_name = phenotype_df_pxs.columns[column]
-            if not common_headers:
-                logger.logging.append(
-                    "WARNING: Cannot find intersection on phenotype between user spreadsheet and "
-                    "phenotype data on column: {}. Removing it now.".format(cur_column_name))
-            elif len(common_headers) < 2:
-                logger.logging.append(
-                    "WARNING: Number of samples is too small to run further tests (Pearson, t-test) "
-                    "on column: {}. Removing it now.".format(cur_column_name))
-            else:
-                valid_samples.append(phenotype_df_pxs.columns[column])
-
-        if len(valid_samples) == 0:
-            logger.logging.append("ERROR: Cannot find any valid column in phenotype data "
-                                  "that has intersection with spreadsheet data.")
-            return None
-
-        # remove the columns that doesn't contain intersections in phenotype data
-        phenotype_df_pxs_trimmed = phenotype_df_pxs[sorted(valid_samples)]
-
-        return phenotype_df_pxs_trimmed
