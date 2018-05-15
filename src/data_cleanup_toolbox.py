@@ -7,9 +7,9 @@ import pandas
 import utils.log_util as logger
 from utils.io_util import IOUtil
 from utils.check_util import CheckUtil
-from utils.gene_mapping_util import GeneMappingUtil
 from utils.transformation_util import TransformationUtil
 from utils.common_util import CommonUtil
+from utils.spreadsheet import SpreadSheet
 
 
 class Pipelines:
@@ -39,23 +39,34 @@ class Pipelines:
             return False, logger.logging
 
         # Checks only non-negative real number appears in user spreadsheet, drop na column wise
-        user_spreadsheet_val_chked = CheckUtil.check_user_spreadsheet_data(self.user_spreadsheet_df, check_na=True,
-                                                                           check_real_number=True,
-                                                                           check_positive_number=True)
+        user_spreadsheet_val_chked = SpreadSheet.check_user_spreadsheet_data(self.user_spreadsheet_df, check_na=True,
+                                                                             check_real_number=True,
+                                                                             check_positive_number=True)
         if user_spreadsheet_val_chked is None:
             return False, logger.logging
 
         # Removes NA value and duplication on column and row name
-        user_spreadsheet_df_checked = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
+        user_spreadsheet_df_checked = SpreadSheet.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
 
         # Checks the validity of gene name to see if it can be ensemble or not
-        user_spreadsheet_df_cleaned = GeneMappingUtil.map_ensemble_gene_name(user_spreadsheet_df_checked,
-                                                                             self.run_parameters)
+        user_spreadsheet_df_cleaned, map_filtered_dedup, mapping = SpreadSheet.map_ensemble_gene_name(
+            user_spreadsheet_df_checked,
+            self.run_parameters)
         if user_spreadsheet_df_cleaned is None:
             return False, logger.logging
 
         IOUtil.write_to_file(user_spreadsheet_df_cleaned, self.run_parameters['spreadsheet_name_full_path'],
                              self.run_parameters['results_directory'], "_ETL.tsv")
+
+        # writes dedupped mapping between user_supplied_gene_name and ensemble name to a file
+        IOUtil.write_to_file(map_filtered_dedup, self.run_parameters['spreadsheet_name_full_path'],
+                             self.run_parameters['results_directory'], "_MAP.tsv", use_index=True, use_header=False)
+
+        # writes user supplied gene name along with its mapping status to a file
+        IOUtil.write_to_file(mapping, self.run_parameters['spreadsheet_name_full_path'],
+                             self.run_parameters['results_directory'],
+                             "_User_To_Ensembl.tsv", use_index=False, use_header=True)
+
         logger.logging.append(
             "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(
                 user_spreadsheet_df_cleaned.shape[0],
@@ -78,19 +89,19 @@ class Pipelines:
 
         logger.logging.append("INFO: Start to process user spreadsheet data.")
         # Checks if only non-negative real number appears in user spreadsheet and drop na column wise
-        user_spreadsheet_val_chked = CheckUtil.check_user_spreadsheet_data(self.user_spreadsheet_df,
-                                                                           dropna_colwise=True,
-                                                                           check_real_number=True,
-                                                                           check_positive_number=True)
+        user_spreadsheet_val_chked = SpreadSheet.check_user_spreadsheet_data(self.user_spreadsheet_df,
+                                                                             dropna_colwise=True,
+                                                                             check_real_number=True,
+                                                                             check_positive_number=True)
         if user_spreadsheet_val_chked is None:
             return False, logger.logging
 
         # Removes NA value and duplication on column and row name
-        user_spreadsheet_df_checked = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
+        user_spreadsheet_df_checked = SpreadSheet.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
 
         # Checks the validity of gene name to see if it can be ensemble or not
-        user_spreadsheet_df_cleaned = GeneMappingUtil.map_ensemble_gene_name(user_spreadsheet_df_checked,
-                                                                             self.run_parameters)
+        user_spreadsheet_df_cleaned, map_filtered_dedup, mapping = SpreadSheet.map_ensemble_gene_name(user_spreadsheet_df_checked,
+                                                                         self.run_parameters)
 
         if 'gg_network_name_full_path' in self.run_parameters.keys() and \
                 not CommonUtil.check_network_data_intersection(user_spreadsheet_df_cleaned.index,
@@ -103,6 +114,15 @@ class Pipelines:
         else:
             IOUtil.write_to_file(user_spreadsheet_df_cleaned, self.run_parameters['spreadsheet_name_full_path'],
                                  self.run_parameters['results_directory'], "_ETL.tsv")
+
+            # writes dedupped mapping between user_supplied_gene_name and ensemble name to a file
+            IOUtil.write_to_file(map_filtered_dedup, self.run_parameters['spreadsheet_name_full_path'],
+                                 self.run_parameters['results_directory'], "_MAP.tsv", use_index=True, use_header=False)
+
+            # writes user supplied gene name along with its mapping status to a file
+            IOUtil.write_to_file(mapping, self.run_parameters['spreadsheet_name_full_path'],
+                                 self.run_parameters['results_directory'],
+                                 "_User_To_Ensembl.tsv", use_index=False, use_header=True)
             logger.logging.append(
                 "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(
                     user_spreadsheet_df_cleaned.shape[0],
@@ -138,8 +158,8 @@ class Pipelines:
             return False, logger.logging
 
         # Imputes na value on user spreadsheet data
-        user_spreadsheet_df_imputed = TransformationUtil.impute_na(self.user_spreadsheet_df,
-                                                                   option=self.run_parameters['impute'])
+        user_spreadsheet_df_imputed = SpreadSheet.impute_na(self.user_spreadsheet_df,
+                                                            option=self.run_parameters['impute'])
         if user_spreadsheet_df_imputed is None:
             return False, logger.logging
 
@@ -149,10 +169,10 @@ class Pipelines:
         if user_spreadsheet_val_chked is None or phenotype_val_checked is None:
             return False, logger.logging
         # Removes NA value and duplication on column and row name
-        user_spreadsheet_df_checked = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
+        user_spreadsheet_df_checked = SpreadSheet.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
         # Checks the validity of gene name to see if it can be ensemble or not
-        user_spreadsheet_df_cleaned = GeneMappingUtil.map_ensemble_gene_name(user_spreadsheet_df_checked,
-                                                                             self.run_parameters)
+        user_spreadsheet_df_cleaned,map_filtered_dedup,mapping = SpreadSheet.map_ensemble_gene_name(user_spreadsheet_df_checked,
+                                                                         self.run_parameters)
         if user_spreadsheet_df_cleaned is None or phenotype_val_checked is None:
             return False, logger.logging
         # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
@@ -160,6 +180,14 @@ class Pipelines:
                              self.run_parameters['results_directory'], "_ETL.tsv")
         IOUtil.write_to_file(user_spreadsheet_df_cleaned, self.run_parameters['spreadsheet_name_full_path'],
                              self.run_parameters['results_directory'], "_ETL.tsv")
+        # writes dedupped mapping between user_supplied_gene_name and ensemble name to a file
+        IOUtil.write_to_file(map_filtered_dedup, self.run_parameters['spreadsheet_name_full_path'],
+                             self.run_parameters['results_directory'], "_MAP.tsv", use_index=True, use_header=False)
+
+        # writes user supplied gene name along with its mapping status to a file
+        IOUtil.write_to_file(mapping, self.run_parameters['spreadsheet_name_full_path'],
+                             self.run_parameters['results_directory'],
+                             "_User_To_Ensembl.tsv", use_index=False, use_header=True)
         logger.logging.append(
             "INFO: Cleaned user spreadsheet has {} row(s), {} column(s).".format(
                 user_spreadsheet_df_cleaned.shape[0],
@@ -185,9 +213,9 @@ class Pipelines:
             return False, logger.logging
 
         # Checks if user spreadsheet contains only real number and drop na column wise
-        user_spreadsheet_dropna = CheckUtil.check_user_spreadsheet_data(self.user_spreadsheet_df,
-                                                                        dropna_colwise=True,
-                                                                        check_real_number=True)
+        user_spreadsheet_dropna = SpreadSheet.check_user_spreadsheet_data(self.user_spreadsheet_df,
+                                                                          dropna_colwise=True,
+                                                                          check_real_number=True)
 
         if user_spreadsheet_dropna is None or user_spreadsheet_dropna.empty:
             logger.logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
@@ -199,7 +227,7 @@ class Pipelines:
                                                                                                    self.phenotype_df)
 
         # Removes NA value and duplication on column and row name
-        user_spreadsheet_df_cleaned = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_dropna)
+        user_spreadsheet_df_cleaned = SpreadSheet.remove_dataframe_indexer_duplication(user_spreadsheet_dropna)
         if user_spreadsheet_df_cleaned is None or phenotype_df_pxs_trimmed is None:
             return False, logger.logging
 
@@ -243,19 +271,19 @@ class Pipelines:
         logger.logging.append("INFO: Start to process user spreadsheet data.")
 
         # Checks if user spreadsheet contains na value and only real number
-        user_spreadsheet_df_val_check = CheckUtil.check_user_spreadsheet_data(self.user_spreadsheet_df,
-                                                                              check_na=True,
-                                                                              dropna_colwise=True,
-                                                                              check_real_number=True)
+        user_spreadsheet_df_val_check = SpreadSheet.check_user_spreadsheet_data(self.user_spreadsheet_df,
+                                                                                check_na=True,
+                                                                                dropna_colwise=True,
+                                                                                check_real_number=True)
         if user_spreadsheet_df_val_check is None:
             return False, logger.logging
 
-        user_spreadsheet_df_rm_na_header = TransformationUtil.remove_na_header(user_spreadsheet_df_val_check)
+        user_spreadsheet_df_rm_na_header = SpreadSheet.remove_na_header(user_spreadsheet_df_val_check)
         if user_spreadsheet_df_rm_na_header is None:
             return False, logger.logging
 
         # Removes NA value and duplication on column and row name
-        user_spreadsheet_df_cleaned = CommonUtil.remove_dataframe_indexer_duplication(user_spreadsheet_df_rm_na_header)
+        user_spreadsheet_df_cleaned = SpreadSheet.remove_dataframe_indexer_duplication(user_spreadsheet_df_rm_na_header)
         if user_spreadsheet_df_cleaned is None:
             return False, logger.logging
 
@@ -300,7 +328,7 @@ class Pipelines:
             self.run_parameters['pasted_gene_list_full_path'], self.pasted_gene_df.shape[0]))
 
         # Removes nan index rows
-        input_small_genes_df = TransformationUtil.remove_na_index(self.pasted_gene_df)
+        input_small_genes_df = SpreadSheet.remove_na_index(self.pasted_gene_df)
 
         # casting index to String type
         input_small_genes_df.index = input_small_genes_df.index.map(str)
@@ -375,8 +403,8 @@ class Pipelines:
             return False, logger.logging
 
         # Imputes na value on user spreadsheet data
-        user_spreadsheet_df_imputed = TransformationUtil.impute_na(self.user_spreadsheet_df,
-                                                                   option=self.run_parameters['impute'])
+        user_spreadsheet_df_imputed = SpreadSheet.impute_na(self.user_spreadsheet_df,
+                                                            option=self.run_parameters['impute'])
         if user_spreadsheet_df_imputed is None:
             return False, logger.logging
 
@@ -423,13 +451,13 @@ class Pipelines:
             return False, logger.logging
 
         # Removes NA index for both signature data and user spreadsheet data
-        signature_df = TransformationUtil.remove_na_index(self.signature_df)
-        user_spreadsheet_df = TransformationUtil.remove_na_index(self.user_spreadsheet_df)
+        signature_df = SpreadSheet.remove_na_index(self.signature_df)
+        user_spreadsheet_df = SpreadSheet.remove_na_index(self.user_spreadsheet_df)
 
         # Checks if only real number and non-NA value appear in user spreadsheet
-        if CheckUtil.check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
-                                                 check_real_number=True,
-                                                 check_positive_number=False) is None:
+        if SpreadSheet.check_user_spreadsheet_data(user_spreadsheet_df, check_na=True,
+                                                   check_real_number=True,
+                                                   check_positive_number=False) is None:
             return False, logger.logging
 
         # Checks duplicate columns and rows in user spreadsheet data
@@ -446,7 +474,7 @@ class Pipelines:
             "INFO: Found {} intersected gene(s) between phenotype and spreadsheet data.".format(len(intersection)))
 
         # Checks number of unique value in userspread sheet equals to 2
-        if not CheckUtil.check_unique_values(user_spreadsheet_df, cnt=2):
+        if not SpreadSheet.check_unique_values(user_spreadsheet_df, cnt=2):
             logger.logging.append(
                 "ERROR: user spreadsheet data doesn't meet the requirment of having at least two unique values.")
             return False, logger.logging
