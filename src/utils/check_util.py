@@ -165,26 +165,6 @@ class CheckUtil:
         return dataframe
 
     @staticmethod
-    def check_unique_values(dataframe, cnt=0):
-        """
-        Checks unique values count per column in the input dataframe no less than the cnt value
-        Args:
-            dataframe:
-            cnt:
-
-        Returns:
-
-        """
-        for column in dataframe:
-            cur_col = dataframe[[column]].dropna(axis=0)
-
-            if not cur_col.empty:
-                count_values = cur_col[column].value_counts()
-                if count_values[count_values < cnt].size < 0:
-                    return False
-        return True
-
-    @staticmethod
     def check_phenotype_data(phenotype_df_pxs, correlation_measure):
         """
         Verifies data value for t-test and pearson separately.

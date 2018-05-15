@@ -1,43 +1,9 @@
 import utils.log_util as logger
 from utils.check_util import CheckUtil
-from utils.transformation_util import TransformationUtil
+from utils.spreadsheet import SpreadSheet
 
 
 class CommonUtil:
-    @staticmethod
-    def remove_dataframe_indexer_duplication(input_dataframe):
-        """
-        Checks the validity of user input spreadsheet data file, including duplication and nan
-
-        Args:
-            input_dataframe: user spreadsheet input file DataFrame, which is uploaded from frontend
-            run_parameters: run_file parameter dictionary
-
-        Returns:
-            flag: Boolean value indicates the status of current check
-            message: A message indicates the status of current check
-        """
-        logger.logging.append("INFO: Start to run sanity checks for input data.")
-
-        # Case 1: removes NA rows in index
-        input_dataframe_idx_na_rmd = TransformationUtil.remove_na_index(input_dataframe)
-        if input_dataframe_idx_na_rmd is None:
-            return None
-
-        # Case 2: checks the duplication on column name and removes it if exists
-        input_dataframe_col_dedup = TransformationUtil.remove_duplicate_column_name(input_dataframe_idx_na_rmd)
-        if input_dataframe_col_dedup is None:
-            return None
-
-        # Case 3: checks the duplication on gene name and removes it if exists
-        input_dataframe_genename_dedup = TransformationUtil.remove_duplicate_row_name(input_dataframe_col_dedup)
-        if input_dataframe_genename_dedup is None:
-            return None
-
-        logger.logging.append("INFO: Finished running sanity check for input data.")
-
-        return input_dataframe_genename_dedup
-
     @staticmethod
     def check_phenotype_intersection(phenotype_df, user_spreadsheet_df_header):
         '''
@@ -50,7 +16,7 @@ class CommonUtil:
         '''
         logger.logging.append("INFO: Start to pre-process phenotype data.")
 
-        phenotype_df_genename_dedup = CommonUtil.remove_dataframe_indexer_duplication(phenotype_df)
+        phenotype_df_genename_dedup = SpreadSheet.remove_dataframe_indexer_duplication(phenotype_df)
         if phenotype_df_genename_dedup is None:
             return None
 

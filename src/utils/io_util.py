@@ -1,6 +1,6 @@
 import pandas
 import utils.log_util as logger
-from utils.transformation_util import TransformationUtil
+from utils.spreadsheet import SpreadSheet
 
 class IOUtil:
     @staticmethod
@@ -30,7 +30,7 @@ class IOUtil:
                            "column(s)".format(file_path, input_df.shape[0], input_df.shape[1]))
 
             # removes rows with "NA" values (which is a valid value in Gene name)
-            input_df_wo_empty_ln = TransformationUtil.remove_empty_row(input_df)
+            input_df_wo_empty_ln = SpreadSheet.remove_empty_row(input_df)
             if input_df_wo_empty_ln is None or input_df_wo_empty_ln.empty:
                 logger.logging.append(
                     "ERROR: Input data {} becomes empty after removing empty row. Please provide a valid input data.".format(
