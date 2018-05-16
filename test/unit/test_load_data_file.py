@@ -3,11 +3,14 @@ import os
 import pandas as pd
 import numpy.testing as npytest
 import shutil
-import data_cleanup_toolbox as data_cln
+from utils.io_util import IOUtil
+import utils.log_util as logger
 
 
 class TestLoad_data_file(unittest.TestCase):
     def setUp(self):
+        logger.init()
+
         self.run_dir = "./run_file"
         self.user_spreadsheet = "user_spreadsheet.tsv"
         self.spreadsheet_path = self.run_dir + "/" + self.user_spreadsheet
@@ -36,14 +39,16 @@ class TestLoad_data_file(unittest.TestCase):
 
     def test_load_data_file(self):
         self.createFile(self.run_dir, self.user_spreadsheet, self.f_context)
-        ret_df = data_cln.load_data_file(self.spreadsheet_path)
+        ret_df = IOUtil.load_data_file(self.spreadsheet_path)
         npytest.assert_array_equal(self.golden_output, ret_df)
         shutil.rmtree(self.run_dir)
 
     def test_load_data_file_with_execption(self):
-        ret_df = data_cln.load_data_file("./file_not_exist")
+        ret_df = IOUtil.load_data_file("./file_not_exist")
         self.assertEqual(None, ret_df)
+
 
 
 if __name__ == '__main__':
     unittest.main()
+

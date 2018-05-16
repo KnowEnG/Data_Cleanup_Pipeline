@@ -1,9 +1,12 @@
 import unittest
-import data_cleanup_toolbox as data_cln
 import os
+import utils.log_util as logger
+from data_cleanup_toolbox import Pipelines
+
 
 class TestRun_gene_prioritization_pipeline(unittest.TestCase):
     def setUp(self):
+        logger.init()
         self.run_parameters = {
             "spreadsheet_name_full_path": "../../data/spreadsheets/TEST_1_gene_expression_real_number.tsv",
             "phenotype_name_full_path": "../../data/spreadsheets/TEST_1_phenotype_pearson.tsv",
@@ -34,7 +37,7 @@ class TestRun_gene_prioritization_pipeline(unittest.TestCase):
 
 
     def test_run_gene_prioritization_pipeline(self):
-        ret_flag, ret_msg = data_cln.run_gene_prioritization_pipeline(self.run_parameters)
+        ret_flag, ret_msg = Pipelines(self.run_parameters).run_gene_prioritization_pipeline()
         self.assertEqual(True, ret_flag)
 
 

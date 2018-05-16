@@ -1,10 +1,13 @@
 import unittest
 import pandas as pd
-import data_cleanup_toolbox as data_cln
+import utils.log_util as logger
+from utils.transformation_util import TransformationUtil
 
 
 class TestRemove_na_index(unittest.TestCase):
     def setUp(self):
+        logger.init()
+
         self.input_df = pd.DataFrame([[1, 2],
                                       [0, 10],
                                       [1, 9]],
@@ -36,22 +39,22 @@ class TestRemove_na_index(unittest.TestCase):
         del self.input_df_fail_na
 
     def test_remove_na_index(self):
-        ret_df = data_cln.remove_na_index(self.input_df)
+        ret_df = TransformationUtil.remove_na_index(self.input_df)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 
     def test_remove_na_index_nan(self):
-        ret_df = data_cln.remove_na_index(self.input_df_nan)
+        ret_df = TransformationUtil.remove_na_index(self.input_df_nan)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 
     def test_remove_na_index_fail_none(self):
-        ret_df = data_cln.remove_na_index(self.input_df_fail_none)
+        ret_df = TransformationUtil.remove_na_index(self.input_df_fail_none)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 
     def test_remove_na_index_fail_na(self):
-        ret_df = data_cln.remove_na_index(self.input_df_fail_na)
+        ret_df = TransformationUtil.remove_na_index(self.input_df_fail_na)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 

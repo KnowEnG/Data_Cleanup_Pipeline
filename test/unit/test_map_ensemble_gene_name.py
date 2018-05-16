@@ -2,11 +2,13 @@ import unittest
 import os
 import pandas as pd
 import numpy.testing as npytest
-import data_cleanup_toolbox as data_cln
-
+from utils.gene_mapping_util import GeneMappingUtil
+import utils.log_util as logger
 
 class TestMap_ensemble_gene_name(unittest.TestCase):
     def setUp(self):
+        logger.init()
+
         self.input_df_good = pd.DataFrame([[1, 0],
                                            [0, 0],
                                            [1, 1]],
@@ -55,7 +57,7 @@ class TestMap_ensemble_gene_name(unittest.TestCase):
         del self.output_unmapped
 
     def test_map_ensemble_gene_name_good(self):
-        ret_val = data_cln.map_ensemble_gene_name(self.input_df_good, self.run_parameters)
+        ret_val = GeneMappingUtil.map_ensemble_gene_name(self.input_df_good, self.run_parameters)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(True, ret_val_boolean)
         npytest.assert_array_equal(self.golden_output_good, ret_val)
@@ -65,12 +67,12 @@ class TestMap_ensemble_gene_name(unittest.TestCase):
         os.remove(self.output_unmapped)
 
     def test_map_ensemble_gene_name_empty_mapped(self):
-        ret_val = data_cln.map_ensemble_gene_name(self.input_df_empty_mapped, self.run_parameters)
+        ret_val = GeneMappingUtil.map_ensemble_gene_name(self.input_df_empty_mapped, self.run_parameters)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(False, ret_val_boolean)
 
     def test_map_ensemble_gene_name_bad(self):
-        ret_val = data_cln.map_ensemble_gene_name(self.input_df_bad, self.run_parameters)
+        ret_val = GeneMappingUtil.map_ensemble_gene_name(self.input_df_bad, self.run_parameters)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(True, ret_val_boolean)
 
