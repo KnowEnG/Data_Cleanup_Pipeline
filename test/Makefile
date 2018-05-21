@@ -2,6 +2,7 @@
 # Variables setup Section                                        -
 # ----------------------------------------------------------------
 SCRIPT =        ../src/data_cleanup.py
+STATIS =        ../src/data_checker.py
 RUN_DIR =       ./run_dir
 DATA_DIR =      ../data/spreadsheets
 RESULTS_DIR =   $(RUN_DIR)/results
@@ -37,6 +38,9 @@ run_pasted_gene_set_conversion:
 # ----------------------------------------------------------------
 # Small Benchmarks RUN Section                                   -
 # ----------------------------------------------------------------
+run_data_checker:
+	python3 ../src/data_checker.py -run_directory $(RUN_DIR) -run_file TEST_1_data_cleanup.yml
+
 run_data_cleaning_small:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_data_cleanup.yml
 
@@ -78,6 +82,9 @@ run_signature_analysis_pipeline:
 
 run_file_format_test:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_2_data_cleanup.yml
+
+run_status_checker:
+	python3 $(STATIS) -run_directory $(RUN_DIR) -run_file data_status.yml 
 
 # ----------------------------------------------------------------
 # - VERIFICATION TESTS RUN SECTION                                       -
