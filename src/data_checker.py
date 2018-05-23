@@ -4,19 +4,19 @@ import sys
 import utils.log_util as logger
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
 
-pipelines = [
-    "ret"
+col = [
+    "status"
 ]
 
 checks = ["check_na", "check_real_number", "check_integer", "check_positive_number", "check_binary"]
+
 
 class Checker:
     def __init__(self, run_parameters):
         self.run_parameters = run_parameters
         self.dataframe = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
             if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.out_df = pandas.DataFrame(index=pipelines, columns=checks)
-
+        self.output = pandas.DataFrame(index=checks, columns=col)
 
     def condition_check(self):
         """
@@ -37,14 +37,17 @@ class Checker:
         output.append(False if self.dataframe.isnull().values.any() else True)
         # checks if dataframe contains only real number
         output.append(False if False in self.dataframe.applymap(lambda x: isinstance(x, (int, float))).values else True)
+        # checks if dataframe contains only integer number
         output.append(False if False in self.dataframe.applymap(lambda x: isinstance(x, (int))).values else True)
-        output.append(False if False in self.dataframe.applymap(lambda x: isinstance(x, (int, float)) and x >= 0).values else True)
-        output.append(False if set(pandas.unique(self.dataframe.values.ravel())) != set([0,1]) else True)
+        # checks if dataframe contains only positive real number
+        output.append(False if False in self.dataframe.applymap(
+            lambda x: isinstance(x, (int, float)) and x >= 0).values else True)
+        # checks if dataframe is binary
+        output.append(False if set(pandas.unique(self.dataframe.values.ravel())) != set([0, 1]) else True)
 
-        out_df = pandas.DataFrame([output], index=['data_statics'], columns=checks)
-        IOUtil.write_to_file(out_df,
-            "data_statics",
-        self.run_parameters['results_directory'], "_ETL.tsv")
+        series = pandas.Series(output)
+        self.output['status'] = series.values
+        IOUtil.write_to_file(self.output, "data_statics", self.run_parameters['results_directory'], "_ETL.tsv")
 
 
 def checker():
@@ -53,7 +56,7 @@ def checker():
         run_directory, run_file = get_run_directory_and_file(sys.argv)
         run_parameters = get_run_parameters(run_directory, run_file)
         obj = Checker(run_parameters)
-        ret = obj.condition_check()
+        obj.condition_check()
 
     except Exception as err:
         logger.logging.append("ERROR: {}".format(str(err)))
