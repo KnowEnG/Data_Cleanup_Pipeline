@@ -5,10 +5,10 @@ import utils.log_util as logger
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
 
 col = [
-    "status"
+    "index", "header", "value"
 ]
 
-checks = ["check_na", "check_real_number", "check_integer", "check_positive_number", "check_binary"]
+checks = ["coantains_na", "check_real_number", "check_integer", "check_positive_number", "check_binary"]
 
 
 class Checker:
@@ -31,23 +31,29 @@ class Checker:
         Returns:
             dataframe: cleaned DataFrame
         """
-        output = []
+        self.output["index"] = Checker.checker_module(pandas.DataFrame(self.dataframe.index.values))
+        self.output["header"] = Checker.checker_module(pandas.DataFrame(self.dataframe.columns.values))
+        self.output["value"] = Checker.checker_module(dataframe=self.dataframe)
+        IOUtil.write_to_file(self.output, "data_statics", self.run_parameters['results_directory'], "_ETL.tsv")
 
+    @staticmethod
+    def checker_module(dataframe):
+        output = []
+        print(dataframe)
         # checks if dataframe contains NA value
-        output.append(False if self.dataframe.isnull().values.any() else True)
+        output.append(True if dataframe.isnull().values.any() else False)
         # checks if dataframe contains only real number
-        output.append(False if False in self.dataframe.applymap(lambda x: isinstance(x, (int, float))).values else True)
+        output.append(False if False in dataframe.applymap(lambda x: isinstance(x, (int, float))).values else True)
         # checks if dataframe contains only integer number
-        output.append(False if False in self.dataframe.applymap(lambda x: isinstance(x, (int))).values else True)
+        output.append(False if False in dataframe.applymap(lambda x: isinstance(x, (int))).values else True)
         # checks if dataframe contains only positive real number
-        output.append(False if False in self.dataframe.applymap(
+        output.append(False if False in dataframe.applymap(
             lambda x: isinstance(x, (int, float)) and x >= 0).values else True)
         # checks if dataframe is binary
-        output.append(False if set(pandas.unique(self.dataframe.values.ravel())) != set([0, 1]) else True)
+        output.append(False if set(pandas.unique(dataframe.values.ravel())) != set([0, 1]) else True)
 
         series = pandas.Series(output)
-        self.output['status'] = series.values
-        IOUtil.write_to_file(self.output, "data_statics", self.run_parameters['results_directory'], "_ETL.tsv")
+        return series.values
 
 
 def checker():
