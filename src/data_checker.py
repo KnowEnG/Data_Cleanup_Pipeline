@@ -1,6 +1,7 @@
 import pandas
 from utils.io_util import IOUtil
 import sys
+import numpy as np
 import utils.log_util as logger
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
 
@@ -8,7 +9,8 @@ col = [
     "index", "header", "value"
 ]
 
-checks = ["coantains_na", "check_real_number", "check_integer", "check_positive_number", "check_binary"]
+checks = ["coantains_na", "check_real_number", "check_integer", "check_positive_number", "check_binary",
+          "check_duplication"]
 
 
 class Checker:
@@ -39,7 +41,6 @@ class Checker:
     @staticmethod
     def checker_module(dataframe):
         output = []
-        print(dataframe)
         # checks if dataframe contains NA value
         output.append(True if dataframe.isnull().values.any() else False)
         # checks if dataframe contains only real number
@@ -51,8 +52,15 @@ class Checker:
             lambda x: isinstance(x, (int, float)) and x >= 0).values else True)
         # checks if dataframe is binary
         output.append(False if set(pandas.unique(dataframe.values.ravel())) != set([0, 1]) else True)
-
+        # checks if index/header has duplicates
+        if dataframe.shape[1] == 1:
+            output.append(True if True in dataframe.duplicated() else False)
+        elif dataframe.shape[1] == 1:
+            output.append(True if True in dataframe.duplicated() else False)
+        else:
+            output.append("NA")
         series = pandas.Series(output)
+
         return series.values
 
 
