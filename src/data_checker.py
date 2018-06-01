@@ -1,16 +1,12 @@
+import sys
 import pandas
 from utils.io_util import IOUtil
-import sys
-import numpy as np
 import utils.log_util as logger
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
 
-col = [
-    "index", "header", "value"
-]
-
-checks = ["coantains_na", "check_real_number", "check_integer", "check_positive_number", "check_binary",
-          "check_duplication"]
+checks_values = ["contains_na", "check_real_number", "check_integer",
+                 "check_positive_number", "check_binary"]
+checks_idx_header = ["contains_na", "contains_duplication"]
 
 
 class Checker:
@@ -18,7 +14,8 @@ class Checker:
         self.run_parameters = run_parameters
         self.dataframe = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
             if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.output = pandas.DataFrame(index=checks, columns=col)
+        self.output_values = pandas.DataFrame(index=checks_values)
+        self.output_idx_header = pandas.DataFrame(index=checks_idx_header)
 
     def condition_check(self):
         """
@@ -33,13 +30,27 @@ class Checker:
         Returns:
             dataframe: cleaned DataFrame
         """
-        self.output["index"] = Checker.checker_module(pandas.DataFrame(self.dataframe.index.values))
-        self.output["header"] = Checker.checker_module(pandas.DataFrame(self.dataframe.columns.values))
-        self.output["value"] = Checker.checker_module(dataframe=self.dataframe)
-        IOUtil.write_to_file(self.output, "data_statics", self.run_parameters['results_directory'], "_ETL.tsv")
+        self.output_idx_header["index"] = Checker.check_index_header(pandas.DataFrame(self.dataframe.index.values))
+        self.output_idx_header["header"] = Checker.check_index_header(pandas.DataFrame(self.dataframe.columns.values))
+        self.output_values["value"] = Checker.check_values(dataframe=self.dataframe)
+        IOUtil.write_to_file(self.output_values, "data_statics_values", self.run_parameters['results_directory'],
+                             "_ETL.tsv")
+        IOUtil.write_to_file(self.output_idx_header, "data_statics_index_header",
+                             self.run_parameters['results_directory'], "_ETL.tsv")
 
     @staticmethod
-    def checker_module(dataframe):
+    def check_index_header(dataframe):
+        output = []
+        # checks if dataframe contains NA value
+        output.append(True if dataframe.isnull().values.any() else False)
+        # checks if index/header has duplicates
+        output.append(True if True in dataframe.duplicated() else False)
+        series = pandas.Series(output)
+
+        return series.values
+
+    @staticmethod
+    def check_values(dataframe):
         output = []
         # checks if dataframe contains NA value
         output.append(True if dataframe.isnull().values.any() else False)
@@ -52,13 +63,7 @@ class Checker:
             lambda x: isinstance(x, (int, float)) and x >= 0).values else True)
         # checks if dataframe is binary
         output.append(False if set(pandas.unique(dataframe.values.ravel())) != set([0, 1]) else True)
-        # checks if index/header has duplicates
-        if dataframe.shape[1] == 1:
-            output.append(True if True in dataframe.duplicated() else False)
-        elif dataframe.shape[1] == 1:
-            output.append(True if True in dataframe.duplicated() else False)
-        else:
-            output.append("NA")
+
         series = pandas.Series(output)
 
         return series.values
