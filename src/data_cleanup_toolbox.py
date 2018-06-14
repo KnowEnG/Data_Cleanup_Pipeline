@@ -525,9 +525,9 @@ class Pipelines:
             return False, logger.logging
 
         IOUtil.write_to_file(self.Pvalue_gene_phenotype, self.run_parameters['Pvalue_gene_phenotype_full_path'],
-                             self.run_parameters['results_directory'], ".tsv")
+                             self.run_parameters['results_directory'], "_ETL.tsv")
         IOUtil.write_to_file(self.Pvalue_gene_phenotype, self.run_parameters['expression_sample_full_path'],
-                             self.run_parameters['results_directory'], ".tsv")
+                             self.run_parameters['results_directory'], "_ETL.tsv")
         IOUtil.write_to_file(self.Pvalue_gene_phenotype, self.run_parameters['TFexpression_full_path'],
-                             self.run_parameters['results_directory'], ".tsv", use_header=False)
-
+                             self.run_parameters['results_directory'], "_ETL.tsv", use_header=False)
+        return True, logger.logging
