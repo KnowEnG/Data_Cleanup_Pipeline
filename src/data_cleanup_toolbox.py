@@ -19,7 +19,7 @@ class Pipelines:
             if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
         self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
             if 'phenotype_name_full_path' in self.run_parameters.keys() else None
-        self.pasted_gene_df = IOUtil.load_pasted_gene_list(self.run_parameters['pasted_gene_list_full_path']) \
+        self.pasted_gene_df = IOUtil.load_data_file_wo_remove_empty_line(self.run_parameters['pasted_gene_list_full_path']) \
             if "pasted_gene_list_full_path" in self.run_parameters.keys() else None
         self.signature_df = IOUtil.load_data_file(self.run_parameters['signature_name_full_path']) \
             if "signature_name_full_path" in self.run_parameters.keys() else None
@@ -27,7 +27,7 @@ class Pipelines:
             if "Pvalue_gene_phenotype_full_path" in self.run_parameters.keys() else None
         self.expression_sample = IOUtil.load_data_file(self.run_parameters['expression_sample_full_path']) \
             if "expression_sample_full_path" in self.run_parameters.keys() else None
-        self.TFexpression = IOUtil.load_data_file(self.run_parameters['TFexpression_full_path']) \
+        self.TFexpression = IOUtil.load_data_file_wo_remove_empty_line(self.run_parameters['TFexpression_full_path']) \
             if "TFexpression_full_path" in self.run_parameters.keys() else None
 
     def run_geneset_characterization_pipeline(self):
@@ -365,7 +365,7 @@ class Pipelines:
                              use_header=True)
 
         # Reads the univeral_gene_list
-        universal_genes_df = IOUtil.load_pasted_gene_list(self.run_parameters['temp_redis_vector'])
+        universal_genes_df = IOUtil.load_data_file_wo_remove_empty_line(self.run_parameters['temp_redis_vector'])
         if universal_genes_df is None:
             return False, logger.logging
 

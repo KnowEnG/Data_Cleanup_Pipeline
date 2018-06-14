@@ -1,14 +1,7 @@
-Pvalue_gene_phenotype_full_path: ../data/spreadsheets/GDSC_Expression_ensembl.tsv
-expression_sample_full_path:   ../data/spreadsheets/GDSC_drug_cpd_ic50_sample.tsv
-TFexpression_full_path:   ../data/spreadsheets/GDSC_drug_cpd_ic50_sample.tsv
-results_directory:          ../data/
+expression_sample_full_path:      ../data/spreadsheets/TEST_1_gene_expression.tsv
+Pvalue_gene_phenotype_full_path:  ../data/spreadsheets/Pvalue_gene_phenotype_interest.tsv
+TFexpression_full_path:           ../data/spreadsheets/TF_Ensemble.tsv
 
-taxonid:                    '9606'                      # taxon id of a given gene name
-source_hint:                ''                          # hint of looking up ensembl name in Redis database
-pipeline_type:              gene_prioritization_pipeline # pipeline name
-impute:                     average
+pipeline_type:              simplified_inpherno_pipeline # pipeline name
 
-redis_credential:                                       # knoweng Redis database credentials
-                            host: knowredis.knoweng.org
-                            password: KnowEnG
-                            port: 6379
+results_directory:          ./run_dir/results

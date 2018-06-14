@@ -11,7 +11,8 @@ SELECT = {
     "phenotype_prediction_pipeline": "run_phenotype_prediction_pipeline",
     "pasted_gene_set_conversion": "run_pasted_gene_set_conversion",
     "feature_prioritization_pipeline": "run_feature_prioritization_pipeline",
-    "signature_analysis_pipeline": "run_signature_analysis_pipeline"
+    "signature_analysis_pipeline": "run_signature_analysis_pipeline",
+    "simplified_inpherno_pipeline": "run_simplified_inpherno_pipeline"
 }
 
 

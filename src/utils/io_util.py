@@ -47,9 +47,10 @@ class IOUtil:
             logger.logging.append("ERROR: {}".format(str(err)))
             return None
 
+    #load_pasted_gene_list
 
     @staticmethod
-    def load_pasted_gene_list(file_path):
+    def load_data_file_wo_remove_empty_line(file_path):
         """
         Loads user uploaded pasted gene list file as a DataFrame object.
 
