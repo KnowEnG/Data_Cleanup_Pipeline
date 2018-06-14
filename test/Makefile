@@ -83,6 +83,9 @@ run_signature_analysis_pipeline:
 run_file_format_test:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_2_data_cleanup.yml
 
+run_simplified_inpherno_pipeline:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_simplified_inpherno_pipeline.yml
+
 run_status_checker:
 	python3 $(STATIS) -run_directory $(RUN_DIR) -run_file data_status.yml 
 
