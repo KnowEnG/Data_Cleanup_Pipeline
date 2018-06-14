@@ -117,7 +117,7 @@ class SpreadSheet:
         output_df_mapped = dataframe[~dataframe.index.str.contains(r'^unmapped.*$')]
         if output_df_mapped.empty:
             logger.logging.append("ERROR: No valid ensemble name can be found.")
-            return None
+            return None, None, None
 
         # removes the temporary added column to keep original shape
         output_df_mapped = output_df_mapped.drop('user_supplied_gene_name', axis=1)

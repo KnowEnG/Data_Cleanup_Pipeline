@@ -1,8 +1,7 @@
 import unittest
-import os
 import pandas as pd
 import numpy.testing as npytest
-from utils.gene_mapping_util import GeneMappingUtil
+from utils.spreadsheet import SpreadSheet
 import utils.log_util as logger
 
 class TestMap_ensemble_gene_name(unittest.TestCase):
@@ -21,7 +20,7 @@ class TestMap_ensemble_gene_name(unittest.TestCase):
                                          index=['ENSG00000000003', "ENSG00000000457", 'S00000005'],
                                          columns=['a', 'b'])
 
-        self.input_df_empty_mapped = pd.DataFrame([[1, 0],
+        self.input_df_cannot_map = pd.DataFrame([[1, 0],
                                                    [0, 0],
                                                    [1, 1]],
                                                   index=['000000003', "000457", 'S00000005'],
@@ -39,7 +38,6 @@ class TestMap_ensemble_gene_name(unittest.TestCase):
         }
 
         self.output_mapping = "./example_MAP.tsv"
-        self.output_unmapped = "./example_User_To_Ensembl.tsv"
 
         self.golden_output_good = pd.DataFrame([[1, 0],
                                                 [0, 0],
@@ -50,36 +48,30 @@ class TestMap_ensemble_gene_name(unittest.TestCase):
     def tearDown(self):
         del self.input_df_good
         del self.input_df_bad
-        del self.input_df_empty_mapped
+        del self.input_df_cannot_map
         del self.run_parameters
         del self.golden_output_good
-        del self.output_mapping
-        del self.output_unmapped
-
-    def test_map_ensemble_gene_name_good(self):
-        ret_val = GeneMappingUtil.map_ensemble_gene_name(self.input_df_good, self.run_parameters)
-        ret_val_boolean = True if ret_val is not None else False
-        self.assertEqual(True, ret_val_boolean)
-        npytest.assert_array_equal(self.golden_output_good, ret_val)
-
-        # clean up files
-        os.remove(self.output_mapping)
-        os.remove(self.output_unmapped)
 
     def test_map_ensemble_gene_name_empty_mapped(self):
-        ret_val = GeneMappingUtil.map_ensemble_gene_name(self.input_df_empty_mapped, self.run_parameters)
-        ret_val_boolean = True if ret_val is not None else False
+        ret_df_mapped_dedup, map_filtered_dedup, mapping = SpreadSheet.map_ensemble_gene_name(self.input_df_cannot_map,
+                                                                                              self.run_parameters)
+        ret_val_boolean = True if ret_df_mapped_dedup is not None else False
         self.assertEqual(False, ret_val_boolean)
 
-    def test_map_ensemble_gene_name_bad(self):
-        ret_val = GeneMappingUtil.map_ensemble_gene_name(self.input_df_bad, self.run_parameters)
-        ret_val_boolean = True if ret_val is not None else False
+    '''
+    def test_map_ensemble_gene_name_good(self):
+        ret_df_mapped_dedup, map_filtered_dedup, mapping = SpreadSheet.map_ensemble_gene_name(self.input_df_good, self.run_parameters)
+        ret_val_boolean = True if ret_df_mapped_dedup is not None else False
         self.assertEqual(True, ret_val_boolean)
+        npytest.assert_array_equal(self.golden_output_good, ret_df_mapped_dedup)
 
-        # clean up files
-        os.remove(self.output_mapping)
-        os.remove(self.output_unmapped)
 
+
+    def test_map_ensemble_gene_name_bad(self):
+        ret_df_mapped_dedup, map_filtered_dedup, mapping = SpreadSheet.map_ensemble_gene_name(self.input_df_bad, self.run_parameters)
+        ret_val_boolean = True if ret_df_mapped_dedup is not None else False
+        self.assertEqual(True, ret_val_boolean)
+    '''
 
 if __name__ == '__main__':
     unittest.main()
