@@ -205,14 +205,13 @@ class Pipelines:
 
     def run_phenotype_prediction_pipeline(self):
         """
-            Runs data cleaning for phenotype_prediction_pipeline.
+        Runs data cleaning for phenotype_prediction_pipeline.
 
-            Args:
-                NA.
-
-            Returns:
-                validation_flag: Boolean type value indicating if input data is valid or not.
-                message: A message indicates the status of current check.
+        Args:
+            NA.
+        Returns:
+            validation_flag: Boolean type value indicating if input data is valid or not.
+            message: A message indicates the status of current check.
         """
         # spreadsheet dimension: sample x phenotype, phenotype dimension : sample x phenotype
         if self.user_spreadsheet_df is None or self.phenotype_df is None:
@@ -254,21 +253,21 @@ class Pipelines:
 
     def run_general_clustering_pipeline(self):
         """
-            Runs data cleaning for general_clustering_pipeline.
+        Runs data cleaning for general_clustering_pipeline.
 
-            Args:
-                NA.
+        Args:
+            NA.
 
-            Returns:
-                validation_flag: Boolean type value indicating if input data is valid or not.
-                message: A message indicates the status of current check.
+        Returns:
+            validation_flag: Boolean type value indicating if input data is valid or not.
+            message: A message indicates the status of current check.
         """
         if self.user_spreadsheet_df is None:
             return False, logger.logging
 
         # Checks intersection between user spreadsheet data and phenotype data
         phenotype_df_cleaned = None
-        if self.phenotype_df is not None:
+        if self.phenotye_df is not None:
             phenotype_df_cleaned = CommonUtil.check_phenotype_intersection(self.phenotype_df,
                                                                            self.user_spreadsheet_df.columns.values)
             if phenotype_df_cleaned is None:
@@ -444,14 +443,14 @@ class Pipelines:
 
     def run_signature_analysis_pipeline(self):
         """
-           Runs data cleaning for signature_analysis_pipeline.
+        Runs data cleaning for signature_analysis_pipeline.
 
-           Args:
-                NA.
-                
-           Returns:
-               validation_flag: Boolean type value indicating if input data is valid or not.
-               message: A message indicates the status of current check.
+        Args:
+             NA.
+
+        Returns:
+            validation_flag: Boolean type value indicating if input data is valid or not.
+            message: A message indicates the status of current check.
         """
         if self.signature_df is None or self.user_spreadsheet_df is None:
             return False, logger.logging
@@ -513,6 +512,16 @@ class Pipelines:
 
 
     def run_simplified_inpherno_pipeline(self):
+        """
+        Runs data cleaning for simplified_inpherno_pipeline.
+
+        Args:
+            NA.
+
+        Returns:
+            validation_flag: Boolean type value indicating if input data is valid or not.
+            message: A message indicates the status of current check.
+        """
         if self.Pvalue_gene_phenotype is None or self.expression_sample is None or self.TFexpression is None:
             return False, logger.logging
         if SpreadSheet.check_user_spreadsheet_data(self.Pvalue_gene_phenotype, check_real_number=True) is None:
