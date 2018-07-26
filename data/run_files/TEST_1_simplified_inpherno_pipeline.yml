@@ -1,0 +1,7 @@
+expression_sample_full_path:      ../data/spreadsheets/TEST_1_gene_expression.tsv
+Pvalue_gene_phenotype_full_path:  ../data/spreadsheets/Pvalue_gene_phenotype_interest.tsv
+TFexpression_full_path:           ../data/spreadsheets/TF_Ensemble.tsv
+
+pipeline_type:              simplified_inpherno_pipeline # pipeline name
+
+results_directory:          ./run_dir/results

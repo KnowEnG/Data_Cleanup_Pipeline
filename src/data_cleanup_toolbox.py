@@ -19,10 +19,16 @@ class Pipelines:
             if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
         self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
             if 'phenotype_name_full_path' in self.run_parameters.keys() else None
-        self.pasted_gene_df = IOUtil.load_pasted_gene_list(self.run_parameters['pasted_gene_list_full_path']) \
+        self.pasted_gene_df = IOUtil.load_data_file_wo_remove_empty_line(self.run_parameters['pasted_gene_list_full_path']) \
             if "pasted_gene_list_full_path" in self.run_parameters.keys() else None
         self.signature_df = IOUtil.load_data_file(self.run_parameters['signature_name_full_path']) \
             if "signature_name_full_path" in self.run_parameters.keys() else None
+        self.Pvalue_gene_phenotype = IOUtil.load_data_file(self.run_parameters['Pvalue_gene_phenotype_full_path']) \
+            if "Pvalue_gene_phenotype_full_path" in self.run_parameters.keys() else None
+        self.expression_sample = IOUtil.load_data_file(self.run_parameters['expression_sample_full_path']) \
+            if "expression_sample_full_path" in self.run_parameters.keys() else None
+        self.TFexpression = IOUtil.load_data_file_wo_remove_empty_line(self.run_parameters['TFexpression_full_path']) \
+            if "TFexpression_full_path" in self.run_parameters.keys() else None
 
     def run_geneset_characterization_pipeline(self):
         """
@@ -199,14 +205,13 @@ class Pipelines:
 
     def run_phenotype_prediction_pipeline(self):
         """
-            Runs data cleaning for phenotype_prediction_pipeline.
+        Runs data cleaning for phenotype_prediction_pipeline.
 
-            Args:
-                NA.
-
-            Returns:
-                validation_flag: Boolean type value indicating if input data is valid or not.
-                message: A message indicates the status of current check.
+        Args:
+            NA.
+        Returns:
+            validation_flag: Boolean type value indicating if input data is valid or not.
+            message: A message indicates the status of current check.
         """
         # spreadsheet dimension: sample x phenotype, phenotype dimension : sample x phenotype
         if self.user_spreadsheet_df is None or self.phenotype_df is None:
@@ -248,21 +253,21 @@ class Pipelines:
 
     def run_general_clustering_pipeline(self):
         """
-            Runs data cleaning for general_clustering_pipeline.
+        Runs data cleaning for general_clustering_pipeline.
 
-            Args:
-                NA.
+        Args:
+            NA.
 
-            Returns:
-                validation_flag: Boolean type value indicating if input data is valid or not.
-                message: A message indicates the status of current check.
+        Returns:
+            validation_flag: Boolean type value indicating if input data is valid or not.
+            message: A message indicates the status of current check.
         """
         if self.user_spreadsheet_df is None:
             return False, logger.logging
 
         # Checks intersection between user spreadsheet data and phenotype data
         phenotype_df_cleaned = None
-        if self.phenotype_df is not None:
+        if self.phenotye_df is not None:
             phenotype_df_cleaned = CommonUtil.check_phenotype_intersection(self.phenotype_df,
                                                                            self.user_spreadsheet_df.columns.values)
             if phenotype_df_cleaned is None:
@@ -359,7 +364,7 @@ class Pipelines:
                              use_header=True)
 
         # Reads the univeral_gene_list
-        universal_genes_df = IOUtil.load_pasted_gene_list(self.run_parameters['temp_redis_vector'])
+        universal_genes_df = IOUtil.load_data_file_wo_remove_empty_line(self.run_parameters['temp_redis_vector'])
         if universal_genes_df is None:
             return False, logger.logging
 
@@ -438,14 +443,14 @@ class Pipelines:
 
     def run_signature_analysis_pipeline(self):
         """
-           Runs data cleaning for signature_analysis_pipeline.
+        Runs data cleaning for signature_analysis_pipeline.
 
-           Args:
-                NA.
-                
-           Returns:
-               validation_flag: Boolean type value indicating if input data is valid or not.
-               message: A message indicates the status of current check.
+        Args:
+             NA.
+
+        Returns:
+            validation_flag: Boolean type value indicating if input data is valid or not.
+            message: A message indicates the status of current check.
         """
         if self.signature_df is None or self.user_spreadsheet_df is None:
             return False, logger.logging
@@ -503,4 +508,35 @@ class Pipelines:
             logger.logging.append(
                 "INFO: Cleaned phenotype data has {} row(s), {} column(s).".format(signature_df.shape[0],
                                                                                    signature_df.shape[1]))
+        return True, logger.logging
+
+
+    def run_simplified_inpherno_pipeline(self):
+        """
+        Runs data cleaning for simplified_inpherno_pipeline.
+
+        Args:
+            NA.
+
+        Returns:
+            validation_flag: Boolean type value indicating if input data is valid or not.
+            message: A message indicates the status of current check.
+        """
+        if self.Pvalue_gene_phenotype is None or self.expression_sample is None or self.TFexpression is None:
+            return False, logger.logging
+        if SpreadSheet.check_user_spreadsheet_data(self.Pvalue_gene_phenotype, check_real_number=True) is None:
+            return False, logger.logging
+
+        if SpreadSheet.check_user_spreadsheet_data(self.expression_sample, check_real_number=True) is None:
+            return False, logger.logging
+
+        if SpreadSheet.check_user_spreadsheet_data(self.TFexpression, check_real_number=True, check_na=True) is None:
+            return False, logger.logging
+
+        IOUtil.write_to_file(self.Pvalue_gene_phenotype, self.run_parameters['Pvalue_gene_phenotype_full_path'],
+                             self.run_parameters['results_directory'], "_ETL.tsv")
+        IOUtil.write_to_file(self.Pvalue_gene_phenotype, self.run_parameters['expression_sample_full_path'],
+                             self.run_parameters['results_directory'], "_ETL.tsv")
+        IOUtil.write_to_file(self.Pvalue_gene_phenotype, self.run_parameters['TFexpression_full_path'],
+                             self.run_parameters['results_directory'], "_ETL.tsv", use_header=False)
         return True, logger.logging

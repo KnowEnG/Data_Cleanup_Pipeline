@@ -128,6 +128,16 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   2. for pearson test, contains only real value or NaN.
 
 
+### simplified_inpherno_pipeline
+  * After removing empty rows and columns, check if a expression_sample data:
+  1. contains only real value.
+  * After removing empty rows and columns, check if a Pvalue_gene_phenotype data:
+  1. contains only real value.
+  * After removing empty rows and columns, check if a TFexpression data:
+  1. contains only real value.
+  2. contains no NA value.
+
+
 * * * 
 ## How to run this pipeline with our data
 * * * 
@@ -277,3 +287,4 @@ Input file after Extract Transform Load (cleaning)
 | abcd_iffe              | unmapped-none   |
 |...                     |...              |
 | abdcefg_hijk           | unmapped-none   |
+

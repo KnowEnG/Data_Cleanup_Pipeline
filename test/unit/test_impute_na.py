@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 import numpy.testing as npytest
-from utils.transformation_util import TransformationUtil
+from utils.spreadsheet import SpreadSheet
 import utils.log_util as logger
 
 
@@ -29,15 +29,15 @@ class TestImpute_na(unittest.TestCase):
         del self.input_df
 
     def test_impute_na_average(self):
-        ret = TransformationUtil.impute_na(self.input_df, "average")
+        ret = SpreadSheet.impute_na(self.input_df, "average")
         npytest.assert_array_equal(self.golden_output_average, ret)
 
     def test_impute_na_remove(self):
-        ret = TransformationUtil.impute_na(self.input_df, "remove")
+        ret = SpreadSheet.impute_na(self.input_df, "remove")
         npytest.assert_array_equal(self.golden_output_remove, ret)
 
     def test_impute_na_bad_option(self):
-        ret = TransformationUtil.impute_na(self.input_df, "bad")
+        ret = SpreadSheet.impute_na(self.input_df, "bad")
         npytest.assert_array_equal(self.input_df, ret)
 
 

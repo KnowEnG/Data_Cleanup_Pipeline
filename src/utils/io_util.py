@@ -19,8 +19,14 @@ class IOUtil:
             return None
 
         try:
+            # loads the header
+            header_df = pandas.read_csv(file_path, sep='\t',  nrows=1, header=None)
+            new_header = header_df.values.tolist()[0][1:]
             # loads input data
-            input_df = pandas.read_csv(file_path, sep='\t', index_col=0, header=0, mangle_dupe_cols=False, error_bad_lines=False, warn_bad_lines=True)
+            input_df = pandas.read_csv(file_path, sep='\t',  skiprows=[0], index_col=0, header=None, error_bad_lines=False, warn_bad_lines=True)
+            del input_df.index.name
+            # reassigns the new_header to input_df
+            input_df.columns = new_header
 
             # casting index and headers to String type
             input_df.index = input_df.index.map(str)
@@ -41,9 +47,10 @@ class IOUtil:
             logger.logging.append("ERROR: {}".format(str(err)))
             return None
 
+    #load_pasted_gene_list
 
     @staticmethod
-    def load_pasted_gene_list(file_path):
+    def load_data_file_wo_remove_empty_line(file_path):
         """
         Loads user uploaded pasted gene list file as a DataFrame object.
 

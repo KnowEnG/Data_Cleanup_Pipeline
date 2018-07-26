@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from utils.common_util import CommonUtil
+from utils.spreadsheet import SpreadSheet 
 import utils.log_util as logger
 
 
@@ -40,7 +40,7 @@ class TestRemove_dataframe_indexer_duplication(unittest.TestCase):
         del self.run_parameters
 
     def test_Remove_dataframe_indexer_duplication(self):
-        ret_val = CommonUtil.remove_dataframe_indexer_duplication(self.input_df_good)
+        ret_val = SpreadSheet.remove_dataframe_indexer_duplication(self.input_df_good)
         ret_val_boolean = True if ret_val is not None else False
         self.assertEqual(True, ret_val_boolean)
 

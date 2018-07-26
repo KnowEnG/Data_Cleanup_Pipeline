@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 import utils.log_util as logger
-from utils.transformation_util import TransformationUtil
+from utils.spreadsheet import SpreadSheet
 
 
 class TestRemove_na_index(unittest.TestCase):
@@ -39,22 +39,22 @@ class TestRemove_na_index(unittest.TestCase):
         del self.input_df_fail_na
 
     def test_remove_na_index(self):
-        ret_df = TransformationUtil.remove_na_index(self.input_df)
+        ret_df = SpreadSheet.remove_na_index(self.input_df)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 
     def test_remove_na_index_nan(self):
-        ret_df = TransformationUtil.remove_na_index(self.input_df_nan)
+        ret_df = SpreadSheet.remove_na_index(self.input_df_nan)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 
     def test_remove_na_index_fail_none(self):
-        ret_df = TransformationUtil.remove_na_index(self.input_df_fail_none)
+        ret_df = SpreadSheet.remove_na_index(self.input_df_fail_none)
         ret_flag = ret_df is not None
         self.assertEqual(False, ret_flag)
 
     def test_remove_na_index_fail_na(self):
-        ret_df = TransformationUtil.remove_na_index(self.input_df_fail_na)
+        ret_df = SpreadSheet.remove_na_index(self.input_df_fail_na)
         ret_flag = ret_df is not None
         self.assertEqual(True, ret_flag)
 
