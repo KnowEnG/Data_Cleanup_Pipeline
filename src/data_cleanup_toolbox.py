@@ -267,7 +267,7 @@ class Pipelines:
 
         # Checks intersection between user spreadsheet data and phenotype data
         phenotype_df_cleaned = None
-        if self.phenotye_df is not None:
+        if self.phenotype_df is not None:
             phenotype_df_cleaned = CommonUtil.check_phenotype_intersection(self.phenotype_df,
                                                                            self.user_spreadsheet_df.columns.values)
             if phenotype_df_cleaned is None:

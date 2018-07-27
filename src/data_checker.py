@@ -33,9 +33,9 @@ class Checker:
         self.output_idx_header["index"] = Checker.check_index_header(pandas.DataFrame(self.dataframe.index.values))
         self.output_idx_header["header"] = Checker.check_index_header(pandas.DataFrame(self.dataframe.columns.values))
         self.output_values["value"] = Checker.check_values(dataframe=self.dataframe)
-        IOUtil.write_to_file(self.output_values, "data_statics_values", self.run_parameters['results_directory'],
+        IOUtil.write_to_file(self.output_values, "data_statistics_values", self.run_parameters['results_directory'],
                              "_ETL.tsv")
-        IOUtil.write_to_file(self.output_idx_header, "data_statics_index_header",
+        IOUtil.write_to_file(self.output_idx_header, "data_statistics_index_header",
                              self.run_parameters['results_directory'], "_ETL.tsv")
 
     @staticmethod
