@@ -1,5 +1,5 @@
-pasted_gene_list_full_path: ../data/spreadsheets/TEST_pasted_gene_list.tsv
-temp_redis_vector:          ../data/spreadsheets/TEST_redis_retrived_universal_data.tsv
+pasted_gene_list_full_path: ../data/spreadsheets/TEST_1_pasted_gene_list.tsv
+temp_redis_vector:          ../data/spreadsheets/TEST_1_redis_retrived_universal_data.tsv
 results_directory:          ./run_dir/results
 
 pipeline_type:              pasted_gene_set_conversion  # pipeline name

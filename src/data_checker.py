@@ -12,7 +12,7 @@ checks_idx_header = ["contains_na", "contains_duplication"]
 class Checker:
     def __init__(self, run_parameters):
         self.run_parameters = run_parameters
-        self.dataframe = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
+        self.dataframe = IOUtil.load_data_file_wo_empty_line(self.run_parameters['spreadsheet_name_full_path']) \
             if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
         self.output_values = pandas.DataFrame(index=checks_values)
         self.output_idx_header = pandas.DataFrame(index=checks_idx_header)
