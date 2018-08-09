@@ -131,11 +131,14 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 ### simplified_inpherno_pipeline
   * After removing empty rows and columns, check if a expression_sample data:
   1. contains only real value.
+  2. creates gene mapping files.
   * After removing empty rows and columns, check if a Pvalue_gene_phenotype data:
   1. contains only real value.
+  2. creates gene mapping files.
   * After removing empty rows and columns, check if a TFexpression data:
   1. contains only real value.
   2. contains no NA value.
+  3. creates gene mapping files.
 
 
 * * * 
@@ -195,6 +198,7 @@ make env_setup
 | make run_phenotype_prediction_pipeline  | phenotype prediction pipeline test                                      |
 | make run_feature_prioritization_pipeline          | feature prioritization pipeline test                                      |
 | make run_signature_analysis_pipeline          | signature analysis pipeline test                                      |
+| make run_simplified_inpherno_pipeline  | simplified_inpherno_pipeline test       |
 
 * * * 
 ## How to run this pipeline with Your data

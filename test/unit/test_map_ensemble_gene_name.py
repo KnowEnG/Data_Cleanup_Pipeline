@@ -1,6 +1,5 @@
 import unittest
 import pandas as pd
-import numpy.testing as npytest
 from utils.spreadsheet import SpreadSheet
 import utils.log_util as logger
 

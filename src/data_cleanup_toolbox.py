@@ -15,19 +15,20 @@ from utils.spreadsheet import SpreadSheet
 class Pipelines:
     def __init__(self, run_parameters):
         self.run_parameters = run_parameters
-        self.user_spreadsheet_df = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
+        self.user_spreadsheet_df = IOUtil.load_data_file_wo_empty_line(self.run_parameters['spreadsheet_name_full_path']) \
             if "spreadsheet_name_full_path" in self.run_parameters.keys() else None
-        self.phenotype_df = IOUtil.load_data_file(self.run_parameters['phenotype_name_full_path']) \
+        self.phenotype_df = IOUtil.load_data_file_wo_empty_line(self.run_parameters['phenotype_name_full_path']) \
             if 'phenotype_name_full_path' in self.run_parameters.keys() else None
-        self.pasted_gene_df = IOUtil.load_data_file_wo_remove_empty_line(self.run_parameters['pasted_gene_list_full_path']) \
+        self.pasted_gene_df = IOUtil.load_data_file_default(
+            self.run_parameters['pasted_gene_list_full_path']) \
             if "pasted_gene_list_full_path" in self.run_parameters.keys() else None
-        self.signature_df = IOUtil.load_data_file(self.run_parameters['signature_name_full_path']) \
+        self.signature_df = IOUtil.load_data_file_wo_empty_line(self.run_parameters['signature_name_full_path']) \
             if "signature_name_full_path" in self.run_parameters.keys() else None
-        self.Pvalue_gene_phenotype = IOUtil.load_data_file(self.run_parameters['Pvalue_gene_phenotype_full_path']) \
+        self.Pvalue_gene_phenotype = IOUtil.load_data_file_wo_empty_line(self.run_parameters['Pvalue_gene_phenotype_full_path']) \
             if "Pvalue_gene_phenotype_full_path" in self.run_parameters.keys() else None
-        self.expression_sample = IOUtil.load_data_file(self.run_parameters['expression_sample_full_path']) \
+        self.expression_sample = IOUtil.load_data_file_wo_empty_line(self.run_parameters['expression_sample_full_path']) \
             if "expression_sample_full_path" in self.run_parameters.keys() else None
-        self.TFexpression = IOUtil.load_data_file_wo_remove_empty_line(self.run_parameters['TFexpression_full_path']) \
+        self.TFexpression = IOUtil.load_data_file_wo_header(self.run_parameters['TFexpression_full_path']) \
             if "TFexpression_full_path" in self.run_parameters.keys() else None
 
     def run_geneset_characterization_pipeline(self):
@@ -106,8 +107,9 @@ class Pipelines:
         user_spreadsheet_df_checked = SpreadSheet.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
 
         # Checks the validity of gene name to see if it can be ensemble or not
-        user_spreadsheet_df_cleaned, map_filtered_dedup, mapping = SpreadSheet.map_ensemble_gene_name(user_spreadsheet_df_checked,
-                                                                         self.run_parameters)
+        user_spreadsheet_df_cleaned, map_filtered_dedup, mapping = SpreadSheet.map_ensemble_gene_name(
+            user_spreadsheet_df_checked,
+            self.run_parameters)
 
         if 'gg_network_name_full_path' in self.run_parameters.keys() and \
                 not CommonUtil.check_network_data_intersection(user_spreadsheet_df_cleaned.index,
@@ -177,8 +179,9 @@ class Pipelines:
         # Removes NA value and duplication on column and row name
         user_spreadsheet_df_checked = SpreadSheet.remove_dataframe_indexer_duplication(user_spreadsheet_val_chked)
         # Checks the validity of gene name to see if it can be ensemble or not
-        user_spreadsheet_df_cleaned,map_filtered_dedup,mapping = SpreadSheet.map_ensemble_gene_name(user_spreadsheet_df_checked,
-                                                                         self.run_parameters)
+        user_spreadsheet_df_cleaned, map_filtered_dedup, mapping = SpreadSheet.map_ensemble_gene_name(
+            user_spreadsheet_df_checked,
+            self.run_parameters)
         if user_spreadsheet_df_cleaned is None or phenotype_val_checked is None:
             return False, logger.logging
         # Stores cleaned phenotype data (transposed) to a file, dimension: phenotype x sample
@@ -364,7 +367,7 @@ class Pipelines:
                              use_header=True)
 
         # Reads the univeral_gene_list
-        universal_genes_df = IOUtil.load_data_file_wo_remove_empty_line(self.run_parameters['temp_redis_vector'])
+        universal_genes_df = IOUtil.load_data_file_default(self.run_parameters['temp_redis_vector'])
         if universal_genes_df is None:
             return False, logger.logging
 
@@ -510,7 +513,6 @@ class Pipelines:
                                                                                    signature_df.shape[1]))
         return True, logger.logging
 
-
     def run_simplified_inpherno_pipeline(self):
         """
         Runs data cleaning for simplified_inpherno_pipeline.
@@ -522,21 +524,33 @@ class Pipelines:
             validation_flag: Boolean type value indicating if input data is valid or not.
             message: A message indicates the status of current check.
         """
-        if self.Pvalue_gene_phenotype is None or self.expression_sample is None or self.TFexpression is None:
-            return False, logger.logging
-        if SpreadSheet.check_user_spreadsheet_data(self.Pvalue_gene_phenotype, check_real_number=True) is None:
-            return False, logger.logging
+        output_files = ['Pvalue_gene_phenotype', 'expression_sample', 'TFexpression']
 
-        if SpreadSheet.check_user_spreadsheet_data(self.expression_sample, check_real_number=True) is None:
-            return False, logger.logging
+        for file in output_files:
+            if eval(str('self.' + file)) is None:
+                return False, logger.logging
 
-        if SpreadSheet.check_user_spreadsheet_data(self.TFexpression, check_real_number=True, check_na=True) is None:
-            return False, logger.logging
+        for file in output_files:
+            cur_data = eval(str('self.' + file))
+            if SpreadSheet.check_user_spreadsheet_data(cur_data, check_real_number=True,
+                                                       check_na=True if file is 'TFexpression' else False) is None:
+                return False, logger.logging
 
-        IOUtil.write_to_file(self.Pvalue_gene_phenotype, self.run_parameters['Pvalue_gene_phenotype_full_path'],
-                             self.run_parameters['results_directory'], "_ETL.tsv")
-        IOUtil.write_to_file(self.Pvalue_gene_phenotype, self.run_parameters['expression_sample_full_path'],
-                             self.run_parameters['results_directory'], "_ETL.tsv")
-        IOUtil.write_to_file(self.Pvalue_gene_phenotype, self.run_parameters['TFexpression_full_path'],
-                             self.run_parameters['results_directory'], "_ETL.tsv", use_header=False)
+            cur_data_cleaned, mapping_dedup, mapping = SpreadSheet.map_ensemble_gene_name(cur_data, self.run_parameters)
+
+            if cur_data_cleaned is None:
+                return False, logger.logging
+
+            IOUtil.write_to_file(cur_data_cleaned, self.run_parameters[file+'_full_path'],
+                                 self.run_parameters['results_directory'], "_ETL.tsv", use_header=False if file is 'TFexpression' else True)
+
+            # writes dedupped mapping between user_supplied_gene_name and ensemble name to a file
+            IOUtil.write_to_file(mapping_dedup, self.run_parameters[file+'_full_path'],
+                                 self.run_parameters['results_directory'], "_MAP.tsv", use_index=True, use_header=False)
+
+            # writes user supplied gene name along with its mapping status to a file
+            IOUtil.write_to_file(mapping, self.run_parameters[file+'_full_path'],
+                                 self.run_parameters['results_directory'],
+                                 "_User_To_Ensembl.tsv", use_index=False, use_header=True)
+
         return True, logger.logging
