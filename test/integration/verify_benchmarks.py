@@ -25,6 +25,7 @@ DC_options_dict = {
     'run_feature_prioritization_pipeline_t_test_replace': 'feature_prioritization_pipeline_t_test_replace',
     'run_feature_prioritization_pipeline_t_test_expand': 'feature_prioritization_pipeline_t_test_expand',
     'run_feature_prioritization_pipeline_t_test_mixed': 'feature_prioritization_pipeline_t_test_mixed',
+    'run_simplified_inpherno_pipeline': 'simplified_inpherno_pipeline',
     'run_file_format_test': 'file_format_test'}
 
 verify_root_dir = '../data/verification'

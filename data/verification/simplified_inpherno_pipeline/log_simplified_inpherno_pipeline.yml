@@ -1,0 +1,10 @@
+SUCCESS:
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_Pvalue_gene_phenotype_interest.tsv
+  with 100 row(s) and 1 column(s)'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_expr_sample.tsv
+  with 9 row(s) and 200 column(s)'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_TF_Ensemble.tsv
+  with 20 row(s) and 0 column(s)'
+- 'INFO: Mapped 100 gene(s) to ensemble name.'
+- 'INFO: Mapped 9 gene(s) to ensemble name.'
+- 'INFO: Mapped 20 gene(s) to ensemble name.'
