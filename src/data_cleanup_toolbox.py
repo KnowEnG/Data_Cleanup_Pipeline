@@ -28,7 +28,7 @@ class Pipelines:
             if "Pvalue_gene_phenotype_full_path" in self.run_parameters.keys() else None
         self.expression_sample = IOUtil.load_data_file_wo_empty_line(self.run_parameters['expression_sample_full_path']) \
             if "expression_sample_full_path" in self.run_parameters.keys() else None
-        self.TFexpression = IOUtil.load_data_file_wo_header(self.run_parameters['TFexpression_full_path']) \
+        self.TFexpression = IOUtil.load_data_file_single_column_no_header(self.run_parameters['TFexpression_full_path']) \
             if "TFexpression_full_path" in self.run_parameters.keys() else None
 
     def run_geneset_characterization_pipeline(self):

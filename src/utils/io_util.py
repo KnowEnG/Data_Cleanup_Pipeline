@@ -74,7 +74,7 @@ class IOUtil:
             return None
 
     @staticmethod
-    def load_data_file_wo_header(file_path):
+    def load_data_file_single_column_no_header(file_path):
         if not file_path or not file_path.strip() or not os.path.exists(file_path):
             logger.logging.append(
                 "ERROR: Input file path is not valid: {}. Please provide a valid input path.".format(file_path))
