@@ -154,7 +154,7 @@ class SpreadSheet:
 
     @staticmethod
     def impute_na(dataframe, option="reject"):
-        '''
+        """
         Impute NA value based on options user selected
         Args:
             dataframe: the dataframe to be imputed
@@ -165,7 +165,7 @@ class SpreadSheet:
 
         Returns:
             dataframe
-        '''
+        """
         if option == "reject":
             if dataframe.isnull().values.any():
                 logger.logging.append("ERROR: User spreadsheet contains NaN value. Rejecting this spreadsheet.")
