@@ -15,7 +15,8 @@ from utils.spreadsheet import SpreadSheet
 class Pipelines:
     def __init__(self, run_parameters):
         self.run_parameters = run_parameters
-        self.user_spreadsheet_df = IOUtil.load_data_file_wo_empty_line(self.run_parameters['spreadsheet_name_full_path']) \
+        self.user_spreadsheet_df = IOUtil.load_data_file_wo_empty_line(
+            self.run_parameters['spreadsheet_name_full_path']) \
             if 'spreadsheet_name_full_path' in self.run_parameters.keys() else None
         self.phenotype_df = IOUtil.load_data_file_wo_empty_line(self.run_parameters['phenotype_name_full_path']) \
             if 'phenotype_name_full_path' in self.run_parameters.keys() else None
@@ -24,7 +25,8 @@ class Pipelines:
             if 'pasted_gene_list_full_path' in self.run_parameters.keys() else None
         self.signature_df = IOUtil.load_data_file_wo_empty_line(self.run_parameters['signature_name_full_path']) \
             if 'signature_name_full_path' in self.run_parameters.keys() else None
-        self.Pvalue_gene_phenotype = IOUtil.load_data_file_wo_empty_line(self.run_parameters['Pvalue_gene_phenotype_full_path']) \
+        self.Pvalue_gene_phenotype = IOUtil.load_data_file_wo_empty_line(
+            self.run_parameters['Pvalue_gene_phenotype_full_path']) \
             if 'Pvalue_gene_phenotype_full_path' in self.run_parameters.keys() else None
         self.expression_sample = IOUtil.load_data_file_wo_empty_line(self.run_parameters['expression_sample_full_path']) \
             if 'expression_sample_full_path' in self.run_parameters.keys() else None
@@ -541,15 +543,20 @@ class Pipelines:
             if cur_data_cleaned is None:
                 return False, logger.logging
 
-            IOUtil.write_to_file(cur_data_cleaned, self.run_parameters[file+'_full_path'],
-                                 self.run_parameters['results_directory'], '_ETL.tsv', use_header=False if file is 'TFexpression' else True)
+            IOUtil.write_to_file(cur_data, self.run_parameters[file + '_full_path'],
+                                 self.run_parameters['results_directory'], '.tsv',
+                                 use_header=False if file is 'TFexpression' else True)
+
+            IOUtil.write_to_file(cur_data_cleaned, self.run_parameters[file + '_full_path'],
+                                 self.run_parameters['results_directory'], '_ETL.tsv',
+                                 use_header=False if file is 'TFexpression' else True)
 
             # writes dedupped mapping between user_supplied_gene_name and ensemble name to a file
-            IOUtil.write_to_file(mapping_dedup, self.run_parameters[file+'_full_path'],
+            IOUtil.write_to_file(mapping_dedup, self.run_parameters[file + '_full_path'],
                                  self.run_parameters['results_directory'], '_MAP.tsv', use_index=True, use_header=False)
 
             # writes user supplied gene name along with its mapping status to a file
-            IOUtil.write_to_file(mapping, self.run_parameters[file+'_full_path'],
+            IOUtil.write_to_file(mapping, self.run_parameters[file + '_full_path'],
                                  self.run_parameters['results_directory'],
                                  '_User_To_Ensembl.tsv', use_index=False, use_header=True)
 
