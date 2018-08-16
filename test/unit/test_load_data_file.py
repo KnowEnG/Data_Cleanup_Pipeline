@@ -39,12 +39,12 @@ class TestLoad_data_file(unittest.TestCase):
 
     def test_load_data_file(self):
         self.createFile(self.run_dir, self.user_spreadsheet, self.f_context)
-        ret_df = IOUtil.load_data_file(self.spreadsheet_path)
+        ret_df = IOUtil.load_data_file_wo_empty_line(self.spreadsheet_path)
         npytest.assert_array_equal(self.golden_output, ret_df)
         shutil.rmtree(self.run_dir)
 
     def test_load_data_file_with_execption(self):
-        ret_df = IOUtil.load_data_file("./file_not_exist")
+        ret_df = IOUtil.load_data_file_wo_empty_line("./file_not_exist")
         self.assertEqual(None, ret_df)
 
 

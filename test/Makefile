@@ -18,13 +18,16 @@ MKDIR_P =       mkdir -p
 # ----------------------------------------------------------------
 # Benchmarks setup Section                                       -
 # ----------------------------------------------------------------
-env_setup: create_run_dir copy_run_files
+env_setup: create_run_dir copy_run_files unzip_files
 
 create_run_dir:
 	$(MKDIR_P) $(RESULTS_DIR) 
 
 copy_run_files:
 	cp $(RUN_FILES_DIR)/*.yml $(RUN_DIR)
+
+unzip_files:
+	gzip -d TEST_1_expr_sample.tsv.gz
 
 # ----------------------------------------------------------------
 # Large Benchmarks RUN Section                                   -

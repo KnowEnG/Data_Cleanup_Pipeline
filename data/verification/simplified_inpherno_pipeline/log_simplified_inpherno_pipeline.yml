@@ -1,0 +1,12 @@
+SUCCESS:
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_Pvalue_gene_phenotype_interest.tsv
+  with 100 row(s) and 1 column(s)'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_expr_sample.tsv
+  with 19311 row(s) and 200 column(s)'
+- 'INFO: Successfully loaded input data: ../data/spreadsheets/TEST_1_TF_Ensemble.tsv
+  with 1544 row(s) and 0 column(s)'
+- 'INFO: Mapped 100 gene(s) to ensemble name.'
+- 'INFO: Mapped 19117 gene(s) to ensemble name.'
+- 'INFO: Unable to map 194 gene(s) to ensemble name.'
+- 'INFO: Mapped 1503 gene(s) to ensemble name.'
+- 'INFO: Unable to map 41 gene(s) to ensemble name.'

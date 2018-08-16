@@ -4,7 +4,7 @@ def init():
 
 
 def generate_logging(flag, message, path):
-    '''
+    """
     Creates logger.logging file
     Args:
         flag: a boolean value indicating if the current run is succeeded or not.
@@ -14,7 +14,7 @@ def generate_logging(flag, message, path):
     Returns:
         NA
 
-    '''
+    """
     import yaml
     if flag:
         status = "SUCCESS"

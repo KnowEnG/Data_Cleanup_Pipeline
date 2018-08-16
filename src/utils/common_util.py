@@ -6,14 +6,14 @@ from utils.spreadsheet import SpreadSheet
 class CommonUtil:
     @staticmethod
     def check_phenotype_intersection(phenotype_df, user_spreadsheet_df_header):
-        '''
+        """
         Pre-processing phenotype data. This includes checking for na index, duplicate column name and row name.
         Args:
             phenotype_df: input phenotype dataframe to be checked
 
         Returns:
             phenotype_df_genename_dedup: cleaned phenotype dataframe
-        '''
+        """
         logger.logging.append("INFO: Start to pre-process phenotype data.")
 
         phenotype_df_genename_dedup = SpreadSheet.remove_dataframe_indexer_duplication(phenotype_df)

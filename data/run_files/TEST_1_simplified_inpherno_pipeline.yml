@@ -1,7 +1,13 @@
-expression_sample_full_path:      ../data/spreadsheets/TEST_1_gene_expression.tsv
-Pvalue_gene_phenotype_full_path:  ../data/spreadsheets/Pvalue_gene_phenotype_interest.tsv
-TFexpression_full_path:           ../data/spreadsheets/TF_Ensemble.tsv
+expression_sample_full_path:      ../data/spreadsheets/TEST_1_expr_sample.tsv
+Pvalue_gene_phenotype_full_path:  ../data/spreadsheets/TEST_1_Pvalue_gene_phenotype_interest.tsv
+TFexpression_full_path:           ../data/spreadsheets/TEST_1_TF_Ensemble.tsv
 
-pipeline_type:              simplified_inpherno_pipeline # pipeline name
-
+pipeline_type:              simplified_inpherno_pipeline      # pipeline name
+taxonid:                    '9606'                            # taxon id of a given gene name
+source_hint:                ''                                # hint of looking up ensembl name in Redis database
 results_directory:          ./run_dir/results
+
+redis_credential:                                             # knoweng Redis database credentials
+                            host: knowredis.knoweng.org
+                            password: KnowEnG
+                            port: 6379
