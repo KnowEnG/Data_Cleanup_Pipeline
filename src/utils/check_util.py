@@ -177,7 +177,6 @@ class CheckUtil:
             phenotype_df_pxs: cleaned phenotype data
 
         """
-        # defines the default values that can exist in phenotype data
         if correlation_measure == 't_test':
             list_values = pandas.unique(phenotype_df_pxs.values.ravel())
             if len(list_values) < 2:

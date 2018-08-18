@@ -5,140 +5,150 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 ## Detailed cleanup steps for each pipeline
 
 ### geneset_characterization_pipeline
-  *After removing empty rows and columns, check if a spreadsheet:*
-  1. is empty. 
-  2. contains NaN value/s column wise. 
-  3. contains value 0 and 1.
-  4. gene name has NaN value. 
-  5. contains duplicate column names. 
-  6. contains duplicate row names. 
-  7. gene names can be mapped to ensemble gene name.
+  *After removing empty rows and columns for user spreadsheet data, check :*
+  1. if spreadsheet is empty, reject.
+  2. if spreadsheet contains NaN value/s, drop the corresponding columns.  
+  3. if spreadsheet contains only non-negative real value. If not, reject.
+  4. if spreadsheet contains NaN value, reject. 
+  5. if spreadsheet contains duplicate column names, remove the duplicated column.
+  6. if spreadsheet contains duplicate row names, remove the duplicated row.
+  7. if spreadsheet gene names can be mapped to ensemble gene name, then generates mapping files.
+  
   
 ### samples_clustering_pipeline
-  *After removing empty rows and columns, check if a spreadsheet:*
-  1. contains NaN value/s column wise.
-  2. contains real values (then replace with their absolute value)
-  3. gene name contains NaN value.
-  4. contains duplicate column name.
-  5. contains duplicate row name.
-  6. gene name can be mapped to ensemble gene name.
-  7. intersects  gene-gene network data (network option only) 
+  *After removing empty rows and columns for user spreadsheet data, check:*
+  1.  if spreadsheet contains NaN value/s, drop the corresponding columns.
+  2.  if spreadsheet contains only real, positive values, accept. If not, reject.
+  3.  if spreadsheet contains NaN value in gene name, remove corresponding rows.
+  4.  if spreadsheet contains duplicate column name, remove duplicate columns.
+  5.  if spreadsheet contains duplicate row name, remove duplicate rows.
+  6.  map spreadsheet gene name to ensemble name and generates mapping files.
 
-  *If the user provides with the phenotype data:*
-  *After removing empty rows and columns, check if a phenotypic spreadsheet:*
-  1. contains duplicate column name. 
-  2. contains duplicate row name. 
-  3. intersects with the genomic spreadsheet.
+  *If the user provides with the network data, check :* 
+  1. if network data is empty, reject.
+  2. if network data can not be intersected with genomic spreadsheet, reject.
+  
+  *If the user provides with the phenotype data, after removing empty rows and columns, check :*
+  3. if phenotypic data cannot be intersected with the genomic spreadsheet, reject. 
 
-  *If the user provides with the network data:* 
-  1. is empty.
-  2. intersects with genomic spreadsheet.
   
 ### gene_prioritization_pipeline
-  *After removing empty rows and columns, check if a spreadsheet:*
-  1. based on impute option user selected:
-     a. reject: reject user spreadsheet if there is NA.
-     b. average: replace NA value with mean of that row.
+  *After removing empty rows and columns for user spreadsheet data, check :*
+  1. for spreadsheet, based on impute option user selected:
+     a. reject: reject user spreadsheet if spreadsheet contain NA value.
+     b. average: replace NA value with mean of each row.
      c. remove: drop entire column which contains NA value.
   2. genomic or phenotypic data is empty. 
-  3. column contains NaN value/s.
-  4. contains real value.
-  5. contains NaN gene name in user spreadsheet.
-  6. contains duplicate column name. 
-  7. contains duplicate row name. 
-  8. gene name can be mapped to ensemble gene name.
+  3. if spreadsheet column contains NaN value/s, drop the corresponding columns.
+  4. if spreadsheet contains only real value, accept. If not, reject.
+  5. if spreadsheet contains NaN in gene name, remove corresponding rows
+  6. if spreadsheet contains duplicate column name, remove duplicate columns. 
+  7. if spreadsheet contains duplicate row name, remove duplicate rows. 
+  8. map spreadsheet gene name to ensemble name and generates mapping files.
   
-  *After removing empty rows and columns, check if a phenotypic spreadsheet:*
-  1. for every single drug:
-    1. drops NA.
-    2. intersects header with spreadsheet header, number of intersection >= 2.
-  2. for t_test:
-    a. number of categories >= 2 
-    b. number of elements per category >= 2 
-    c. expand and keep the original NAs 
-  3. for pearson t only real value or NaN
+  *After removing empty rows and columns phenotype data, check:*
+  1. for t_test, check if a phenotypic data satisfy the following conditions:
+    a. if number of unique values/categories < 2, reject.
+    b. if number of elements per category < 2, reject. 
+    c. expand the phenotypic data and keep the original NAs 
+  2. for pearson test, check if a phenotypic data contains only numeric value. If not, reject.
+  3. for every single drug:
+    1. drops NA for the current drug.
+    2. intersects header with spreadsheet. If an intersection exists, add this drug to a common list until iterate through all drugs. 
+    3. checks if the common list return by step 2 is emtpy. If it's empty, reject.
+  
   
 ### pasted_gene_list
-  *After removing empty rows and columns, check if a spreadsheet:*
-  1. input genes contains NaN value/s.
+  *After removing empty rows and columns in user spreadsheet data, check:*
+  1. if a spreadsheet input gene names contain NaN value/s, remove corresponding rows. 
   2. casts index of input genes dataframe to string type
-  3. intersects with universal genes list from redis database
+  3. retrieve gene mapping status from database and creates a status column to existing dataframe
+  4. if the dataframe from step 3 intersects with universal genes list from redis database, mark the intersected genes with value 1, else 0.
+
 
 ### general_clustering_pipeline
-  *After removing empty rows and columns, check if a spreadsheet:*
-  1. contains NaN value/s column wise.
-  2. contains real value. 
-  3. contains NaN value in gene name.
-  4. contains NaN value in header.
-  5. contains duplicate row names. 
-  6. contains duplicate column names. 
+  *After removing empty rows and columns for user spreadsheet data, check :*
+  1. if spreadsheet contains NaN value/s, drop the corresponding columns.
+  2. if spreadsheet contains real value, accept. If not, reject.
+  3. if spreadsheet contains NaN value in gene name, remove corresponding rows.
+  4. if spreadsheet contains NaN value in header, remove corresponding columns. 
+  5. if spreadsheet contains duplicate row names, remove duplicate rows.
+  6. if spreadsheet contains duplicate column names, remove duplicate columns.
   
   *If the user provides with the phenotype data:*
-  *After removing empty rows and columns, check if a phenotypic spreadsheet:*
-  1. contains duplicate column name. 
-  2. contains duplicate row name. 
-  3. intersects with the genomic spreadsheet.
+  *After removing empty rows and columns, check :*
+  1. if phenotypic spreadsheet contains duplicate column name, remove duplicate column. 
+  2. if phenotypic spreadsheet contains duplicate row name, remove duplicate row. 
+  3. if phenotypic spreadsheet intersects with the genomic spreadsheet, accept. If not, reject.
+
 
 ### signatuer_analysis_pipeline
-  *After removing empty rows and columns, check if a spreadsheet:*
-  1. contains NaN value/s column wise.
-  2. contains real value. 
-  3. contains NaN value in gene name.
-  4. contains NaN value in header.
-  5. contains duplicate row names. 
-  6. contains duplicate column names. 
-  7. contains at least two unique values per column.
-  8. gene name can be mapped to ensemble gene name.
+  *After removing empty rows and columns for user spreadsheet data, check :*
+  1. if spreadsheet contains NaN value/s, drop the corresponding columns.
+  2. if spreadsheet contains only positive, real value, accept. If not, reject. 
+  3. if spreadsheet contains duplicate row names, reject. 
+  4. if spreadsheet contains duplicate column names, reject. 
+  7. if spreadsheet contains at least two unique values per column, accpet. If not, reject.
+  8. map spreadsheet gene name to ensemble name and generates mapping files.
 
-  *After removing empty rows and columns, check if a signature data:*
-  1. intersects with spreadsheet.
+  *After removing empty rows and columns for signature data, check :*
+  1. if signature data can be intersected with spreadsheet.
 
-  *If the user provides with the network data, check if a network:*
-  1. find unique genes.
-  2. intersects with signature data and spreadsheet on genes. 
+  *If the user provides with the network data, check :*
+  1. if the unique genes in network data has intersection with signature data and spreadsheet data. 
+
 
 ### feature_prioritization_pipeline
-  *After removing empty rows and columns, check if a spreadsheet:*
+  *After removing empty rows and columns in user spreadsheet data, check :*
   1. based on impute option user selected:
      a. reject: reject user spreadsheet if there is NA.
-     b. average: replace NA value with mean of that row.
+     b. average: replace NA value with mean of each row.
      c. remove: drop entire column which contains NA value.
-  2. contains NaN value/s column wise.
-  3. contains real value. 
+  2. if a spreadsheet contains NaN value/s, drop the corresponding columns.
+  3. if a spreadsheet contains only real value, accept. If not, reject.
+  4. if correlation_meature is t_test, perform phenotype expansion 
  
-  *After removing empty rows and columns, check if a phenotypic spreadsheet:*
-  1. for t_test:
-    a. number of categories >= 2 
-    b. number of elements per category >= 2 
-    c. expand and keep the original NAs 
-  2. for pearson test, contains only real value or NaN.
+  *After removing empty rows and columns, check:*
+  1. for t_test, check if a phenotypic data satisfy the following conditions:
+    a. if number of unique values/categories < 2, reject.
+    b. if number of elements per category < 2, reject. 
+    c. expand the phenotypic data and keep the original NAs 
+  2. for pearson test, check if a phenotypic data contains only numeric value. If not, reject.
+  3. for every single drug:
+    1. drops NA for the current drug.
+    2. intersects header with spreadsheet. If an intersection exists, add this drug to a common list until iterate through all drugs. 
+    3. checks if the common list return by step 2 is emtpy. If it's empty, reject.
+
 
 ### phenotype_prediction_pipeline
-  *After removing empty rows and columns, check if a spreadsheet:*
-  1. contains NaN value/s column wise.
-  2. contains real value. 
-  3. contains NaN value in gene name.
-  4. contains NaN value in header.
-  5. contains duplicate row names. 
-  6. contains duplicate column names. 
-  7. gene name can be mapped to ensemble gene name.
+  *After removing empty rows and columns in user spreadsheet data, check :*
+  1. if spreadsheet contains NaN value/s, drop the corresponding columns.
+  2. if spreadsheet contains only real value, accept. If not, reject.
+  3. if spreadsheet contains duplicate row names, remove duplicate rows. 
+  4. if spreadsheet contains duplicate column names, remove duplicate columns. 
+  5. map spreadsheet gene name to ensemble name and generates mapping files.
  
-  *After removing empty rows and columns, check if a phenotypic spreadsheet:*
-  1. intersects with spreadsheet on phenotype.
-  2. for pearson test, contains only real value or NaN.
+  *After removing empty rows and columns in phenotype data, check :*
+  1. if phenotypic data intersects with spreadsheet on phenotype.
+  2. if phenotypic data for pearson test, contains only real value or NaN.
+  3. for every single drug:
+    1. drops NA for the current drug.
+    2. intersects header with spreadsheet. If an intersection exists, add this drug to a common list until iterate through all drugs. 
+    3. checks if the common list return by step 2 is emtpy. If it's empty, reject.
 
 
 ### simplified_inpherno_pipeline
-  * After removing empty rows and columns, check if a expression_sample data:
-  1. contains only real value.
-  2. creates gene mapping files.
-  * After removing empty rows and columns, check if a Pvalue_gene_phenotype data:
-  1. contains only real value.
-  2. creates gene mapping files.
-  * After removing empty rows and columns, check if a TFexpression data:
-  1. contains only real value.
-  2. contains no NA value.
-  3. creates gene mapping files.
+  *After removing empty rows and columns in user spreadsheet data, check :*
+  1. if expression_sample data contains only real value, accept. If not, reject.
+  2. if expression_sample data's gene name can be mapped to ensemble gene name, then generates mapping files.
+
+  *After removing empty rows and columns in Pvalue gene phenotype data, check :*
+  1. if Pvalue_gene_phenotype data contains only real value, accept. If not, reject.
+  2. if Pvalue_gene_phenotype's gene name can be mapped to ensemble gene name, then generates mapping files.
+
+  *After removing empty rows and columns in TF expression data, check :*
+  1. if TFexpression data contains only real value and doesn't contain NA, accept. If not, reject.
+  2. if TFexpression data's gene name can be mapped to ensemble gene name, then generates mapping files.
 
 
 * * * 
@@ -237,12 +247,12 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 
   * Update PYTHONPATH enviroment variable
    ``` 
-   export PYTHONPATH='../src':$PYTHONPATH    
+   export PYTHONPATH='./src':$PYTHONPATH    
    ```
    
   * Run (these relative paths assume you are in the test directory with setup as described above)
    ```
-  python3 ../src/data_cleanup.py -run_directory ./run_dir -run_file TEMPLATE_data_cleanup.yml
+  python3 ./src/data_cleanup.py -run_directory ./run_dir -run_file TEMPLATE_data_cleanup.yml
    ```
 
 * * * 
@@ -251,7 +261,7 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 
 | **Key**                    | **Value**                            | **Comments**                                      |
 | -------------------------- | ------------------------------------ | ------------------------------------------------- |
-| pipeline_type              | **gene_priorization_pipeline**, ...  | Choose pipeline cleaning type                     |
+| pipeline_type              | **gene_priorization_pipeline**, ..  | Choose pipeline cleaning type                     |
 | spreadsheet_name_full_path | directory+spreadsheet_name           | Path and file name of user genomic spreadsheet    |
 | phenotype_full_path        | directory+phenotype_data_name        | Path and file name of user phenotypic spreadsheet |
 | gg_network_name_full_path  | directory+gg_network_name            | Path and file name of user network                |
@@ -280,7 +290,7 @@ Input file after Extract Transform Load (cleaning)
 | (translated gene)      | (input gene name)    |
 | :--------------------: |:--------------------:|
 | ENS00000012345         | abc_def_er           |
-|...                     |...                   |
+|..                     |..                   |
 | ENS00000054321         | def_org_ifi          |
 
 
@@ -289,6 +299,6 @@ Input file after Extract Transform Load (cleaning)
 | (input gene name)      | (unmapped-none) |
 | :--------------------: |:---------------:|
 | abcd_iffe              | unmapped-none   |
-|...                     |...              |
+|..                     |..              |
 | abdcefg_hijk           | unmapped-none   |
 
