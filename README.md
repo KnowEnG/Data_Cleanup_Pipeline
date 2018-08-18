@@ -247,12 +247,12 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 
   * Update PYTHONPATH enviroment variable
    ``` 
-   export PYTHONPATH='./src':$PYTHONPATH    
+   export PYTHONPATH='../src':$PYTHONPATH    
    ```
    
   * Run (these relative paths assume you are in the test directory with setup as described above)
    ```
-  python3 ./src/data_cleanup.py -run_directory ./run_dir -run_file TEMPLATE_data_cleanup.yml
+  python3 ../src/data_cleanup.py -run_directory ./run_dir -run_file TEMPLATE_data_cleanup.yml
    ```
 
 * * * 
@@ -261,7 +261,7 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 
 | **Key**                    | **Value**                            | **Comments**                                      |
 | -------------------------- | ------------------------------------ | ------------------------------------------------- |
-| pipeline_type              | **gene_priorization_pipeline**, ..  | Choose pipeline cleaning type                     |
+| pipeline_type              | **gene_priorization_pipeline**, ...  | Choose pipeline cleaning type                     |
 | spreadsheet_name_full_path | directory+spreadsheet_name           | Path and file name of user genomic spreadsheet    |
 | phenotype_full_path        | directory+phenotype_data_name        | Path and file name of user phenotypic spreadsheet |
 | gg_network_name_full_path  | directory+gg_network_name            | Path and file name of user network                |
@@ -290,7 +290,7 @@ Input file after Extract Transform Load (cleaning)
 | (translated gene)      | (input gene name)    |
 | :--------------------: |:--------------------:|
 | ENS00000012345         | abc_def_er           |
-|..                     |..                   |
+|...                     |...                   |
 | ENS00000054321         | def_org_ifi          |
 
 
@@ -299,6 +299,6 @@ Input file after Extract Transform Load (cleaning)
 | (input gene name)      | (unmapped-none) |
 | :--------------------: |:---------------:|
 | abcd_iffe              | unmapped-none   |
-|..                     |..              |
+|...                     |...              |
 | abdcefg_hijk           | unmapped-none   |
 
