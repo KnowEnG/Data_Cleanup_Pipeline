@@ -68,8 +68,8 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 
 ### general_clustering_pipeline
   *After removing empty rows and columns for user spreadsheet data, check :*
-  1. if spreadsheet contains NaN value/s, drop the corresponding columns.
-  2. if spreadsheet contains real value, accept. If not, reject.
+  1.  if spreadsheet contains NaN value/s, drop the corresponding columns.
+  2.  if spreadsheet contains only real, positive values, accept. If not, reject.
   3. if spreadsheet contains NaN value in gene name, remove corresponding rows.
   4. if spreadsheet contains NaN value in header, remove corresponding columns. 
   5. if spreadsheet contains duplicate row names, remove duplicate rows.
@@ -88,8 +88,8 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   2. if spreadsheet contains only positive, real value, accept. If not, reject. 
   3. if spreadsheet contains duplicate row names, reject. 
   4. if spreadsheet contains duplicate column names, reject. 
-  7. if spreadsheet contains at least two unique values per column, accpet. If not, reject.
-  8. map spreadsheet gene name to ensemble name and generates mapping files.
+  5. if spreadsheet contains at least two unique values per column, accpet. If not, reject.
+  6. map spreadsheet gene name to ensemble name and generates mapping files.
 
   *After removing empty rows and columns for signature data, check :*
   1. if signature data can be intersected with spreadsheet.
@@ -164,12 +164,11 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 ```
  apt-get install -y python3-pip
  apt-get install -y libblas-dev liblapack-dev libatlas-base-dev gfortran
- pip3 install numpy==1.11.1
- pip3 install pandas==0.18.1
+ pip3 install numpy
+ pip3 install pandas
  pip3 install scipy==0.19.1
- pip3 install scikit-learn==0.17.1
+ pip3 install scikit-learn==0.19.2
  apt-get install -y libfreetype6-dev libxft-dev
- pip3 install matplotlib==1.4.2
  pip3 install xmlrunner
  pip3 install pyyaml
  pip3 install knpackage
