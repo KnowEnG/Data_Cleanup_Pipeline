@@ -282,9 +282,9 @@ class Pipelines:
 
         # Checks if user spreadsheet contains na value and only real number
         user_spreadsheet_df_val_check = SpreadSheet.check_user_spreadsheet_data(self.user_spreadsheet_df,
-                                                                                check_na=True,
                                                                                 dropna_colwise=True,
-                                                                                check_real_number=True)
+                                                                                check_real_number=True,
+                                                                                check_positive_number=True)
         if user_spreadsheet_df_val_check is None:
             return False, logger.logging
 
