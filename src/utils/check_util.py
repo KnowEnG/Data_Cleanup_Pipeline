@@ -167,21 +167,21 @@ class CheckUtil:
     @staticmethod
     def check_phenotype_data(phenotype_df_pxs, correlation_measure):
         """
-        Verifies data value for t-test and pearson separately.
+        Verifies data value for t-test, pearson, and edgeR separately.
 
         Args:
             phenotype_df_pxs: phenotype data
-            correlation_measure: correlation measure: pearson or t-test
+            correlation_measure: correlation measure: pearson, t-test, or edgeR
 
         Returns:
             phenotype_df_pxs: cleaned phenotype data
 
         """
-        if correlation_measure == 't_test':
+        if correlation_measure in ['t_test', 'edgeR']:
             list_values = pandas.unique(phenotype_df_pxs.values.ravel())
             if len(list_values) < 2:
                 logger.logging.append(
-                    "ERROR: t_test requests at least two categories in your phenotype dataset. "
+                    "ERROR: " + correlation_measure + " requests at least two categories in your phenotype dataset. "
                     "Please revise your phenotype data and reupload.")
                 return None
 
@@ -197,7 +197,7 @@ class CheckUtil:
                     count_values = cur_df_lowercase[column].value_counts()
                     if count_values[count_values < 2].size > 0:
                         logger.logging.append(
-                            "ERROR: t_test requires at least two unique values per category in phenotype data.")
+                            "ERROR: " + correlation_measure + " requires at least two unique values per category in phenotype data.")
                         return None
 
         if correlation_measure == 'pearson':

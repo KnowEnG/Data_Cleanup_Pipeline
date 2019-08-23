@@ -82,7 +82,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   3. if phenotypic spreadsheet intersects with the genomic spreadsheet, accept. If not, reject.
 
 
-### signatuer_analysis_pipeline
+### signature_analysis_pipeline
   *After removing empty rows and columns for user spreadsheet data, check :*
   1. if spreadsheet contains NaN value/s, drop the corresponding columns.
   2. if spreadsheet contains only positive, real value, accept. If not, reject. 
@@ -104,9 +104,10 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
      a. reject: reject user spreadsheet if there is NA.
      b. average: replace NA value with mean of each row.
      c. remove: drop entire column which contains NA value.
-  2. if a spreadsheet contains NaN value/s, drop the corresponding columns.
-  3. if a spreadsheet contains only real value, accept. If not, reject.
-  4. if correlation_meature is t_test, perform phenotype expansion 
+  2. if spreadsheet contains NaN value/s, drop the corresponding columns.
+  3. if spreadsheet contains non-real values, reject.
+  4. if correlation is edgeR and spreadsheet contains negative values, reject;
+     otherwise, accept.
  
   *After removing empty rows and columns, check:*
   1. for t_test, check if a phenotypic data satisfy the following conditions:
@@ -205,7 +206,15 @@ make env_setup
 | make run_general_clustering_pipeline          | general clustering test                                       |
 | make run_pasted_gene_list          | pasted gene list test                                      |
 | make run_phenotype_prediction_pipeline  | phenotype prediction pipeline test                                      |
-| make run_feature_prioritization_pipeline          | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_pearson          | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_t_test_binary          | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_t_test_replace         | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_t_test_expand          | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_t_test_mixed           | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_edgeR_binary           | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_edgeR_replace          | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_edgeR_expand           | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_edgeR_mixed            | feature prioritization pipeline test                                      |
 | make run_signature_analysis_pipeline          | signature analysis pipeline test                                      |
 | make run_simplified_inpherno_pipeline  | simplified_inpherno_pipeline test       |
 
@@ -268,7 +277,7 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 | redis_credential           | host, password and port              | Credential to access gene names lookup            |
 | taxonid                    | 9606                                 | Taxon id of the genes                             |
 | source_hint                | ' '                                  | Hint for lookup ensembl names                     |
-| correlation_measure        | t_test/pearson                       | Correlation measure gene prioritization pipeline  |
+| correlation_measure        | t_test/pearson/edgeR* (*FP only)     | Correlation measure gene/feature prioritization pipeline  |
 
 
 
