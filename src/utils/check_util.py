@@ -1,5 +1,7 @@
 import pandas
+
 import utils.log_util as logger
+from utils.transformation_util import TransformationUtil
 
 
 class CheckUtil:
@@ -178,27 +180,13 @@ class CheckUtil:
 
         """
         if correlation_measure in ['t_test', 'edgeR']:
-            list_values = pandas.unique(phenotype_df_pxs.values.ravel())
-            if len(list_values) < 2:
-                logger.logging.append(
-                    "ERROR: " + correlation_measure + " requests at least two categories in your phenotype dataset. "
-                    "Please revise your phenotype data and reupload.")
+            # force any string phenotypes to lowercase
+            # TODO: do we know where this requirement came from? are we sure we
+            #       want this behavior?
+            TransformationUtil.force_string_columns_to_lowercase(phenotype_df_pxs)
+            phenotype_df_pxs = TransformationUtil.encode_as_binary(phenotype_df_pxs, 2)
+            if phenotype_df_pxs.empty:
                 return None
-
-            for column in phenotype_df_pxs:
-                cur_col = phenotype_df_pxs[[column]].dropna(axis=0)
-
-                if not cur_col.empty:
-                    if cur_col[column].dtype == object:
-                        cur_df_lowercase = cur_col.apply(lambda x: x.astype(str).str.lower())
-                    else:
-                        cur_df_lowercase = cur_col
-
-                    count_values = cur_df_lowercase[column].value_counts()
-                    if count_values[count_values < 2].size > 0:
-                        logger.logging.append(
-                            "ERROR: " + correlation_measure + " requires at least two unique values per category in phenotype data.")
-                        return None
 
         if correlation_measure == 'pearson':
             if False in phenotype_df_pxs.applymap(lambda x: isinstance(x, (int, float))):
@@ -208,5 +196,3 @@ class CheckUtil:
                 return None
 
         return phenotype_df_pxs
-
-

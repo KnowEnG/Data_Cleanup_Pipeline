@@ -1,7 +1,6 @@
-sample_id	drug1
-a	1.0
-b	
-c	0.0
-d	1.0
-f	1.0
-e	0.0
+	drug1_b
+a	0.0
+c	1.0
+d	0.0
+f	0.0
+e	1.0

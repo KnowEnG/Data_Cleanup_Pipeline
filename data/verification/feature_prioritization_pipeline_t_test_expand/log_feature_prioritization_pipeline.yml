@@ -5,6 +5,7 @@ SUCCESS:
   with 10 row(s) and 1 column(s)'
 - 'WARNING: Removed 1 empty row(s).'
 - 'INFO: Start to run checks for phenotypic data.'
+- 'INFO: Expanding categoric column drug1 as indicator variables.'
 - 'INFO: Finished running checks for phenotypic data.'
 - 'INFO: Cleaned user spreadsheet has 13 row(s), 5 column(s).'
-- 'INFO: Cleaned phenotypic data has 9 row(s), 1 column(s).'
+- 'INFO: Cleaned phenotypic data has 9 row(s), 4 column(s).'
