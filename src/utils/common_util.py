@@ -51,7 +51,14 @@ class CommonUtil:
             logger.logging.append("ERROR: After drop NA, user spreadsheet data becomes empty.")
             return None, None
 
-        # Checks value of phenotype dataframe for t-test and pearson
+        # for edgeR, require non-negative values
+        if correlation_measure == 'edgeR' and (user_spreadsheet_df_chk < 0).any().any():
+            logger.logging.append("ERROR: Features spreadsheet contains negative numbers. For edgeR, " + \
+                "features spreadsheet values must be the original raw read counts from a sequencing experiment. " + \
+                "Use a different features spreadsheet or a different correlation measure.") 
+            return None, None
+
+        # Checks value of phenotype dataframe for t_test, pearson, and edgeR
         logger.logging.append("INFO: Start to run checks for phenotypic data.")
         phenotype_df_chk = CheckUtil.check_phenotype_data(phenotype_df, correlation_measure)
         if phenotype_df_chk is None:

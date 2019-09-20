@@ -30,6 +30,9 @@ def data_cleanup():
         run_pipelines(run_parameters, SELECT[run_parameters['pipeline_type']])
     except Exception as err:
         logger.logging.append("ERROR: {}".format(str(err)))
+        # try to write the log
+        logger.generate_logging(False, logger.logging,
+            run_parameters["results_directory"] + "/log_" + run_parameters["pipeline_type"] + ".yml")
         raise RuntimeError(str(err))
 
 

@@ -433,13 +433,7 @@ class Pipelines:
                 user_spreadsheet_val_chked.shape[0],
                 user_spreadsheet_val_chked.shape[1]))
 
-        if self.run_parameters['correlation_measure'] == 't_test':
-            phenotype_df = get_spreadsheet_df(self.run_parameters['phenotype_name_full_path'])
-            phenotype_output = TransformationUtil.phenotype_expander(phenotype_df)
-        else:
-            phenotype_output = phenotype_val_chked
-
-        IOUtil.write_to_file(phenotype_output, self.run_parameters['phenotype_name_full_path'],
+        IOUtil.write_to_file(phenotype_val_chked, self.run_parameters['phenotype_name_full_path'],
                              self.run_parameters['results_directory'], '_ETL.tsv')
         logger.logging.append(
             'INFO: Cleaned phenotypic data has {} row(s), {} column(s).'.format(phenotype_val_chked.shape[0],

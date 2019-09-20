@@ -34,23 +34,28 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   
 ### gene_prioritization_pipeline
   *After removing empty rows and columns for user spreadsheet data, check :*
-  1. for spreadsheet, based on impute option user selected:
-     a. reject: reject user spreadsheet if spreadsheet contain NA value.
-     b. average: replace NA value with mean of each row.
-     c. remove: drop entire column which contains NA value.
-  2. genomic or phenotypic data is empty. 
-  3. if spreadsheet column contains NaN value/s, drop the corresponding columns.
-  4. if spreadsheet contains only real value, accept. If not, reject.
-  5. if spreadsheet contains NaN in gene name, remove corresponding rows
-  6. if spreadsheet contains duplicate column name, remove duplicate columns. 
-  7. if spreadsheet contains duplicate row name, remove duplicate rows. 
-  8. map spreadsheet gene name to ensemble name and generates mapping files.
+  1. based on impute option user selected:
+     a. reject: reject user spreadsheet if it contains any missing values.
+     b. average: replace missing values with the mean value of the containing row.
+     c. remove: drop any columns with missing values.
+  2. reject if genomic or phenotypic data is empty. 
+  3. if spreadsheet contains non-real values, reject.
+  4. remove any rows whose gene names are missing.
+  5. if spreadsheet contains duplicate column name, remove duplicate columns. 
+  6. if spreadsheet contains duplicate row name, remove duplicate rows. 
+  7. map spreadsheet gene name to ensemble name and generates mapping files.
   
   *After removing empty rows and columns phenotype data, check:*
-  1. for t_test, check if a phenotypic data satisfy the following conditions:
-    a. if number of unique values/categories < 2, reject.
-    b. if number of elements per category < 2, reject. 
-    c. expand the phenotypic data and keep the original NAs 
+  1. If the correlation measure is t-test or edgeR...
+    a. Force any string phenotypes to lowercase.
+    b. Convert each phenotype to binary encoding. For each phenotype, let `num_distinct_values` be the number of distinct values, excluding NA, in the phenotype.
+        - if `num_distinct_values` < 2, drop the phenotype.
+        - if `num_distinct_values` == 2 and the two distinct values are 0 and 1, leave the phenotype unchanged.
+        - if `num_distinct_values` == 2 and the two distinct values are not 0 and 1, replace all instances of one of the distinct values with 0 and replace all instances of the other distinct value with 1. Preserve any missing values. Edit the phenotype name to indicate which of the original values is now represented by 1.
+        - if `num_distinct_values` > 2, expand the phenotype into `num_distinct_values` indicator phenotypes; any NAs will be preserved.
+    c. For each of the binary phenotypes present at the end of step 1b, count the number of samples having value 0
+       and the number of samples having value 1. If either of those counts is less than 2, drop the phenotype.
+    d. Confirm at least one phenotype remains.
   2. for pearson test, check if a phenotypic data contains only numeric value. If not, reject.
   3. for every single drug:
     1. drops NA for the current drug.
@@ -82,7 +87,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   3. if phenotypic spreadsheet intersects with the genomic spreadsheet, accept. If not, reject.
 
 
-### signatuer_analysis_pipeline
+### signature_analysis_pipeline
   *After removing empty rows and columns for user spreadsheet data, check :*
   1. if spreadsheet contains NaN value/s, drop the corresponding columns.
   2. if spreadsheet contains only positive, real value, accept. If not, reject. 
@@ -103,22 +108,27 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
   1. based on impute option user selected:
      a. reject: reject user spreadsheet if there is NA.
      b. average: replace NA value with mean of each row.
-     c. remove: drop entire column which contains NA value.
-  2. if a spreadsheet contains NaN value/s, drop the corresponding columns.
-  3. if a spreadsheet contains only real value, accept. If not, reject.
-  4. if correlation_meature is t_test, perform phenotype expansion 
+     c. remove: drop any columns with missing values.
+  2. if spreadsheet contains non-real values, reject.
+  3. if correlation is edgeR and spreadsheet contains negative values, reject;
+     otherwise, accept.
  
   *After removing empty rows and columns, check:*
-  1. for t_test, check if a phenotypic data satisfy the following conditions:
-    a. if number of unique values/categories < 2, reject.
-    b. if number of elements per category < 2, reject. 
-    c. expand the phenotypic data and keep the original NAs 
+  1. If the correlation measure is t-test or edgeR...
+    a. Force any string phenotypes to lowercase.
+    b. Convert each phenotype to binary encoding. For each phenotype, let `num_distinct_values` be the number of distinct values, excluding NA, in the phenotype.
+        - if `num_distinct_values` < 2, drop the phenotype.
+        - if `num_distinct_values` == 2 and the two distinct values are 0 and 1, leave the phenotype unchanged.
+        - if `num_distinct_values` == 2 and the two distinct values are not 0 and 1, replace all instances of one of the distinct values with 0 and replace all instances of the other distinct value with 1. Preserve any missing values. Edit the phenotype name to indicate which of the original values is now represented by 1.
+        - if `num_distinct_values` > 2, expand the phenotype into `num_distinct_values` indicator phenotypes; any NAs will be preserved.
+    c. For each of the binary phenotypes present at the end of step 1b, count the number of samples having value 0
+       and the number of samples having value 1. If either of those counts is less than 2, drop the phenotype.
+    d. Confirm at least one phenotype remains.
   2. for pearson test, check if a phenotypic data contains only numeric value. If not, reject.
-  3. for every single drug:
-    1. drops NA for the current drug.
-    2. intersects header with spreadsheet. If an intersection exists, add this drug to a common list until iterate through all drugs. 
+  3. for every single phenotype:
+    1. drops NA for the current phenotype.
+    2. intersects header with spreadsheet. If an intersection exists, add this phenotype to a common list until iterate through all phenotypes. 
     3. checks if the common list return by step 2 is emtpy. If it's empty, reject.
-
 
 ### phenotype_prediction_pipeline
   *After removing empty rows and columns in user spreadsheet data, check :*
@@ -205,7 +215,15 @@ make env_setup
 | make run_general_clustering_pipeline          | general clustering test                                       |
 | make run_pasted_gene_list          | pasted gene list test                                      |
 | make run_phenotype_prediction_pipeline  | phenotype prediction pipeline test                                      |
-| make run_feature_prioritization_pipeline          | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_pearson          | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_t_test_binary          | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_t_test_replace         | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_t_test_expand          | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_t_test_mixed           | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_edgeR_binary           | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_edgeR_replace          | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_edgeR_expand           | feature prioritization pipeline test                                      |
+| make run_feature_prioritization_pipeline_edgeR_mixed            | feature prioritization pipeline test                                      |
 | make run_signature_analysis_pipeline          | signature analysis pipeline test                                      |
 | make run_simplified_inpherno_pipeline  | simplified_inpherno_pipeline test       |
 
@@ -268,7 +286,7 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 | redis_credential           | host, password and port              | Credential to access gene names lookup            |
 | taxonid                    | 9606                                 | Taxon id of the genes                             |
 | source_hint                | ' '                                  | Hint for lookup ensembl names                     |
-| correlation_measure        | t_test/pearson                       | Correlation measure gene prioritization pipeline  |
+| correlation_measure        | t_test/pearson/edgeR* (*FP only)     | Correlation measure gene/feature prioritization pipeline  |
 
 
 

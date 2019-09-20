@@ -1,5 +1,7 @@
 import pandas
+
 import utils.log_util as logger
+from utils.transformation_util import TransformationUtil
 
 
 class CheckUtil:
@@ -167,38 +169,24 @@ class CheckUtil:
     @staticmethod
     def check_phenotype_data(phenotype_df_pxs, correlation_measure):
         """
-        Verifies data value for t-test and pearson separately.
+        Verifies data value for t-test, pearson, and edgeR separately.
 
         Args:
             phenotype_df_pxs: phenotype data
-            correlation_measure: correlation measure: pearson or t-test
+            correlation_measure: correlation measure: pearson, t-test, or edgeR
 
         Returns:
             phenotype_df_pxs: cleaned phenotype data
 
         """
-        if correlation_measure == 't_test':
-            list_values = pandas.unique(phenotype_df_pxs.values.ravel())
-            if len(list_values) < 2:
-                logger.logging.append(
-                    "ERROR: t_test requests at least two categories in your phenotype dataset. "
-                    "Please revise your phenotype data and reupload.")
+        if correlation_measure in ['t_test', 'edgeR']:
+            # force any string phenotypes to lowercase
+            # TODO: do we know where this requirement came from? are we sure we
+            #       want this behavior?
+            TransformationUtil.force_string_columns_to_lowercase(phenotype_df_pxs)
+            phenotype_df_pxs = TransformationUtil.encode_as_binary(phenotype_df_pxs, 2)
+            if phenotype_df_pxs.empty:
                 return None
-
-            for column in phenotype_df_pxs:
-                cur_col = phenotype_df_pxs[[column]].dropna(axis=0)
-
-                if not cur_col.empty:
-                    if cur_col[column].dtype == object:
-                        cur_df_lowercase = cur_col.apply(lambda x: x.astype(str).str.lower())
-                    else:
-                        cur_df_lowercase = cur_col
-
-                    count_values = cur_df_lowercase[column].value_counts()
-                    if count_values[count_values < 2].size > 0:
-                        logger.logging.append(
-                            "ERROR: t_test requires at least two unique values per category in phenotype data.")
-                        return None
 
         if correlation_measure == 'pearson':
             if False in phenotype_df_pxs.applymap(lambda x: isinstance(x, (int, float))):
@@ -208,5 +196,3 @@ class CheckUtil:
                 return None
 
         return phenotype_df_pxs
-
-

@@ -77,6 +77,18 @@ run_feature_prioritization_pipeline_t_test_expand:
 run_feature_prioritization_pipeline_t_test_mixed:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_4_feature_prioritization_pipeline_t_test.yml
 
+run_feature_prioritization_pipeline_edgeR_binary:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_feature_prioritization_pipeline_edgeR.yml
+
+run_feature_prioritization_pipeline_edgeR_replace:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_2_feature_prioritization_pipeline_edgeR.yml
+
+run_feature_prioritization_pipeline_edgeR_expand:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_3_feature_prioritization_pipeline_edgeR.yml
+
+run_feature_prioritization_pipeline_edgeR_mixed:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_4_feature_prioritization_pipeline_edgeR.yml
+
 run_signature_analysis_pipeline:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_signature_analysis_pipeline.yml
 
