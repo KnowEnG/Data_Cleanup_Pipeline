@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
-import utils.log_util as logger
-from utils.spreadsheet import SpreadSheet
+import kndatacleanup.utils.log_util as logger
+from kndatacleanup.utils.spreadsheet import SpreadSheet
 
 
 class TestRemove_na_index(unittest.TestCase):

@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
-from utils.common_util import CommonUtil
-import utils.log_util as logger
+from kndatacleanup.utils.common_util import CommonUtil
+import kndatacleanup.utils.log_util as logger
 
 
 class TestRemove_dataframe_indexer_duplication(unittest.TestCase):

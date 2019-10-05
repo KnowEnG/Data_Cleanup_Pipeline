@@ -3,9 +3,9 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from utils.check_util import CheckUtil
-import utils.log_util as logger
-from utils.transformation_util import TransformationUtil
+from kndatacleanup.utils.check_util import CheckUtil
+import kndatacleanup.utils.log_util as logger
+from kndatacleanup.utils.transformation_util import TransformationUtil
 
 
 class Testcheck_phenotype_data(unittest.TestCase):

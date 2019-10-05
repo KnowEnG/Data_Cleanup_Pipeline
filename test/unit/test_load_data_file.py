@@ -3,8 +3,8 @@ import os
 import pandas as pd
 import numpy.testing as npytest
 import shutil
-from utils.io_util import IOUtil
-import utils.log_util as logger
+from kndatacleanup.utils.io_util import IOUtil
+import kndatacleanup.utils.log_util as logger
 
 
 class TestLoad_data_file(unittest.TestCase):

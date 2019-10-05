@@ -1,8 +1,8 @@
 import unittest
 import pandas as pd
 import numpy.testing as npytest
-from utils.spreadsheet import SpreadSheet
-import utils.log_util as logger
+from kndatacleanup.utils.spreadsheet import SpreadSheet
+import kndatacleanup.utils.log_util as logger
 
 class TestCheck_duplicate_gene_name(unittest.TestCase):
     def setUp(self):

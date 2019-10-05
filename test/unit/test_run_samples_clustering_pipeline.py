@@ -1,7 +1,7 @@
 import unittest
 import os
-import utils.log_util as logger
-from data_cleanup_toolbox import Pipelines
+import kndatacleanup.utils.log_util as logger
+from kndatacleanup.data_cleanup_toolbox import Pipelines
 
 class TestRun_samples_clustering_pipeline(unittest.TestCase):
     def setUp(self):

@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
-from utils.check_util import CheckUtil
-import utils.log_util as logger
+from kndatacleanup.utils.check_util import CheckUtil
+import kndatacleanup.utils.log_util as logger
 
 class TestCheck_user_spreadsheet_data(unittest.TestCase):
     def setUp(self):
