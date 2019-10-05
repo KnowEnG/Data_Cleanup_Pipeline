@@ -1,0 +1,314 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="Pythone">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>kndatacleanup package &#8212; data_cleanup_pipeline 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="kndatacleanup-package">
+<h1>kndatacleanup package<a class="headerlink" href="#kndatacleanup-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="kndatacleanup.utils.html">kndatacleanup.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="kndatacleanup.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kndatacleanup.utils.html#module-kndatacleanup.utils.check_util">kndatacleanup.utils.check_util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kndatacleanup.utils.html#module-kndatacleanup.utils.common_util">kndatacleanup.utils.common_util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kndatacleanup.utils.html#module-kndatacleanup.utils.io_util">kndatacleanup.utils.io_util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kndatacleanup.utils.html#module-kndatacleanup.utils.log_util">kndatacleanup.utils.log_util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kndatacleanup.utils.html#module-kndatacleanup.utils.redis_util">kndatacleanup.utils.redis_util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kndatacleanup.utils.html#module-kndatacleanup.utils.spreadsheet">kndatacleanup.utils.spreadsheet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kndatacleanup.utils.html#module-kndatacleanup.utils.transformation_util">kndatacleanup.utils.transformation_util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kndatacleanup.utils.html#module-kndatacleanup.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-kndatacleanup.data_checker">
+<span id="kndatacleanup-data-checker-module"></span><h2>kndatacleanup.data_checker module<a class="headerlink" href="#module-kndatacleanup.data_checker" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kndatacleanup.data_checker.Checker">
+<em class="property">class </em><code class="descclassname">kndatacleanup.data_checker.</code><code class="descname">Checker</code><span class="sig-paren">(</span><em>run_parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_checker.Checker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="kndatacleanup.data_checker.Checker.check_index_header">
+<em class="property">static </em><code class="descname">check_index_header</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_checker.Checker.check_index_header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.data_checker.Checker.check_values">
+<em class="property">static </em><code class="descname">check_values</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_checker.Checker.check_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.data_checker.Checker.condition_check">
+<code class="descname">condition_check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_checker.Checker.condition_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Customized checks for input data (contains NA value, contains all real number, contains all positive number)
+Args:</p>
+<blockquote>
+<div>dataframe: input DataFrame to be checked
+check_na: check NA in DataFrame
+dropna_colwise: drop column which contains NA
+check_real_number: check only real number exists in DataFrame
+check_positive_number: check only positive number exists in DataFrame</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>dataframe: cleaned DataFrame</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kndatacleanup.data_checker.checker">
+<code class="descclassname">kndatacleanup.data_checker.</code><code class="descname">checker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_checker.checker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-kndatacleanup.data_cleanup">
+<span id="kndatacleanup-data-cleanup-module"></span><h2>kndatacleanup.data_cleanup module<a class="headerlink" href="#module-kndatacleanup.data_cleanup" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="kndatacleanup.data_cleanup.data_cleanup">
+<code class="descclassname">kndatacleanup.data_cleanup.</code><code class="descname">data_cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup.data_cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kndatacleanup.data_cleanup.run_pipelines">
+<code class="descclassname">kndatacleanup.data_cleanup.</code><code class="descname">run_pipelines</code><span class="sig-paren">(</span><em>run_parameters</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup.run_pipelines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-kndatacleanup.data_cleanup_toolbox">
+<span id="kndatacleanup-data-cleanup-toolbox-module"></span><h2>kndatacleanup.data_cleanup_toolbox module<a class="headerlink" href="#module-kndatacleanup.data_cleanup_toolbox" title="Permalink to this headline">¶</a></h2>
+<p>This module serves as a connecting function between front end and back end.
+It validates/cleans the user spreadsheet data and returns a boolean value to
+indicate if the user spreadsheet is valid or not.</p>
+<dl class="class">
+<dt id="kndatacleanup.data_cleanup_toolbox.Pipelines">
+<em class="property">class </em><code class="descclassname">kndatacleanup.data_cleanup_toolbox.</code><code class="descname">Pipelines</code><span class="sig-paren">(</span><em>run_parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup_toolbox.Pipelines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="kndatacleanup.data_cleanup_toolbox.Pipelines.run_feature_prioritization_pipeline">
+<code class="descname">run_feature_prioritization_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup_toolbox.Pipelines.run_feature_prioritization_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run data cleaning for feature prioritization pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>NA.</dd>
+<dt>Returns:</dt>
+<dd>validation_flag: Boolean type value indicating if input data is valid or not.
+message: A message indicates the status of current check.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.data_cleanup_toolbox.Pipelines.run_gene_prioritization_pipeline">
+<code class="descname">run_gene_prioritization_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup_toolbox.Pipelines.run_gene_prioritization_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs data cleaning for gene_prioritization_pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>NA.</dd>
+<dt>Returns:</dt>
+<dd>validation_flag: Boolean type value indicating if input data is valid or not.
+message: A message indicates the status of current check.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.data_cleanup_toolbox.Pipelines.run_general_clustering_pipeline">
+<code class="descname">run_general_clustering_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup_toolbox.Pipelines.run_general_clustering_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs data cleaning for general_clustering_pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>NA.</dd>
+<dt>Returns:</dt>
+<dd>validation_flag: Boolean type value indicating if input data is valid or not.
+message: A message indicates the status of current check.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.data_cleanup_toolbox.Pipelines.run_geneset_characterization_pipeline">
+<code class="descname">run_geneset_characterization_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup_toolbox.Pipelines.run_geneset_characterization_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs data cleaning for geneset_characterization_pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>NA</dd>
+<dt>Returns:</dt>
+<dd>validation_flag: Boolean type value indicating if input data is valid or not.
+message: A message indicates the status of current check.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.data_cleanup_toolbox.Pipelines.run_pasted_gene_set_conversion">
+<code class="descname">run_pasted_gene_set_conversion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup_toolbox.Pipelines.run_pasted_gene_set_conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs data cleaning for pasted_gene_set_conversion.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>NA.</dd>
+<dt>Returns:</dt>
+<dd><blockquote class="first">
+<div>validation_flag: Boolean type value indicating if input data is valid or not.</div></blockquote>
+<p class="last">message: A message indicates the status of current check.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.data_cleanup_toolbox.Pipelines.run_phenotype_prediction_pipeline">
+<code class="descname">run_phenotype_prediction_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup_toolbox.Pipelines.run_phenotype_prediction_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs data cleaning for phenotype_prediction_pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>NA.</dd>
+<dt>Returns:</dt>
+<dd>validation_flag: Boolean type value indicating if input data is valid or not.
+message: A message indicates the status of current check.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.data_cleanup_toolbox.Pipelines.run_samples_clustering_pipeline">
+<code class="descname">run_samples_clustering_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup_toolbox.Pipelines.run_samples_clustering_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs data cleaning for samples_clustering_pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>NA</dd>
+<dt>Returns:</dt>
+<dd>validation_flag: Boolean type value indicating if input data is valid or not.
+message: A message indicates the status of current check.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.data_cleanup_toolbox.Pipelines.run_signature_analysis_pipeline">
+<code class="descname">run_signature_analysis_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup_toolbox.Pipelines.run_signature_analysis_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs data cleaning for signature_analysis_pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>NA.</dd>
+<dt>Returns:</dt>
+<dd>validation_flag: Boolean type value indicating if input data is valid or not.
+message: A message indicates the status of current check.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.data_cleanup_toolbox.Pipelines.run_simplified_inpherno_pipeline">
+<code class="descname">run_simplified_inpherno_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.data_cleanup_toolbox.Pipelines.run_simplified_inpherno_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs data cleaning for simplified_inpherno_pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>NA.</dd>
+<dt>Returns:</dt>
+<dd>validation_flag: Boolean type value indicating if input data is valid or not.
+message: A message indicates the status of current check.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kndatacleanup">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-kndatacleanup" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">data_cleanup_pipeline</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jing Ge.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/kndatacleanup.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

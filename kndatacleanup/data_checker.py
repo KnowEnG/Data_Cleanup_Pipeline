@@ -1,7 +1,7 @@
 import sys
 import pandas
-from utils.io_util import IOUtil
-import utils.log_util as logger
+from .utils.io_util import IOUtil
+from .utils import log_util as logger
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
 
 checks_values = ["contains_na", "check_real_number", "check_integer",

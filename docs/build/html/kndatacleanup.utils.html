@@ -1,0 +1,634 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="Pythone">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>kndatacleanup.utils package &#8212; data_cleanup_pipeline 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="kndatacleanup-utils-package">
+<h1>kndatacleanup.utils package<a class="headerlink" href="#kndatacleanup-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-kndatacleanup.utils.check_util">
+<span id="kndatacleanup-utils-check-util-module"></span><h2>kndatacleanup.utils.check_util module<a class="headerlink" href="#module-kndatacleanup.utils.check_util" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kndatacleanup.utils.check_util.CheckUtil">
+<em class="property">class </em><code class="descclassname">kndatacleanup.utils.check_util.</code><code class="descname">CheckUtil</code><a class="headerlink" href="#kndatacleanup.utils.check_util.CheckUtil" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.check_util.CheckUtil.check_duplicates">
+<em class="property">static </em><code class="descname">check_duplicates</code><span class="sig-paren">(</span><em>dataframe</em>, <em>check_column=False</em>, <em>check_row=False</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.check_util.CheckUtil.check_duplicates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks duplicates on column direction or row direction
+Args:</p>
+<blockquote>
+<div>dataframe: input data frame to be checked
+check_column: boolean value True: check, False: not check
+check_row: boolean value True: check, False: not check</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>NA</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.check_util.CheckUtil.check_intersection_for_phenotype_and_user_spreadsheet">
+<em class="property">static </em><code class="descname">check_intersection_for_phenotype_and_user_spreadsheet</code><span class="sig-paren">(</span><em>dataframe_header</em>, <em>phenotype_df_pxs</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.check_util.CheckUtil.check_intersection_for_phenotype_and_user_spreadsheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks intersection between phenotype data and user spreadsheet on each drug</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe_header: the header of dataframe as a list
+phenotype_df_pxs: phenotype dataframe in phenotype x sample</dd>
+<dt>Returns:</dt>
+<dd>phenotype_df_pxs_trimmed: a trimmed phenotype dataframe</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.check_util.CheckUtil.check_phenotype_data">
+<em class="property">static </em><code class="descname">check_phenotype_data</code><span class="sig-paren">(</span><em>phenotype_df_pxs</em>, <em>correlation_measure</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.check_util.CheckUtil.check_phenotype_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies data value for t-test, pearson, and edgeR separately.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>phenotype_df_pxs: phenotype data
+correlation_measure: correlation measure: pearson, t-test, or edgeR</dd>
+<dt>Returns:</dt>
+<dd>phenotype_df_pxs: cleaned phenotype data</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.check_util.CheckUtil.check_user_spreadsheet_data">
+<em class="property">static </em><code class="descname">check_user_spreadsheet_data</code><span class="sig-paren">(</span><em>dataframe</em>, <em>check_na=False</em>, <em>dropna_colwise=False</em>, <em>check_real_number=False</em>, <em>check_positive_number=False</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.check_util.CheckUtil.check_user_spreadsheet_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Customized checks for input data (contains NA value, contains all real number, contains all positive number)
+Args:</p>
+<blockquote>
+<div>dataframe: input DataFrame to be checked
+check_na: check NA in DataFrame
+dropna_colwise: drop column which contains NA
+check_real_number: check only real number exists in DataFrame
+check_positive_number: check only positive number exists in DataFrame</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>dataframe: cleaned DataFrame</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.check_util.CheckUtil.compare_order">
+<em class="property">static </em><code class="descname">compare_order</code><span class="sig-paren">(</span><em>list_a</em>, <em>list_b</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.check_util.CheckUtil.compare_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the input two lists are the same, including order.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>list_a: list a
+list_b: list b</dd>
+<dt>Returns:</dt>
+<dd>True: list a and b are exactly the same
+False: list a and b are not same</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.check_util.CheckUtil.find_intersection">
+<em class="property">static </em><code class="descname">find_intersection</code><span class="sig-paren">(</span><em>list_a</em>, <em>list_b</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.check_util.CheckUtil.find_intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find intersection between list_a, list_b
+Args:</p>
+<blockquote>
+<div>list_a: list a
+list_b: list b</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>intersection: the intersection</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kndatacleanup.utils.common_util">
+<span id="kndatacleanup-utils-common-util-module"></span><h2>kndatacleanup.utils.common_util module<a class="headerlink" href="#module-kndatacleanup.utils.common_util" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kndatacleanup.utils.common_util.CommonUtil">
+<em class="property">class </em><code class="descclassname">kndatacleanup.utils.common_util.</code><code class="descname">CommonUtil</code><a class="headerlink" href="#kndatacleanup.utils.common_util.CommonUtil" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.common_util.CommonUtil.check_network_data_intersection">
+<em class="property">static </em><code class="descname">check_network_data_intersection</code><span class="sig-paren">(</span><em>list_of_genes</em>, <em>run_parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.common_util.CommonUtil.check_network_data_intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks intersection of genes between network data and input list
+Args:</p>
+<blockquote>
+<div>list_of_genes: user input genes list
+run_parameters: configuration file</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>True/False indicating if an intersection is discovered</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.common_util.CommonUtil.check_phenotype_intersection">
+<em class="property">static </em><code class="descname">check_phenotype_intersection</code><span class="sig-paren">(</span><em>phenotype_df</em>, <em>user_spreadsheet_df_header</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.common_util.CommonUtil.check_phenotype_intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pre-processing phenotype data. This includes checking for na index, duplicate column name and row name.
+Args:</p>
+<blockquote>
+<div>phenotype_df: input phenotype dataframe to be checked</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>phenotype_df_genename_dedup: cleaned phenotype dataframe</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.common_util.CommonUtil.validate_inputs_for_gp_fp">
+<em class="property">static </em><code class="descname">validate_inputs_for_gp_fp</code><span class="sig-paren">(</span><em>user_spreadsheet_df</em>, <em>phenotype_df</em>, <em>correlation_measure</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.common_util.CommonUtil.validate_inputs_for_gp_fp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input data check for Gene_Prioritization_Pipeline/Feature_Prioritization_Pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>run_parameters: input configuration table</dd>
+<dt>Returns:</dt>
+<dd>user_spreadsheet_df_dropna: cleaned user spreadsheet
+phenotype_df_pxs: phenotype data</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kndatacleanup.utils.io_util">
+<span id="kndatacleanup-utils-io-util-module"></span><h2>kndatacleanup.utils.io_util module<a class="headerlink" href="#module-kndatacleanup.utils.io_util" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kndatacleanup.utils.io_util.IOUtil">
+<em class="property">class </em><code class="descclassname">kndatacleanup.utils.io_util.</code><code class="descname">IOUtil</code><a class="headerlink" href="#kndatacleanup.utils.io_util.IOUtil" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.io_util.IOUtil.load_data_file_default">
+<em class="property">static </em><code class="descname">load_data_file_default</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.io_util.IOUtil.load_data_file_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads data file as a DataFrame object.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>file_path: input file, which is uploaded from frontend</dd>
+<dt>Returns:</dt>
+<dd>input_df: user input as a DataFrame, which doesn't have empty line</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.io_util.IOUtil.load_data_file_single_column_no_header">
+<em class="property">static </em><code class="descname">load_data_file_single_column_no_header</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.io_util.IOUtil.load_data_file_single_column_no_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads data file with only single column without header included as a DataFrame object.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>file_path:</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.io_util.IOUtil.load_data_file_wo_empty_line">
+<em class="property">static </em><code class="descname">load_data_file_wo_empty_line</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.io_util.IOUtil.load_data_file_wo_empty_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads data file as a DataFrame object and removes empty line by a given file path.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>file_path: input file, which is uploaded from frontend</dd>
+<dt>Returns:</dt>
+<dd>input_df_wo_empty_ln: user input as a DataFrame, which doesn't have empty line</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.io_util.IOUtil.write_to_file">
+<em class="property">static </em><code class="descname">write_to_file</code><span class="sig-paren">(</span><em>target_file</em>, <em>target_path</em>, <em>result_directory</em>, <em>suffix</em>, <em>use_index=True</em>, <em>use_header=True</em>, <em>na_rep=''</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.io_util.IOUtil.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write to a csv file.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>target_file: the file which will be write to disk
+target_path: the location the target_file which will be written to
+result_directory: target_file directory
+suffix: output file suffix</dd>
+<dt>Returns:</dt>
+<dd>NA</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kndatacleanup.utils.log_util">
+<span id="kndatacleanup-utils-log-util-module"></span><h2>kndatacleanup.utils.log_util module<a class="headerlink" href="#module-kndatacleanup.utils.log_util" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="kndatacleanup.utils.log_util.generate_logging">
+<code class="descclassname">kndatacleanup.utils.log_util.</code><code class="descname">generate_logging</code><span class="sig-paren">(</span><em>flag</em>, <em>message</em>, <em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.log_util.generate_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates logger.logging file
+Args:</p>
+<blockquote>
+<div>flag: a boolean value indicating if the current run is succeeded or not.
+message: a list of error message
+path: log file location</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>NA</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="kndatacleanup.utils.log_util.init">
+<code class="descclassname">kndatacleanup.utils.log_util.</code><code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.log_util.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-kndatacleanup.utils.redis_util">
+<span id="kndatacleanup-utils-redis-util-module"></span><h2>kndatacleanup.utils.redis_util module<a class="headerlink" href="#module-kndatacleanup.utils.redis_util" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kndatacleanup.utils.redis_util.RedisUtil">
+<em class="property">class </em><code class="descclassname">kndatacleanup.utils.redis_util.</code><code class="descname">RedisUtil</code><span class="sig-paren">(</span><em>credential</em>, <em>source_hint</em>, <em>taxonid</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.redis_util.RedisUtil" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="kndatacleanup.utils.redis_util.RedisUtil.conv_gene">
+<code class="descname">conv_gene</code><span class="sig-paren">(</span><em>fk_array</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.redis_util.RedisUtil.conv_gene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the redis database to convert a gene to ensembl stable id
+This checks first if there is a unique name for the provided foreign key.
+If not it uses the hint and taxid to try and filter the foreign key
+possiblities to find a matching stable id.
+Args:</p>
+<blockquote>
+<div>fk_array (list): the foreign gene identifers to be translated
+hint (str): a hint for conversion
+taxid (str): the species taxid, 'unknown' if unknown</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>str: result of searching for gene in redis DB</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.utils.redis_util.RedisUtil.get_node_info">
+<code class="descname">get_node_info</code><span class="sig-paren">(</span><em>fk_array</em>, <em>ntype</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.redis_util.RedisUtil.get_node_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the redis database to convert a node alias to KN internal id
+Figures out the type of node for each id in fk_array and then returns
+all of the metadata associated or unmapped-*
+Args:</p>
+<blockquote>
+<div>fk_array (list): the array of foreign gene identifers to be translated
+ntype (str): 'Gene' or 'Property' or None
+hint (str): a hint for conversion
+taxid (str): the species taxid, None if unknown</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>list: list of lists containing 5 col info for each mapped gene</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="kndatacleanup.utils.redis_util.RedisUtil.node_desc">
+<code class="descname">node_desc</code><span class="sig-paren">(</span><em>stable_array</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.redis_util.RedisUtil.node_desc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the redis database to find metadata about node given its stable id
+Return all metadata for each element of stable_array
+Args:</p>
+<blockquote>
+<div>stable_array (str): the array of stable identifers to be searched</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>list: list of lists containing 4 col info for each mapped node</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kndatacleanup.utils.spreadsheet">
+<span id="kndatacleanup-utils-spreadsheet-module"></span><h2>kndatacleanup.utils.spreadsheet module<a class="headerlink" href="#module-kndatacleanup.utils.spreadsheet" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet">
+<em class="property">class </em><code class="descclassname">kndatacleanup.utils.spreadsheet.</code><code class="descname">SpreadSheet</code><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet.check_unique_values">
+<em class="property">static </em><code class="descname">check_unique_values</code><span class="sig-paren">(</span><em>dataframe</em>, <em>cnt=0</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet.check_unique_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks unique values count per column in the input dataframe no less than the cnt value
+Args:</p>
+<blockquote>
+<div>dataframe:
+cnt:</div></blockquote>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet.check_user_spreadsheet_data">
+<em class="property">static </em><code class="descname">check_user_spreadsheet_data</code><span class="sig-paren">(</span><em>dataframe</em>, <em>check_na=False</em>, <em>dropna_colwise=False</em>, <em>check_real_number=False</em>, <em>check_positive_number=False</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet.check_user_spreadsheet_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Customized checks for input data (contains NA value, contains all real number, contains all positive number)
+Args:</p>
+<blockquote>
+<div>dataframe: input DataFrame to be checked
+check_na: check NA in DataFrame
+dropna_colwise: drop column which contains NA
+check_real_number: check only real number exists in DataFrame
+check_positive_number: check only positive number exists in DataFrame</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>dataframe: cleaned DataFrame</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet.impute_na">
+<em class="property">static </em><code class="descname">impute_na</code><span class="sig-paren">(</span><em>dataframe</em>, <em>option='reject'</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet.impute_na" title="Permalink to this definition">¶</a></dt>
+<dd><p>Impute NA value based on options user selected
+Args:</p>
+<blockquote>
+<div><p>dataframe: the dataframe to be imputed
+option:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>reject(default value): reject spreadsheet if we found NA</li>
+<li>remove: remove Nan row</li>
+<li>average: replace Nan value with row mean</li>
+</ol>
+</div></blockquote>
+</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>dataframe</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet.map_ensemble_gene_name">
+<em class="property">static </em><code class="descname">map_ensemble_gene_name</code><span class="sig-paren">(</span><em>dataframe</em>, <em>run_parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet.map_ensemble_gene_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the gene name follows ensemble format.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe: input DataFrame
+run_parameters: user configuration from run_file</dd>
+<dt>Returns:</dt>
+<dd>output_df_mapped_dedup: cleaned DataFrame</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet.remove_dataframe_indexer_duplication">
+<em class="property">static </em><code class="descname">remove_dataframe_indexer_duplication</code><span class="sig-paren">(</span><em>input_dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet.remove_dataframe_indexer_duplication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the validity of user input spreadsheet data file, including duplication and nan</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>input_dataframe: user spreadsheet input file DataFrame, which is uploaded from frontend
+run_parameters: run_file parameter dictionary</dd>
+<dt>Returns:</dt>
+<dd>flag: Boolean value indicates the status of current check
+message: A message indicates the status of current check</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet.remove_duplicate_column_name">
+<em class="property">static </em><code class="descname">remove_duplicate_column_name</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet.remove_duplicate_column_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks duplicate column names and rejects it if it exists</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe: input dataframe to be checked</dd>
+<dt>Returns:</dt>
+<dd>user_spreadsheet_df_genename_dedup.T: a DataFrame in original format
+ret_msg: error message</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet.remove_duplicate_row_name">
+<em class="property">static </em><code class="descname">remove_duplicate_row_name</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet.remove_duplicate_row_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks duplication on gene name and rejects it if it exists.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe: input DataFrame</dd>
+<dt>Returns:</dt>
+<dd>dataframe_genename_dedup: a DataFrame in original format
+ret_msg: error message</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet.remove_empty_row">
+<em class="property">static </em><code class="descname">remove_empty_row</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet.remove_empty_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove empty rows in a dataframe
+Args:</p>
+<blockquote>
+<div>dataframe: input dataframe</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>a dataframe without empty line</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet.remove_na_header">
+<em class="property">static </em><code class="descname">remove_na_header</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet.remove_na_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove NA in header</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe: input DataFrame</dd>
+<dt>Returns:</dt>
+<dd>dataframe: with not null header selected</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.spreadsheet.SpreadSheet.remove_na_index">
+<em class="property">static </em><code class="descname">remove_na_index</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.spreadsheet.SpreadSheet.remove_na_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove rows contains NA as index.
+Args:</p>
+<blockquote>
+<div>dataframe: input dataframe to be cleaned</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>dataframe_rm_na_idx: a cleaned dataframe</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kndatacleanup.utils.transformation_util">
+<span id="kndatacleanup-utils-transformation-util-module"></span><h2>kndatacleanup.utils.transformation_util module<a class="headerlink" href="#module-kndatacleanup.utils.transformation_util" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kndatacleanup.utils.transformation_util.TransformationUtil">
+<em class="property">class </em><code class="descclassname">kndatacleanup.utils.transformation_util.</code><code class="descname">TransformationUtil</code><a class="headerlink" href="#kndatacleanup.utils.transformation_util.TransformationUtil" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="kndatacleanup.utils.transformation_util.TransformationUtil.converting_message">
+<code class="descname">converting_message</code><em class="property"> = &lt;string.Template object&gt;</em><a class="headerlink" href="#kndatacleanup.utils.transformation_util.TransformationUtil.converting_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.transformation_util.TransformationUtil.encode_as_binary">
+<em class="property">static </em><code class="descname">encode_as_binary</code><span class="sig-paren">(</span><em>input_df</em>, <em>min_num_samples</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.transformation_util.TransformationUtil.encode_as_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts each column of the input dataframe to binary encoding. Intended
+for use with dataframes whose columns are binary or categorical, but it
+will not throw an exception if given numeric or free-text data; such columns
+will usually be excluded from the output due to the <cite>min_num_samples</cite>
+filtering.</p>
+<p>For each column, let <cite>num_distinct_values</cite> be the number of distinct values,
+excluding NA, in the column.
+- If <cite>num_distinct_values</cite> &lt; 2, drop the column from the output.
+- If <cite>num_distinct_values</cite> == 2 and the two distinct values are 0 and 1,</p>
+<blockquote>
+<div>leave the column unchanged in the output.</div></blockquote>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>If <cite>num_distinct_values</cite> == 2 and the two distinct values are not 0 and 1,</dt>
+<dd>convert the column for the output as follows: Replace all instances
+of one of the distinct values with 0 and replace all instances of the
+other distinct value with 1. Any missing values will remain unchanged.
+Edit the column name to indicate which of the original values is now
+represented by 1.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>If <cite>num_distinct_values</cite> &gt; 2, expand the column into <cite>num_distinct_values</cite></dt>
+<dd>indicator columns in the output; any NAs will be preserved</dd>
+</dl>
+</li>
+</ul>
+<p>Finally, for each of the binary columns present at the end of the above
+procedure, count the number of samples having value 0 and the number of
+samples having value 1. If either of those counts is less than <cite>min_num_samples</cite>,
+drop the column from the output.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">input_df (pandas.DataFrame): the dataframe to process.
+min_num_samples (int): the minimum number of samples that must have value 0</p>
+<blockquote class="last">
+<div>and that must have value 1 in each of the output columns.</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>pandas.DataFrame: a new dataframe derived from the input as described.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="kndatacleanup.utils.transformation_util.TransformationUtil.expanding_message">
+<code class="descname">expanding_message</code><em class="property"> = &lt;string.Template object&gt;</em><a class="headerlink" href="#kndatacleanup.utils.transformation_util.TransformationUtil.expanding_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="kndatacleanup.utils.transformation_util.TransformationUtil.force_string_columns_to_lowercase">
+<em class="property">static </em><code class="descname">force_string_columns_to_lowercase</code><span class="sig-paren">(</span><em>in_out_df</em><span class="sig-paren">)</span><a class="headerlink" href="#kndatacleanup.utils.transformation_util.TransformationUtil.force_string_columns_to_lowercase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a dataframe, forces any columns of strings to be entirely lowercase.
+The change will be made <em>in place</em>; i.e., the input dataframe will be
+modified and returned as the output dataframe.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>in_out_df: dataframe to process.</dd>
+<dt>Returns:</dt>
+<dd>in_out_df: the input dataframe, now modified.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="kndatacleanup.utils.transformation_util.TransformationUtil.too_few_distinct_values_message">
+<code class="descname">too_few_distinct_values_message</code><em class="property"> = &lt;string.Template object&gt;</em><a class="headerlink" href="#kndatacleanup.utils.transformation_util.TransformationUtil.too_few_distinct_values_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kndatacleanup.utils.transformation_util.TransformationUtil.too_few_samples_message">
+<code class="descname">too_few_samples_message</code><em class="property"> = &lt;string.Template object&gt;</em><a class="headerlink" href="#kndatacleanup.utils.transformation_util.TransformationUtil.too_few_samples_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kndatacleanup.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-kndatacleanup.utils" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">data_cleanup_pipeline</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jing Ge.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/kndatacleanup.utils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

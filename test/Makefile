@@ -1,12 +1,13 @@
 # ----------------------------------------------------------------
 # Variables setup Section                                        -
 # ----------------------------------------------------------------
-SCRIPT =        ../src/data_cleanup.py
-STATIS =        ../src/data_checker.py
+SCRIPT =        -m kndatacleanup.data_cleanup
+STATIS =        -m kndatacleanup.data_checker
 RUN_DIR =       ./run_dir
 DATA_DIR =      ../data/spreadsheets
 RESULTS_DIR =   $(RUN_DIR)/results
 RUN_FILES_DIR = ../data/run_files
+PYTHONPATH =    ../kndatacleanup
 
 RMR =           rm -rf
 GZIP =          gzip
@@ -39,7 +40,7 @@ run_pasted_gene_set_conversion:
 # Small Benchmarks RUN Section                                   -
 # ----------------------------------------------------------------
 run_data_checker:
-	python3 ../src/data_checker.py -run_directory $(RUN_DIR) -run_file TEST_1_data_cleanup.yml
+	python3 ${STATIS} -run_directory $(RUN_DIR) -run_file TEST_1_data_cleanup.yml
 
 run_data_cleaning_small:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file TEST_1_data_cleanup.yml

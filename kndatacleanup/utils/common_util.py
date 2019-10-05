@@ -1,6 +1,6 @@
-import utils.log_util as logger
-from utils.check_util import CheckUtil
-from utils.spreadsheet import SpreadSheet
+from . import log_util as logger
+from .check_util import CheckUtil
+from .spreadsheet import SpreadSheet
 
 
 class CommonUtil:

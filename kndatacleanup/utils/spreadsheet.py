@@ -1,6 +1,6 @@
 import pandas
-import utils.log_util as logger
-from utils.redis_util import RedisUtil
+from . import log_util as logger
+from .redis_util import RedisUtil
 
 
 class SpreadSheet:

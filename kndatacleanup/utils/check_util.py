@@ -1,7 +1,7 @@
 import pandas
 
-import utils.log_util as logger
-from utils.transformation_util import TransformationUtil
+from . import log_util as logger
+from .transformation_util import TransformationUtil
 
 
 class CheckUtil:

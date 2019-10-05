@@ -1,7 +1,7 @@
 import os
 import pandas
-import utils.log_util as logger
-from utils.spreadsheet import SpreadSheet
+from . import log_util as logger
+from .spreadsheet import SpreadSheet
 
 class IOUtil:
     @staticmethod

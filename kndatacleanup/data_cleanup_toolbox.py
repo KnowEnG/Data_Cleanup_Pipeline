@@ -4,12 +4,12 @@
     indicate if the user spreadsheet is valid or not. 
 """
 import pandas
-import utils.log_util as logger
-from utils.io_util import IOUtil
-from utils.check_util import CheckUtil
-from utils.transformation_util import TransformationUtil
-from utils.common_util import CommonUtil
-from utils.spreadsheet import SpreadSheet
+from .utils import log_util as logger
+from .utils.io_util import IOUtil
+from .utils.check_util import CheckUtil
+from .utils.transformation_util import TransformationUtil
+from .utils.common_util import CommonUtil
+from .utils.spreadsheet import SpreadSheet
 
 
 class Pipelines:
@@ -324,7 +324,7 @@ class Pipelines:
             message: A message indicates the status of current check.
 
         """
-        from utils.redis_util import RedisUtil
+        from .utils.redis_util import RedisUtil
 
         # Gets redis database instance by its credential
         redis_db = RedisUtil(self.run_parameters['redis_credential'],

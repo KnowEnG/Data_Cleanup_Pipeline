@@ -264,12 +264,12 @@ set the spreadsheet, and drug_response (phenotype data) file names to point to y
 
   * Update PYTHONPATH enviroment variable
    ``` 
-   export PYTHONPATH='../src':$PYTHONPATH    
+   export PYTHONPATH='../kndatacleanup':$PYTHONPATH    
    ```
    
   * Run (these relative paths assume you are in the test directory with setup as described above)
    ```
-  python3 ../src/data_cleanup.py -run_directory ./run_dir -run_file TEMPLATE_data_cleanup.yml
+  python3 -m kndatacleanup.data_cleanup -run_directory ./run_dir -run_file TEMPLATE_data_cleanup.yml
    ```
 
 * * * 

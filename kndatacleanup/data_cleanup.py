@@ -1,7 +1,7 @@
 import sys
-import utils.log_util as logger
+from .utils import log_util as logger
 from knpackage.toolbox import get_run_parameters, get_run_directory_and_file
-from data_cleanup_toolbox import Pipelines
+from .data_cleanup_toolbox import Pipelines
 
 SELECT = {
     "samples_clustering_pipeline": "run_samples_clustering_pipeline",
