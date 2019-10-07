@@ -8,5 +8,5 @@ setup(
     author='KnowEnG Dev',
     author_email='knowengdev@gmail.com',
     license='University of Illinois Board of Trustees',
-    packages=['kndatacleanup'],
+    packages=['kndatacleanup', 'kndatacleanup.utils'],
     zip_safe=False)
