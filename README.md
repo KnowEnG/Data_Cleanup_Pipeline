@@ -74,7 +74,7 @@ This pipeline **cleanup** the data of a given spreadsheet for subsequent process
 ### general_clustering_pipeline
   *After removing empty rows and columns for user spreadsheet data, check :*
   1.  if spreadsheet contains NaN value/s, drop the corresponding columns.
-  2.  if spreadsheet contains only real, positive values, accept. If not, reject.
+  2.  if spreadsheet contains only real, values, accept. If not, reject.
   3. if spreadsheet contains NaN value in gene name, remove corresponding rows.
   4. if spreadsheet contains NaN value in header, remove corresponding columns. 
   5. if spreadsheet contains duplicate row names, remove duplicate rows.
