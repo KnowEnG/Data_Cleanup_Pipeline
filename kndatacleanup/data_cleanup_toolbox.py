@@ -284,7 +284,7 @@ class Pipelines:
         user_spreadsheet_df_val_check = SpreadSheet.check_user_spreadsheet_data(self.user_spreadsheet_df,
                                                                                 dropna_colwise=True,
                                                                                 check_real_number=True,
-                                                                                check_positive_number=True)
+                                                                                check_positive_number=False)
         if user_spreadsheet_df_val_check is None:
             return False, logger.logging
 
