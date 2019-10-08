@@ -1,3 +1,5 @@
+logging = []
+
 def init():
     global logging
     logging = []
