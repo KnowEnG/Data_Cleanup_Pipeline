@@ -53,7 +53,7 @@ class CheckUtil:
         # loop through phenotype (phenotype x sample) to check header intersection between phenotype and spreadsheet
         for column in range(0, len(phenotype_df_pxs.columns)):
             # drops columns with NA value in phenotype dataframe
-            phenotype_df_sxp = phenotype_df_pxs.ix[:, column].to_frame().dropna(axis=0)
+            phenotype_df_sxp = phenotype_df_pxs.iloc[:, column].to_frame().dropna(axis=0)
             phenotype_index = list(phenotype_df_sxp.index.values)
             # finds common headers
             common_headers = set(phenotype_index) & set(dataframe_header)
