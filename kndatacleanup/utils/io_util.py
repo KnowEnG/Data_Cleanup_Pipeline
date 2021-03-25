@@ -51,7 +51,7 @@ class IOUtil:
             # loads input data
             input_df = pandas.read_csv(file_path, sep='\t', skiprows=[0], index_col=0, header=None,
                                        error_bad_lines=False, warn_bad_lines=True)
-            del input_df.index.name
+            input_df.index.name = None # newer versions of pandas won't allow `del` for this operation
             # reassigns the new_header to input_df
             input_df.columns = new_header
 
