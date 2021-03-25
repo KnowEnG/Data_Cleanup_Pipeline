@@ -384,7 +384,7 @@ class Pipelines:
         universal_genes_df.loc[common_idx] = 1
         # names the column of universal_genes_df to be 'uploaded_gene_set'
         universal_genes_df.columns = ['uploaded_gene_set']
-        del universal_genes_df.index.name
+        universal_genes_df.index.name = None # newer versions of pandas won't allow `del` for this operation
 
         # outputs final results
         IOUtil.write_to_file(mapped_small_genes_df, self.run_parameters['pasted_gene_list_full_path'],
